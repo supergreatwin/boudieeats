@@ -1,6 +1,9 @@
 name: Publish BoudieEats
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
