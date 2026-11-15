@@ -1,0 +1,54 @@
+name: Publish BoudieEats
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Extract the Astro project
+        run: tar -xzf boudieeats-source.tar.gz
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: boudieeats/.node-version
+          cache: npm
+          cache-dependency-path: boudieeats/package-lock.json
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        id: pages
+      - name: Install dependencies
+        run: npm ci
+        working-directory: boudieeats
+      - name: Build the site
+        run: npm run build
+        working-directory: boudieeats
+        env:
+          ASTRO_TELEMETRY_DISABLED: '1'
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+          SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          PUBLIC_INDEXABLE: 'true'
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: boudieeats/dist
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
