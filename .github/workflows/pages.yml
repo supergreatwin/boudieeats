@@ -40,6 +40,31 @@ jobs:
               path.write_text(current.replace(old_line, new_line, 1), encoding="utf-8")
               print(f"Updated {filename}: {corrected}")
           PY
+      - name: Inspect editorial content layout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path("boudieeats/src")
+          print("===== EDITORIAL FILE PATHS =====")
+          for p in sorted(root.rglob("*")):
+              if p.is_file() and ("/content/" in str(p) or "/pages/" in str(p)):
+                  print(p)
+          print("===== EDITORIAL SOURCE SAMPLES =====")
+          files = [
+              root/"content/reviews/takeaway-bowls.md",
+              root/"content/reviews/cafe-iced-coffee.md",
+              root/"content/reviews/cafe-hot-coffee.md",
+              root/"content/config.ts",
+              root/"content.config.ts",
+          ]
+          for sub in ("stories", "articles", "journal"):
+              folder = root/"content"/sub
+              if folder.exists(): files.extend(list(sorted(folder.glob("*.md")))[:2])
+          for p in files:
+              if p.exists():
+                  print(f"===== FILE {p} =====")
+                  print(p.read_text(encoding="utf-8")[:7000])
+          PY
       - uses: actions/setup-node@v6
         with:
           node-version-file: boudieeats/.node-version
