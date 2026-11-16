@@ -20,12 +20,26 @@ jobs:
       - uses: actions/checkout@v6
       - name: Extract the Astro project
         run: tar -xzf boudieeats-source.tar.gz
-      - name: Inspect existing restaurant review metadata
+      - name: Correct restaurant and café review titles
         run: |
-          for file in boudieeats/src/content/reviews/*.md; do
-            echo "=== FILE: $file ==="
-            sed -n '1,70p' "$file"
-          done
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path("boudieeats/src/content/reviews")
+          updates = {
+              "takeaway-bowls.md": ("تيك أواي في العربية", "فول طبالي"),
+              "cafe-iced-coffee.md": ("قهوة ساقعة جنب الشباك", "آيسد كوفي سيلانترو"),
+              "cafe-hot-coffee.md": ("فنجان قهوة في الكافيه", "فلات وايت La Mie"),
+          }
+          for filename, (previous, corrected) in updates.items():
+              path = root / filename
+              current = path.read_text(encoding="utf-8")
+              old_line = f'title: "{previous}"'
+              new_line = f'title: "{corrected}"'
+              if current.count(old_line) != 1:
+                  raise RuntimeError(f"Unexpected title in {path}")
+              path.write_text(current.replace(old_line, new_line, 1), encoding="utf-8")
+              print(f"Updated {filename}: {corrected}")
+          PY
       - uses: actions/setup-node@v6
         with:
           node-version-file: boudieeats/.node-version
