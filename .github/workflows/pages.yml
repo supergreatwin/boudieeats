@@ -40,31 +40,11 @@ jobs:
               path.write_text(current.replace(old_line, new_line, 1), encoding="utf-8")
               print(f"Updated {filename}: {corrected}")
           PY
-      - name: Inspect editorial content layout
+      - name: Publish reviewed Boudie Eats articles
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          root = Path("boudieeats/src")
-          print("===== EDITORIAL FILE PATHS =====")
-          for p in sorted(root.rglob("*")):
-              if p.is_file() and ("/content/" in str(p) or "/pages/" in str(p)):
-                  print(p)
-          print("===== EDITORIAL SOURCE SAMPLES =====")
-          files = [
-              root/"content/reviews/takeaway-bowls.md",
-              root/"content/reviews/cafe-iced-coffee.md",
-              root/"content/reviews/cafe-hot-coffee.md",
-              root/"content/config.ts",
-              root/"content.config.ts",
-          ]
-          for sub in ("stories", "articles", "journal"):
-              folder = root/"content"/sub
-              if folder.exists(): files.extend(list(sorted(folder.glob("*.md")))[:2])
-          for p in files:
-              if p.exists():
-                  print(f"===== FILE {p} =====")
-                  print(p.read_text(encoding="utf-8")[:7000])
-          PY
+          cp editorial/reviews/takeaway-bowls.md boudieeats/src/content/reviews/takeaway-bowls.md
+          cp editorial/reviews/cafe-iced-coffee.md boudieeats/src/content/reviews/cafe-iced-coffee.md
+          cp editorial/stories/cilantro-betna-el-tany.md boudieeats/src/content/stories/cilantro-betna-el-tany.md
       - uses: actions/setup-node@v6
         with:
           node-version-file: boudieeats/.node-version
@@ -84,6 +64,14 @@ jobs:
           SITE_URL: ${{ steps.pages.outputs.origin }}
           SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           PUBLIC_INDEXABLE: 'true'
+      - name: Verify published article pages
+        run: |
+          test -s boudieeats/dist/reviews/takeaway-bowls/index.html
+          test -s boudieeats/dist/reviews/cafe-iced-coffee/index.html
+          test -s boudieeats/dist/stories/cilantro-betna-el-tany/index.html
+          grep -q 'الفطار المصري' boudieeats/dist/reviews/takeaway-bowls/index.html
+          grep -q 'أربع سنين' boudieeats/dist/reviews/cafe-iced-coffee/index.html
+          grep -q 'بيتنا التاني' boudieeats/dist/stories/cilantro-betna-el-tany/index.html
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist
