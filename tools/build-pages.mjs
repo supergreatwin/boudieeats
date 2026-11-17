@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { alignSearchUrls } from './search-urls.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -34,6 +35,13 @@ const env = {
 };
 execFileSync('npm', ['ci'], { cwd: project, env, stdio: 'inherit' });
 execFileSync('npm', ['run', 'build'], { cwd: project, env, stdio: 'inherit' });
+
+alignSearchUrls({
+  directory: join(project, 'dist'),
+  deployed: new URL((env.SITE_BASE_PATH.replace(/\/?$/, '/')), site),
+  canonical: new URL('https://boudieeats.pages.dev/'),
+  indexable: env.PUBLIC_INDEXABLE === 'true',
+});
 
 // Publish Google Search Console verification at the Cloudflare site root.
 const verificationFile = 'google7cba358329a08d09.html';
