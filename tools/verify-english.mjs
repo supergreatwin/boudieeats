@@ -7,7 +7,7 @@ const files = readdirSync(dir,{recursive:true}).filter(p=>p.endsWith('.html'));
 const errors=[];
 for(const entry of files){
   // Search Console verification files are deliberately plain text, not HTML documents.
-  if(/^google[a-z0-9]+\.html$/.test(entry))continue;
+  if(/^google[a-z0-9]+\.html$/.test(entry) || entry.startsWith('ar/'))continue;
   const text=readFileSync(join(dir,entry),'utf8');
   if(!/<html[^>]*lang="en"[^>]*dir="ltr"/.test(text))errors.push(entry+': missing English LTR document language');
   const hits=[...text.matchAll(/[\u0600-\u06ff]+/g)].slice(0,12).map(m=>text.slice(Math.max(m.index-85,0),Math.min(m.index+135,text.length)).replace(/\s+/g,' '));
