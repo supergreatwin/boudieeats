@@ -29,6 +29,8 @@ jobs:
         env:
           SITE_URL: https://boudieeats.pages.dev
           SITE_BASE_PATH: /
+      - name: Verify every page is English
+        run: node tools/verify-english.mjs
       - name: Check public pages, privacy and links
         run: |
           test -f boudieeats/dist/reader-responses/index.html
