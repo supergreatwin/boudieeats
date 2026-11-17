@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { alignSearchUrls } from './search-urls.mjs';
 import { addEngagementPages } from './engagement-pages.mjs';
+import { localizeSource } from './localize-source.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -26,6 +27,9 @@ writeFileSync(coffee, current.replace(oldTitle, 'title: "فلات وايت La Mi
 for (const path of ['reviews/takeaway-bowls.md', 'reviews/cafe-iced-coffee.md', 'stories/cilantro-betna-el-tany.md']) {
   copyFileSync(join(root, 'editorial', path), join(content, path));
 }
+
+// Localize the compiled source before Astro generates any pages.
+localizeSource(project);
 
 const env = {
   ...process.env,
@@ -54,9 +58,9 @@ const verificationFile = 'google7cba358329a08d09.html';
 copyFileSync(join(root, verificationFile), join(project, 'dist', verificationFile));
 
 for (const [path, expected] of [
-  ['reviews/takeaway-bowls', 'الفطار المصري'],
-  ['reviews/cafe-iced-coffee', 'أربع سنين'],
-  ['stories/cilantro-betna-el-tany', 'بيتنا التاني'],
+  ['reviews/takeaway-bowls', 'Egyptian Breakfast'],
+  ['reviews/cafe-iced-coffee', 'Four Years'],
+  ['stories/cilantro-betna-el-tany', 'Our Second Home'],
 ]) {
   const file = join(project, 'dist', path, 'index.html');
   if (!existsSync(file) || !readFileSync(file, 'utf8').includes(expected)) {
