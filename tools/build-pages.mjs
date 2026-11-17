@@ -8,6 +8,7 @@ import { addEngagementPages } from './engagement-pages.mjs';
 import { localizeSource } from './localize-source.mjs';
 import { restoreArabicVisitorPages, finishLanguageLinks } from './bilingual-pages.mjs';
 import { addAccountPages } from './account-pages.mjs';
+import { bePublicConfig } from './be-public-config.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -97,8 +98,8 @@ cpSync(arabicBackup, join(dist, 'ar'), { recursive: true });
 addAccountPages({
   directory: dist,
   basePath: originalBase,
-  supabaseUrl: process.env.BE_SUPABASE_URL || '',
-  supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || '',
+  supabaseUrl: process.env.BE_SUPABASE_URL || bePublicConfig.url,
+  supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey,
 });
 finishLanguageLinks({ directory: dist, basePath: originalBase });
 

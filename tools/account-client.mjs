@@ -141,11 +141,29 @@ async function loadProfile(){
  const {data,error:loadError}=await client.from('be_profiles').select('id,username,display_name,bio,role').eq('id',user.id).single();
  if(loadError){profile=null;say(tr('Your profile is unavailable. Please contact the editor.','ملفك الشخصي مش متاح دلوقتي. تواصل مع التحرير.')+' '+loadError.message,true);return;}
  profile=data;
+ // Initial profile preferences are only display data. Never trust user metadata for roles.
+ const initial={};
  if(!profile.username&&user.user_metadata?.requested_username){
    const username=String(user.user_metadata.requested_username).toLowerCase();
-   if(/^[a-z][a-z0-9_]{2,23}$/.test(username)){
-    const {data:saved}=await client.from('be_profiles').update({username}).eq('id',user.id).select('username').maybeSingle();
-    if(saved)profile.username=saved.username;
+   if(/^[a-z][a-z0-9_]{2,23}$/.test(username))initial.username=username;
+ }
+ if(!profile.display_name&&user.user_metadata?.display_name){
+   initial.display_name=String(user.user_metadata.display_name).slice(0,80);
+ }
+ if(Object.keys(initial).length){
+   const {data:saved,error:saveError}=await client.from('be_profiles')
+     .update(initial).eq('id',user.id)
+     .select('id,username,display_name,bio,role').maybeSingle();
+   if(saved)profile=saved;
+   if(saveError&&initial.username){
+     // A username may already be taken. Preserve the profile and allow a new choice.
+     if(initial.display_name){
+       const fallback=await client.from('be_profiles')
+         .update({display_name:initial.display_name}).eq('id',user.id)
+         .select('id,username,display_name,bio,role').maybeSingle();
+       if(fallback.data)profile=fallback.data;
+     }
+     say(tr('That username is taken. Choose a different one in your profile.','اسم المستخدم ده محجوز. اختار اسم تاني من الملف الشخصي.'),true);
    }
  }
 }
