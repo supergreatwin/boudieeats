@@ -24,13 +24,13 @@ jobs:
         run: |
           node --check tools/engagement-pages.mjs
           node --check tools/build-pages.mjs
-      - name: Inspect English localization source map
-        run: node tools/inspect-source.mjs
       - name: Build static website
         run: node tools/build-pages.mjs
         env:
           SITE_URL: https://boudieeats.pages.dev
           SITE_BASE_PATH: /
+      - name: Verify every page is English
+        run: node tools/verify-english.mjs
       - name: Check public pages, privacy and links
         run: |
           test -f boudieeats/dist/reader-responses/index.html
