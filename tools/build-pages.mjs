@@ -41,6 +41,7 @@ alignSearchUrls({
   deployed: new URL((env.SITE_BASE_PATH.replace(/\/?$/, '/')), site),
   canonical: new URL('https://boudieeats.pages.dev/'),
   indexable: env.PUBLIC_INDEXABLE === 'true',
+  analyticsId: 'G-F35G5DT9NH',
 });
 
 // Publish Google Search Console verification at the Cloudflare site root.

@@ -1,8 +1,14 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export function alignSearchUrls({ directory, deployed, canonical, indexable, excludeUnmatched = false }) {
+export function alignSearchUrls({ directory, deployed, canonical, indexable, analyticsId }) {
   if (!indexable) return;
+  const useAnalytics = deployed.href === canonical.href && /^G-[A-Z0-9]{10}$/.test(analyticsId);
+  if (useAnalytics) {
+    for (const file of ['analytics.css', 'analytics.js']) {
+      copyFileSync(new URL(file, import.meta.url), join(directory, file));
+    }
+  }
   const absolute = url => url.replaceAll(deployed.href, canonical.href);
   for (const entry of readdirSync(directory, { recursive: true })) {
     if (!entry.endsWith('.html')) continue;
@@ -11,8 +17,8 @@ export function alignSearchUrls({ directory, deployed, canonical, indexable, exc
     const end = html.indexOf('</head>');
     if (end === -1) continue;
     let head = html.slice(0, end).replace(/<link rel="canonical"[^>]*>|<meta property="og:(?:url|image)"[^>]*>|<script type="application\/ld\+json">[^<]*<\/script>/g, absolute);
-    if (excludeUnmatched) {
-      head = head.replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, follow">');
+    if (useAnalytics && !/<meta name="robots"[^>]*noindex/.test(head)) {
+      head += `<link rel="stylesheet" href="/analytics.css"><script defer src="/analytics.js" data-measurement-id="${analyticsId}"></script>`;
     }
     if (entry === 'index.html') {
       const journal = { '@context': 'https://schema.org', '@type': 'WebSite',
