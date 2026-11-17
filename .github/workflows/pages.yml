@@ -18,60 +18,19 @@ jobs:
       pages: read
     steps:
       - uses: actions/checkout@v6
-      - name: Extract the Astro project
-        run: tar -xzf boudieeats-source.tar.gz
-      - name: Correct restaurant and café review titles
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          root = Path("boudieeats/src/content/reviews")
-          updates = {
-              "takeaway-bowls.md": ("تيك أواي في العربية", "فول طبالي"),
-              "cafe-iced-coffee.md": ("قهوة ساقعة جنب الشباك", "آيسد كوفي سيلانترو"),
-              "cafe-hot-coffee.md": ("فنجان قهوة في الكافيه", "فلات وايت La Mie"),
-          }
-          for filename, (previous, corrected) in updates.items():
-              path = root / filename
-              current = path.read_text(encoding="utf-8")
-              old_line = f'title: "{previous}"'
-              new_line = f'title: "{corrected}"'
-              if current.count(old_line) != 1:
-                  raise RuntimeError(f"Unexpected title in {path}")
-              path.write_text(current.replace(old_line, new_line, 1), encoding="utf-8")
-              print(f"Updated {filename}: {corrected}")
-          PY
-      - name: Publish reviewed Boudie Eats articles
-        run: |
-          cp editorial/reviews/takeaway-bowls.md boudieeats/src/content/reviews/takeaway-bowls.md
-          cp editorial/reviews/cafe-iced-coffee.md boudieeats/src/content/reviews/cafe-iced-coffee.md
-          cp editorial/stories/cilantro-betna-el-tany.md boudieeats/src/content/stories/cilantro-betna-el-tany.md
       - uses: actions/setup-node@v6
         with:
-          node-version-file: boudieeats/.node-version
+          node-version-file: .node-version
           cache: npm
-          cache-dependency-path: boudieeats/package-lock.json
+          cache-dependency-path: tools/astro/package-lock.json
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         id: pages
-      - name: Install dependencies
-        run: npm ci
-        working-directory: boudieeats
-      - name: Build the site
-        run: npm run build
-        working-directory: boudieeats
+      - name: Build and verify the site
+        run: node tools/build-pages.mjs
         env:
-          ASTRO_TELEMETRY_DISABLED: '1'
           SITE_URL: ${{ steps.pages.outputs.origin }}
           SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          PUBLIC_INDEXABLE: 'true'
-      - name: Verify published article pages
-        run: |
-          test -s boudieeats/dist/reviews/takeaway-bowls/index.html
-          test -s boudieeats/dist/reviews/cafe-iced-coffee/index.html
-          test -s boudieeats/dist/stories/cilantro-betna-el-tany/index.html
-          grep -q 'الفطار المصري' boudieeats/dist/reviews/takeaway-bowls/index.html
-          grep -q 'أربع سنين' boudieeats/dist/reviews/cafe-iced-coffee/index.html
-          grep -q 'بيتنا التاني' boudieeats/dist/stories/cilantro-betna-el-tany/index.html
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist
