@@ -1,0 +1,48 @@
+import {mkdirSync,readFileSync,readdirSync,writeFileSync,copyFileSync} from 'node:fs';
+import {join} from 'node:path';
+const css='<style>@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:wght@500;600;700&family=Lalezar&family=Aref+Ruqaa:wght@400;700&display=swap");*{box-sizing:border-box}body{margin:0;background:#fffcf6;color:#252822;font:16px/1.65 "DM Sans",sans-serif}html[lang^="ar"] body{font:18px/1.65 "Lalezar",sans-serif}a{color:#315b4b}h1,h2{font-family:"Fraunces",serif;line-height:1.3;margin:0}html[lang^="ar"] h1,html[lang^="ar"] h2{font-family:"Aref Ruqaa",serif;line-height:1.5}.be-shell{width:min(1140px,calc(100% - 36px));margin:auto}.be-top{background:white;border-bottom:1px solid #e3ded1}.be-top>.be-shell{min-height:80px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:12px 0}.be-brand{font-size:26px;font-weight:800;text-decoration:none}.be-top nav{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:14px;font-weight:700}.be-top nav a{text-decoration:none}.be-main{padding:45px 0 80px}.be-main>h1{font-size:clamp(36px,6vw,68px)}.be-main>p{max-width:730px}.be-overline{font:800 12px "DM Sans",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#c94b25}.be-intro{color:#626861;margin:10px 0 28px}.be-status{min-height:1.8em;color:#315b4b;font-weight:700;font-size:14px;margin-bottom:10px}.be-status[data-error="true"]{color:#a62020}.be-panel{border:1px solid #e1ded6;background:white;padding:clamp(20px,3vw,34px);margin-bottom:18px}.be-panel h2{font-size:clamp(23px,3vw,32px);margin-bottom:14px}.be-panel p{margin-bottom:20px}.be-panel .be-muted{font-size:14px;color:#666a64}.be-form{display:grid;gap:14px}.be-field{display:grid;gap:6px;font-weight:700;font-size:14px}.be-field input,.be-field textarea,.be-field select{width:100%;padding:12px;border:1px solid #b8bcb6;border-radius:5px;background:#fffcf6;color:#252822;font:16px/1.4 "DM Sans",sans-serif}html[lang^="ar"] .be-field input,html[lang^="ar"] .be-field textarea,html[lang^="ar"] .be-field select{font:17px "Lalezar",sans-serif}.be-field textarea{min-height:150px;resize:vertical}.be-field input[name=username],.be-field input[name=slug],.be-field input[name=email]{direction:ltr;text-align:left}.be-field :is(input,textarea,select):focus{outline:2px solid #f0642b;outline-offset:2px}button{font:inherit;padding:8px 16px;background:white;color:#315b4b;border:1px solid #315b4b;border-radius:6px;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.be-primary,.be-active{background:#315b4b;color:white}.be-form .be-primary{min-height:48px}.be-actions,.be-tabs,.be-list-actions{display:flex;flex-wrap:wrap;gap:10px}.be-tabs{padding:18px 0;border-block:1px solid #deddd3;margin:20px 0}.be-greeting{display:flex;align-items:center;justify-content:space-between;gap:16px}.be-greeting h2{font-size:clamp(24px,3vw,38px)}.be-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px}.be-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:18px}.be-metrics section{padding:19px;background:#f0f5ed;border-top:3px solid #f0642b;display:grid;gap:7px}.be-metrics span{color:#666a64;font-size:13px}.be-metrics strong{font-size:22px;overflow-wrap:anywhere}.be-list-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 0;border-bottom:1px solid #ddd}.be-list-row small{display:block;color:#666a64}.be-list-row strong{overflow-wrap:anywhere}.be-list-actions button{padding:6px 9px;font-size:12px}.be-disabled{max-width:750px;border-top:4px solid #f0642b}.be-footer{padding:25px 0;border-top:1px solid #e3ded1;font-size:13px;color:#666a64}.be-footer .be-shell{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}a:focus-visible,button:focus-visible{outline:3px solid #f0642b;outline-offset:3px}@media(max-width:640px){.be-main{padding-top:28px}.be-list-row{align-items:flex-start;flex-direction:column}.be-panel{padding:18px}.be-greeting{align-items:flex-start}}</style>';
+const esc=v=>String(v).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+function render({arabic,desk,base,config}){
+ const language=arabic?'ar-EG':'en',direction=arabic?'rtl':'ltr';
+ const title=desk?(arabic?'مكتب التحرير':'Editorial desk'):(arabic?'حسابي':'My account');
+ const description=desk?(arabic?'مساحة خاصة للمقالات والمراجعات وطلبات المساهمة.':'A private workspace for contributors, review queues and assignments.'):(arabic?'حسابك المستقل في بودي إيتس. اسم مستخدم وملف شخصي ومساهمات خاصة.':'Your independent BoudieEats account, username, profile and private submissions.');
+ const localBase=base+(arabic?'ar/':'');
+ const publicConfig=JSON.stringify({url:config.url||'',publishableKey:config.key||'',basePath:base}).replace(/</g,'\\u003c');
+ return '<!doctype html><html lang="'+language+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#315b4b">'+
+ '<title>'+title+' | BoudieEats</title><meta name="description" content="'+esc(description)+'"><link rel="canonical" href="https://boudieeats.pages.dev/'+(arabic?'ar/':'')+(desk?'editorial-desk/':'account/')+'">'+css+'</head>'+
+ '<body data-mode="'+(desk?'desk':'account')+'"><header class="be-top"><div class="be-shell"><a class="be-brand" href="'+localBase+'">BoudieEats.</a><nav>'+
+ '<a href="'+localBase+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
+ '<a href="'+localBase+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
+ '<a href="'+localBase+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
+ '<a href="'+localBase+'account/">'+(arabic?'حسابي':'My account')+'</a>'+
+ '<a href="'+localBase+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a></nav></div></header>'+
+ '<main class="be-shell be-main"><p class="be-overline">'+(arabic?'المجتمع والتحرير':'COMMUNITY & EDITORIAL')+'</p><h1>'+title+'.</h1>'+
+ '<p class="be-intro">'+description+'</p><div id="be-account-status" class="be-status" role="status" aria-live="polite"></div><div id="be-account-app"></div></main>'+
+ '<footer class="be-footer"><div class="be-shell"><span>© BoudieEats</span><span>'+(arabic?'حسابات الموقع مستقلة عن GitHub وعن Without Permission.':'Accounts are separate from GitHub and Without Permission.')+'</span></div></footer>'+
+ '<script>window.BE_AUTH_CONFIG='+publicConfig+';</script><script type="module" src="'+base+'be-account.js"></script></body></html>';
+}
+export function addAccountPages({directory,basePath='/',supabaseUrl='',supabasePublishableKey=''}){
+ const base=basePath.endsWith('/')?basePath:basePath+'/';
+ if((supabaseUrl&&!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(supabaseUrl))||
+    (supabasePublishableKey&&!/^sb_publishable_/.test(supabasePublishableKey))||
+    (!!supabaseUrl!==!!supabasePublishableKey))throw new Error('A dedicated BoudieEats Supabase URL and publishable key must be configured together');
+ const config={url:supabaseUrl,key:supabasePublishableKey};
+ copyFileSync(new URL('./account-client.mjs',import.meta.url),join(directory,'be-account.js'));
+ for(const arabic of [false,true])for(const desk of [false,true]){
+  const slug=(arabic?'ar/':'')+(desk?'editorial-desk':'account');
+  const folder=join(directory,slug);mkdirSync(folder,{recursive:true});
+  writeFileSync(join(folder,'index.html'),render({arabic,desk,base,config}));
+ }
+ for(const entry of readdirSync(directory,{recursive:true})){
+  if(!entry.endsWith('.html')||/^google[a-z0-9]+\.html$/.test(entry)||/^(ar\/)?(account|editorial-desk)\/index\.html$/.test(entry))continue;
+  const file=join(directory,entry);let html=readFileSync(file,'utf8');
+  if(!html.includes('</header>'))continue;
+  const arabic=entry.startsWith('ar/');
+  const link=base+(arabic?'ar/':'')+'account/';
+  const label=arabic?'حسابي':'My account';
+  const menuStyle='<style>.be-account-nav{display:inline-flex;margin:8px;padding:8px 14px;border:1px solid currentColor;border-radius:6px;text-decoration:none;font-weight:700}</style>';
+  html=html.replace('</head>',menuStyle+'</head>');
+  html=html.replace('</header>','<a class="be-account-nav" href="'+link+'">'+label+'</a></header>');
+  writeFileSync(file,html);
+ }
+}

@@ -25,6 +25,8 @@ jobs:
           node --check tools/engagement-pages.mjs
           node --check tools/build-pages.mjs
           node --check tools/bilingual-pages.mjs
+          node --check tools/account-pages.mjs
+          node --check tools/account-client.mjs
       - name: Build static website
         run: node tools/build-pages.mjs
         env:
@@ -34,6 +36,8 @@ jobs:
         run: node tools/verify-english.mjs
       - name: Verify Arabic and English editions
         run: node tools/verify-bilingual.mjs
+      - name: Verify independent accounts and private schema
+        run: node tools/verify-accounts.mjs
       - name: Check public pages, privacy and links
         run: |
           test -f boudieeats/dist/reader-responses/index.html

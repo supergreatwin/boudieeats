@@ -1,34 +1,32 @@
 # BoudieEats Editorial Desk
 
 Production: https://boudieeats.pages.dev/
-Editorial gateway: https://boudieeats.pages.dev/editorial-desk/
+English desk: https://boudieeats.pages.dev/editorial-desk/
+Arabic desk: https://boudieeats.pages.dev/ar/editorial-desk/
+Accounts: https://boudieeats.pages.dev/account/
 
-## Workflow
-1. **Pitch / backlog:** Create a GitHub Issue from a recipe, review, or editorial task template.
-2. **Draft:** Write in the relevant \`editorial/reviews/\`, \`editorial/stories/\`, or newsletter draft directory. Additional content paths need wiring into \`tools/build-pages.mjs\` and Astro collections before they appear publicly.
-3. **Review:** Open a Pull Request. Check sourcing, Arabic voice, factual accuracy, copyright, sensitive personal data, and mobile layout.
-4. **Approve / publish:** After approval, merge to \`main\`. The existing GitHub Actions workflow builds the site; Cloudflare Pages deploys only if its Git integration/build is still enabled.
-5. **Measure:** Use the existing Google Analytics property on the production origin. Do not publish private reader submissions.
+## Account status
 
-## Reader contributions
-- Public response form: https://tally.so/r/kbG7Lo
-- Newsletter interest list: https://tally.so/r/vXDORl
-- Review submissions inside the authenticated Tally dashboard; do not copy reader email addresses into public GitHub issues.
-- A quote may be used only after the contributor's publishing permission and editorial review; avoid publishing contact details.
-- These forms are separate from Without Permission.
+Account pages and the permissions-first editorial interface are generated in both languages. **The dedicated BoudieEats Supabase backend has not yet been created or configured.** Until then, sign-up is intentionally disabled and the desk clearly indicates that it is awaiting setup. Do not claim it is a functioning user login.
 
-## Newsletter
-The interest list is **not** an active Beehiiv subscription.
-The connected Beehiiv account currently only has a Without Permission publication. Create a distinct BoudieEats publication in Beehiiv before any activation or migration, configure opt-in/unsubscribe and sender details, and connect its approved signup form on this site. Never add waitlist contacts to another brand's mailing list.
+Create a dedicated BoudieEats project and apply `supabase/schema.sql`. Never put BoudieEats readers into the Without Permission database. For full activation steps, see the repository README.
 
-## Backend and permissions
-This is a GitHub-based editorial workflow, not a full authenticated headless CMS.
-The connected Supabase project is named Without Permission; do not share its auth, service role, or editorial tables with BoudieEats. If a dedicated BoudieEats project is created later, protect all editorial/response tables with RLS and keep service keys off the frontend.
+## Reader-to-editor workflow
 
-## Cloudflare
-The source archive remains the original site content; \`tools/engagement-pages.mjs\` adds the reader, newsletter, and editorial gateway pages **after** Astro builds.
-Cloudflare Pages should build with:
-- Build command: \`node tools/build-pages.mjs\`
-- Output: \`boudieeats/dist\`
-- \`SITE_URL=https://boudieeats.pages.dev\`
-- Production branch: \`main\`
+1. A reader registers with an email, password and requested username, confirms email, then uses the on-site account area. The username is claimed after verification if available.
+2. Readers can save their profile, submit private food ideas, and apply to become contributors.
+3. A verified administrator can approve contributor applications, after which a contributor can create private recipe, review or food-story drafts in Arabic or English.
+4. The contributor submits the draft for review; an editor requests changes or approves it.
+5. **Approving a draft is not public publishing.** A separate deployment integration is needed before editorial approval can put content onto the static site. Until then the existing GitHub PR workflow remains the manual way to publish editorial content.
+
+## Existing editorial source workflow
+
+- Reviewed site content lives under `editorial/reviews/`, `editorial/stories/`, and `editorial/newsletter/`.
+- Updates to those files are built from GitHub PRs. New article paths require content-collection integration in `tools/build-pages.mjs`.
+- Public response forms: English https://tally.so/r/kbG7Lo · Arabic https://tally.so/r/aO4rxy.
+- Newsletter prelaunch waitlist: English https://tally.so/r/vXDORl · Arabic https://tally.so/r/7XK9Dz.
+- Neither waitlist is an active email-sending subscription. Keep subscriber lists private and separated by publication.
+
+## Security
+
+All BoudieEats profiles, pitches, applications and drafts are protected by Supabase RLS. Roles are assigned in the dedicated backend, never by browser metadata. Only a publishable key may be sent to the browser; keep all secret keys on the server. Verify email and password reset end to end before opening registration.

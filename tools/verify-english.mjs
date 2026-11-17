@@ -20,7 +20,9 @@ const home=readFileSync(join(dir,'index.html'),'utf8');
 if(!home.includes('tally.so/embed/vXDORl'))errors.push('Home newsletter embed missing');
 if(!home.includes('AN EGYPTIAN FOOD JOURNAL'))errors.push('English cover identity missing');
 const desk=readFileSync(join(dir,'editorial-desk/index.html'),'utf8');
-if(!desk.includes('GitHub usernames'))errors.push('Editorial GitHub username access guidance missing');
+if(!desk.includes('be-account.js') || !desk.includes('data-mode="desk"'))errors.push('Independent editorial desk missing');
+const account=readFileSync(join(dir,'account/index.html'),'utf8');
+if(!account.includes('be-account.js') || !account.includes('data-mode="account"'))errors.push('Independent account page missing');
 const signup=readFileSync(join(dir,'newsletter-signup/index.html'),'utf8');
 if(!signup.includes('not issuing active email subscriptions'))errors.push('Newsletter status transparency missing');
 if(errors.length){console.error(errors.join('\n\n').slice(0,14500));process.exit(1);}
