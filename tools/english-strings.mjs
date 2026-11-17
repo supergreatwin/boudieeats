@@ -9,7 +9,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "أنا بودي، بحب الأكل وبحب أفهمه. بكتب عن اللي بجربه في المطبخ، واللي بطلبه بره، والحكايات اللي بتفضل معانا بعد ما الأكل يخلص.",
-    "I'm Boudie. I love food and I love understanding it. I write about what I cook, what I order and the memories that remain after the meal."
+    "I’m Boudie. I love food and I love understanding it. I write about what I cook, what I order and the memories that remain after the meal."
   ],
   [
     "الوصفات والحكايات اللي حفظتها على الجهاز ده.",
@@ -41,11 +41,11 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "وصفات مصرية من مطبخ بودي، بالتفاصيل اللي بتفرق في الطعم.",
-    "Egyptian recipes from Boudie's kitchen, with the little details that make a difference."
+    "Egyptian recipes from Boudie’s kitchen, with the little details that make a difference."
   ],
   [
     "دوّر في وصفات وتجارب وحكايات بودي.",
-    "Search Boudie's recipes, reviews, and food stories."
+    "Search Boudie’s recipes, reviews, and food stories."
   ],
   [
     "دوّر باسم أكلة، مكوّن، أو موضوع.",
@@ -65,7 +65,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "لحد ما تنزل، اتفرّج على اللي بيتطبخ في مطبخ بودي.",
-    "While it is being written, discover what is cooking in Boudie's kitchen."
+    "While it is being written, discover what is cooking in Boudie’s kitchen."
   ],
   [
     "عايز تسأل عن وصفة أو ترشح مكان أو تقترح تعاون؟",
@@ -173,7 +173,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "على مزاج بودي.",
-    "Boudie's way."
+    "Boudie’s way."
   ],
   [
     "اتعرّف على بودي",
@@ -237,7 +237,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "اختيار بودي",
-    "Boudie's pick"
+    "Boudie’s pick"
   ],
   [
     "أول وصفة في الطريق",
@@ -253,7 +253,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "هنا هتنزل الحاجات اللي بجربها.",
-    "This is where I'll share the products I try."
+    "This is where I’ll share the products I try."
   ],
   [
     "أول زيارة لسه في الطريق",
@@ -261,7 +261,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "لما أنشر تجربة، هتلاقي المكان واللي طلبته ورأيي في الزيارة.",
-    "When I publish a review, I'll include the place, my order, and my impressions."
+    "When I publish a review, I’ll include the place, my order, and my impressions."
   ],
   [
     "رشّحلي مطعم",
@@ -497,7 +497,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "تركات بودي",
-    "Boudie's tips"
+    "Boudie’s tips"
   ],
   [
     "الصورة هتتضاف قريب",
@@ -685,7 +685,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "دي صورة الطبق من مطبخ بودي. الخطوات والمقادير هتنزل هنا أول ما تبقى جاهزة.",
-    "This dish is from Boudie's kitchen. Full ingredients and steps will be shared when ready."
+    "This dish is from Boudie’s kitchen. Full ingredients and steps will be shared when ready."
   ],
   [
     "وقت التحضير مرن",
@@ -745,7 +745,7 @@ export const ENGLISH_STRINGS = [
   ],
   [
     "كل وصفات بودي",
-    "All Boudie's recipes"
+    "All Boudie’s recipes"
   ],
   [
     "النتائج:",
