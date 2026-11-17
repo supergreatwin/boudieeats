@@ -31,6 +31,13 @@ jobs:
         env:
           SITE_URL: ${{ steps.pages.outputs.origin }}
           SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          BE_SUPABASE_URL: ${{ vars.BE_SUPABASE_URL }}
+          BE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.BE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: Verify bilingual accounts
+        run: |
+          node tools/verify-english.mjs
+          node tools/verify-bilingual.mjs
+          node tools/verify-accounts.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist
