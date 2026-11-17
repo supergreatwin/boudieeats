@@ -786,5 +786,29 @@ export const ENGLISH_STRINGS = [
   [
     "بودي",
     "Boudie"
+  ],
+  [
+    "في الوصفات",
+    "recipes"
+  ],
+  [
+    "في اليومية",
+    "the journal"
+  ],
+  [
+    "الحكايات",
+    "Stories"
+  ],
+  [
+    "وصفة",
+    "Recipe"
+  ],
+  [
+    "الرابط اتنسخ.",
+    "Link copied."
+  ],
+  [
+    " من ${checks.length} ingredients ready",
+    " of ${checks.length} ingredients ready"
   ]
 ];
