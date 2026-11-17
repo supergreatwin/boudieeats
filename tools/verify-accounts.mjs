@@ -20,8 +20,8 @@ for(const name of ['signInWithPassword','signUp','resetPasswordForEmail','update
 }
 const english=readFileSync(join(dist,'index.html'),'utf8');
 const arabic=readFileSync(join(dist,'ar/index.html'),'utf8');
-if(!english.includes('href="/account/"'))errors.push('English account menu missing');
-if(!arabic.includes('href="/ar/account/"'))errors.push('Arabic account menu missing');
+if(!/class="be-account-nav" href="[^"]*\/account\/"/.test(english))errors.push('English account menu missing');
+if(!/class="be-account-nav" href="[^"]*\/ar\/account\/"/.test(arabic))errors.push('Arabic account menu missing');
 const schema=readFileSync(new URL('../supabase/schema.sql',import.meta.url),'utf8');
 for(const marker of ['enable row level security','be_register_profile','be_my_role','be_submit_draft','be_review_draft']){
  if(!schema.includes(marker))errors.push('Private DB schema missing '+marker);
