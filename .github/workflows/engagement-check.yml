@@ -24,6 +24,8 @@ jobs:
         run: |
           node --check tools/engagement-pages.mjs
           node --check tools/build-pages.mjs
+      - name: Inspect English localization source map
+        run: node tools/inspect-source.mjs
       - name: Build static website
         run: node tools/build-pages.mjs
         env:
