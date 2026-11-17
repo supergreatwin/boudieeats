@@ -35,6 +35,10 @@ const env = {
 execFileSync('npm', ['ci'], { cwd: project, env, stdio: 'inherit' });
 execFileSync('npm', ['run', 'build'], { cwd: project, env, stdio: 'inherit' });
 
+// Publish Google Search Console verification at the Cloudflare site root.
+const verificationFile = 'google7cba358329a08d09.html';
+copyFileSync(join(root, verificationFile), join(project, 'dist', verificationFile));
+
 for (const [path, expected] of [
   ['reviews/takeaway-bowls', 'الفطار المصري'],
   ['reviews/cafe-iced-coffee', 'أربع سنين'],
