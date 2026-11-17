@@ -7,9 +7,9 @@ Accounts: https://boudieeats.pages.dev/account/
 
 ## Account status
 
-Account pages and the permissions-first editorial interface are generated in both languages. **The dedicated BoudieEats Supabase backend has not yet been created or configured.** Until then, sign-up is intentionally disabled and the desk clearly indicates that it is awaiting setup. Do not claim it is a functioning user login.
+The project **vktegxiycqwqnnqpxiuh** has been created on Supabase, and the protected account schema has been applied successfully. The bilingual website now uses its independent public browser connection. **Signup and recovery email deliverability, Auth redirect configuration and real-user login still require end-to-end acceptance tests.** Do not claim those email flows have passed before verifying them.
 
-Create a dedicated BoudieEats project and apply `supabase/schema.sql`. Never put BoudieEats readers into the Without Permission database. For full activation steps, see the repository README.
+Do not use or modify the Without Permission database. For the remaining Auth configuration and admin bootstrap, see the README.
 
 ## Reader-to-editor workflow
 
