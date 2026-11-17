@@ -13,25 +13,22 @@ BoudieEats has a bilingual private account interface at `/account/` and `/ar/acc
 
 ## Status
 
-The UI and isolated schema are in the repository. **Registration and login are disabled until a dedicated BoudieEats Supabase project, SQL schema, email confirmation, SMTP, and browser tests are configured.** This is intentional: do not provide an insecure or misleading sign-up button.
+The dedicated BoudieEats Supabase project **vktegxiycqwqnnqpxiuh** is active and the account schema was applied successfully. The bilingual site is configured to use this project's public publishable key, with RLS protecting all account and editorial data. **Email-confirmation redirects, SMTP delivery, and end-to-end signup have not yet been verified; do not announce public registration as launch-ready until those checks pass.**
 
 BoudieEats accounts are independent of GitHub and of the **Without Permission** publication. Do not deploy the schema to the latter's project.
 
-## Activate in a dedicated Supabase project
+## Verify production authentication and launch
 
-1. Obtain explicit confirmation of which Supabase organization the BoudieEats project should use. Check any nonzero project cost and obtain the user's approval before purchase.
-2. Create an independent project, e.g. `BoudieEats`. Use only its own project URL and **publishable** client key. Never copy a service-role or secret key into the repository or browser.
-3. In the **BoudieEats** project SQL Editor apply [`supabase/schema.sql`](./supabase/schema.sql). Verify that `be_profiles`, `be_applications`, `be_pitches`, and `be_drafts` exist and all have RLS enabled. Run Supabase security advisors. The schema is a setup file, **not** a managed CLI migration.
+1. The separate project is already created at [BoudieEats Supabase](https://supabase.com/dashboard/project/vktegxiycqwqnnqpxiuh), with initial cost quoted at $0/month. Its four RLS-enabled tables and policies are deployed as migration `boudieeats_independent_accounts_initial`. **Do not rerun the initial schema.**
+2. The site has the dedicated project's public URL and publishable key in `tools/be-public-config.mjs`. This key is public by design, not a secret. The GitHub build no longer needs repository variables; Cloudflare may optionally override using matching `BE_SUPABASE_URL` and `BE_SUPABASE_PUBLISHABLE_KEY`. Never use the Without Permission project.
+3. The next steps are Auth configuration and a controlled real-email signup test; they cannot be confirmed through the available Supabase project-management connector.
 4. Auth settings: enable Email provider and **Confirm email**, minimum password length at least 12, rate limits, and CAPTCHA if appropriate. Configure a verified SMTP provider; do **not** open public registration until confirmation and password-reset messages arrive successfully.
 5. Set the Supabase Auth Site URL to the chosen production site. Add **both** language return URLs to the redirect allowlist:
    - `https://boudieeats.pages.dev/account/`
    - `https://boudieeats.pages.dev/ar/account/`
    - `https://supergreatwin.github.io/boudieeats/account/`
    - `https://supergreatwin.github.io/boudieeats/ar/account/`
-6. Add the following public (not secret) build-time environment variables to Cloudflare Pages and GitHub Actions repository variables:
-   - `BE_SUPABASE_URL=https://PROJECT_REF.supabase.co`
-   - `BE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...`
-   No other project key is valid. The static build rejects incomplete/mismatched settings.
+6. Public URL and publishable key are already embedded in the build, so manually adding build variables is **not required**. Do not put private or service-role keys into client settings. If Cloudflare already has `BE_SUPABASE_URL` or `BE_SUPABASE_PUBLISHABLE_KEY` overrides, check they match the BoudieEats project.
 7. Confirm the owner account with a real email address. Then bootstrap **only** that verified user from the BoudieEats SQL editor:
    ```sql
    update public.be_profiles
