@@ -810,5 +810,9 @@ export const ENGLISH_STRINGS = [
   [
     " من ${checks.length} ingredients ready",
     " of ${checks.length} ingredients ready"
+  ],
+  [
+    " من ",
+    " of "
   ]
 ];
