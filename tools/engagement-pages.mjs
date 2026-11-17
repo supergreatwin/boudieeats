@@ -1,90 +1,82 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-/**
- * Add reader engagement pages to the compiled Astro site.
- * The source archive remains unchanged; these pages are generated at build time.
- * No privileged keys, credentials, or subscriber records are stored in the output.
- */
 export function addEngagementPages({ directory, basePath = '/' }) {
-  const normalizedBase = '/' + String(basePath).replace(/^\/+|\/+$/g, '');
-  const base = normalizedBase === '/' ? '/' : normalizedBase + '/';
-  const link = path => base + path;
-  const canonical = 'https://boudieeats.pages.dev/';
-  const formUrl = id => 'https://tally.so/r/' + id;
-  const embed = (id, title) => '<iframe title="' + title + '" src="https://tally.so/embed/' + id +
-    '?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0"></iframe>' +
-    '<script src="https://tally.so/widgets/embed.js" defer></script>' +
-    '<p class="fallback">لو النموذج ما ظهرش عندك، <a href="' + formUrl(id) + '" rel="noopener noreferrer">افتحه مباشرة من Tally</a>.</p>';
+  const normalized = '/' + String(basePath).replace(/^\/+|\/+$/g, '');
+  const base = normalized === '/' ? '/' : normalized + '/';
+  const link = slug => base + slug;
+  const origin = 'https://boudieeats.pages.dev/';
+  const feedback = 'https://tally.so/r/kbG7Lo';
+  const waitlist = 'https://tally.so/r/vXDORl';
+  const menu = '<nav class="be-reader-links" aria-label="Reader participation">' +
+    '<a href="' + link('reader-responses/') + '">Send feedback</a>' +
+    '<a href="' + link('newsletter-signup/') + '">Newsletter</a>' +
+    '<a href="' + link('editorial-desk/') + '">Editorial desk</a></nav>';
+  const menuCss = '<style>.be-reader-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;padding:20px;font:600 15px/1.5 "DM Sans",sans-serif}.be-reader-links a{color:inherit;text-decoration:underline;text-underline-offset:4px}</style>';
 
-  const footerLinks = '<nav class="be-reader-links" aria-label="روابط المشاركة في BoudieEats">' +
-    '<a href="' + link('reader-responses/') + '">شاركنا تجربتك أو اقتراحك</a>' +
-    '<a href="' + link('newsletter-signup/') + '">نشرة BoudieEats</a></nav>';
-  const footerStyle = '<style>.be-reader-links{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;direction:rtl;padding:18px 12px;font-family:Lalezar,Tahoma,sans-serif;font-size:1.05rem}.be-reader-links a{color:inherit;text-decoration:underline;text-underline-offset:4px}</style>';
-
-  // Insert links in existing compiled pages, without replacing their designs or content.
   for (const entry of readdirSync(directory, { recursive: true })) {
     if (!entry.endsWith('.html')) continue;
     const path = join(directory, entry);
     let html = readFileSync(path, 'utf8');
-    if (html.includes('class="be-reader-links"') || !/<\/body>/i.test(html)) continue;
-    html = html.replace(/<\/head>/i, footerStyle + '</head>');
-    if (/<\/footer>/i.test(html)) html = html.replace(/<\/footer>/i, footerLinks + '</footer>');
-    else html = html.replace(/<\/body>/i, footerLinks + '</body>');
+    if (html.includes('class="be-reader-links"') || !html.includes('</body>')) continue;
+    html = html.replace('</head>', menuCss + '</head>');
+    if (html.includes('</footer>')) html = html.replace('</footer>', menu + '</footer>');
+    else html = html.replace('</body>', menu + '</body>');
     writeFileSync(path, html);
   }
 
-  const css = '<style>' +
-    '@import url("https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Lalezar&display=swap");' +
-    ':root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#fffcf6;color:#222;font:20px/1.7 Lalezar,Tahoma,sans-serif}a{color:#a43d16}header,main,footer{max-width:960px;margin:0 auto;padding:18px 24px}header{border-bottom:1px solid #ecdcd0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}header a{text-decoration:none}main{padding-top:34px;padding-bottom:60px}h1,h2{font-family:"Aref Ruqaa",serif;line-height:1.5}h1{font-size:clamp(2.1rem,5vw,3.4rem);margin:0 0 12px}h2{font-size:1.65rem}p{max-width:760px}iframe{display:block;width:100%;border:0;min-height:550px;background:transparent;margin-top:20px}.kicker{color:#9e451f;font-size:.95rem}.muted{color:#555}.panel{border:1px solid #ecdcd0;background:#fff;border-radius:20px;padding:22px;margin:18px 0}.actions{display:flex;flex-wrap:wrap;gap:14px}.actions a{display:inline-block;border-radius:12px;padding:9px 14px;background:#f0642b;color:white;text-decoration:none}.fallback{font-size:.95rem}footer{border-top:1px solid #ecdcd0;font-size:.9rem}.desk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.desk-grid a{display:block}.desk-grid .panel{margin:0}a:focus-visible{outline:3px solid #f0642b;outline-offset:3px}@media(max-width:580px){header,main,footer{padding:18px}body{font-size:18px}}</style>';
+  const styles = '<style>@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@500;600;700&display=swap");' +
+    '*{box-sizing:border-box}body{margin:0;background:#fffaf2;color:#33232b;font:17px/1.7 "DM Sans",sans-serif}a{color:#8f3152}' +
+    'header,main,footer{max-width:980px;margin:auto;padding:20px 26px}header{border-bottom:1px solid #ecdfe0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}header a{text-decoration:none}' +
+    'h1,h2{font-family:"Fraunces",serif;line-height:1.3}h1{font-size:clamp(2.25rem,5vw,3.75rem);margin:10px 0 14px}h2{font-size:1.6rem}main{padding-top:32px;padding-bottom:70px}p{max-width:800px}' +
+    '.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;font-weight:700;color:#8f3152}.muted{color:#685961}.panel{border:1px solid #ecdfe0;background:#fff;border-radius:18px;padding:22px;margin:18px 0}' +
+    '.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}.grid .panel{margin:0}.grid a{display:block;margin:8px 0}.button{display:inline-block;background:#8f3152;color:#fff;text-decoration:none;border-radius:11px;padding:10px 16px}' +
+    'iframe{display:block;border:none;width:100%;min-height:600px;margin-top:14px}.fallback{font-size:.95rem}footer{border-top:1px solid #ecdfe0;color:#685961;font-size:.9rem}a:focus-visible{outline:3px solid #8f3152;outline-offset:4px}@media(max-width:580px){header,main,footer{padding:18px}body{font-size:16px}}</style>';
 
-  function page({ slug, title, intro, content, noindex = false }) {
-    const dir = join(directory, slug);
-    mkdirSync(dir, { recursive: true });
-    const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-      '<title>' + title + ' | BoudieEats</title><meta name="description" content="' + intro + '">' +
-      '<link rel="canonical" href="' + canonical + slug + '/">' +
-      (noindex ? '<meta name="robots" content="noindex,nofollow">' : '') +
-      css + '</head><body><header><a href="' + link('') + '"><b>BoudieEats — أكّيل</b></a><a href="' + link('') + '">الصفحة الرئيسية</a></header>' +
-      '<main><p class="kicker">BoudieEats · بودي إيتس</p><h1>' + title + '</h1><p class="muted">' + intro + '</p>' + content + '</main>' +
-      '<footer><a href="' + link('reader-responses/') + '">ارسل لنا رأيك</a> · <a href="' + link('newsletter-signup/') + '">النشرة البريدية</a> · <a href="' + link('') + '">الموقع</a></footer></body></html>';
-    writeFileSync(join(dir, 'index.html'), html);
+  function embed(id, label) {
+    return '<iframe title="' + label + '" src="https://tally.so/embed/' + id + '?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" height="600" frameborder="0"></iframe>' +
+      '<script defer src="https://tally.so/widgets/embed.js"></script>' +
+      '<p class="fallback">Trouble loading? <a href="https://tally.so/r/' + id + '" rel="noopener noreferrer">Open the form directly</a>.</p>';
+  }
+  function page({ slug, title, description, content, noindex = false }) {
+    const folder = join(directory,slug);
+    mkdirSync(folder,{recursive:true});
+    const head = '<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + title + ' | BoudieEats</title><meta name="description" content="' + description.replaceAll('"','&quot;') + '">' +
+      '<link rel="canonical" href="' + origin + slug + '/">' + (noindex?'<meta name="robots" content="noindex,nofollow">':'') + styles + '</head>';
+    const html = head + '<body><header><a href="' + link('') + '"><strong>BoudieEats.</strong></a><nav><a href="' + link('recipes/') + '">Recipes</a> · <a href="' + link('reviews/') + '">Reviews</a> · <a href="' + link('') + '">Home</a></nav></header>' +
+      '<main><div class="eyebrow">An Egyptian food journal</div><h1>' + title + '</h1><p class="muted">' + description + '</p>' + content + '</main>' +
+      '<footer><a href="' + link('reader-responses/') + '">Feedback</a> · <a href="' + link('newsletter-signup/') + '">Newsletter</a> · <a href="' + link('editorial-desk/') + '">Editorial desk</a></footer></body></html>';
+    writeFileSync(join(folder,'index.html'),html);
   }
 
   page({
-    slug: 'reader-responses', title: 'شاركنا تجربتك',
-    intro: 'من هنا تقدر تبعت ترشيحات المطاعم والكافيهات، اقتراحات الوصفات، تجارب السوبرماركت، وملاحظاتك على المقالات.',
-    content: '<div class="panel"><h2>رأيك مهم</h2><p>تقدر تسيب اسمك وإيميلك أو تبعت من غير بيانات تواصل. لو سمحت باقتباس تجربتك، هنراجعها ونتواصل معاك قبل النشر.</p>' +
-      embed('kbG7Lo', 'BoudieEats reader responses') + '</div>'
+    slug:'reader-responses', title:'Share your experience',
+    description:'Recommend a restaurant, suggest a recipe, comment on a review, or tell us what you would like BoudieEats to cover.',
+    content:'<div class="panel"><h2>Your opinion matters</h2><p>Share your thoughts with or without a name. You may choose a public display username, but it does not create an account. We will never publish your contribution without permission.</p>' + embed('kbG7Lo','Reader feedback form') + '</div>'
   });
-
   page({
-    slug: 'newsletter-signup', title: 'نشرة BoudieEats',
-    intro: 'وصفات، ريڤيوهات، ومقارنات منتجات — هتوصلك في نشرة BoudieEats لما نطلقها.',
-    content: '<div class="panel"><h2>سجّل اهتمامك</h2><p>دي قائمة انتظار قبل إطلاق النشرة، وليست اشتراكًا فعالًا أو تأكيدًا بوصول رسائل حالياً. عند الإطلاق هنتواصل معاك، ومش هنضيفك لنشرة تانية.</p>' +
-      embed('vXDORl', 'BoudieEats newsletter interest list') + '</div>'
+    slug:'newsletter-signup', title:'The Boudie Letter',
+    description:'Original recipes, restaurant reviews, and food stories from Egypt — delivered when the newsletter launches.',
+    content:'<div class="panel"><h2>Join the launch list</h2><p>We are collecting launch interest, not issuing active email subscriptions yet. A dedicated BoudieEats Beehiiv publication is required before newsletter deliveries can start. Your email will not be added to any other publication.</p>' +
+      embed('vXDORl','BoudieEats newsletter launch list') + '</div>'
   });
-
   page({
-    slug: 'editorial-desk', title: 'غرفة تحرير BoudieEats',
-    intro: 'بوابة عمل تحريرية لإدارة الأفكار والمسودات والمراجعات والنشر. الحسابات والأذونات تدار من GitHub وTally، وليست من هذه الصفحة.',
-    noindex: true,
-    content: '<div class="panel"><h2>مسار النشر</h2><p>فكرة ← مسودة ← مراجعة تحريرية ← موافقة عبر Pull Request ← نشر تلقائي من الفرع main.</p><p>البوابة دي مش لوحة إدارة محمية في حد ذاتها؛ فتح المحتوى الخاص والتعديل عليه يتطلب تسجيل الدخول والأذونات في كل خدمة.</p></div>' +
-      '<div class="desk-grid">' +
-      '<div class="panel"><h2>الأفكار والتكليفات</h2><a href="https://github.com/supergreatwin/boudieeats/issues/new/choose">افتح تكليفًا جديدًا</a><a href="https://github.com/supergreatwin/boudieeats/issues">تابع المهام</a></div>' +
-      '<div class="panel"><h2>المراجعة والنشر</h2><a href="https://github.com/supergreatwin/boudieeats/pulls">راجع المسودات وطلبات الدمج</a><a href="https://github.com/supergreatwin/boudieeats/actions/workflows/pages.yml">حالة النشر</a></div>' +
-      '<div class="panel"><h2>الردود والاقتراحات</h2><a href="https://tally.so/forms">لوحة نماذج Tally (تسجيل دخول مطلوب)</a><a href="' + formUrl('kbG7Lo') + '">جرّب نموذج الردود</a></div>' +
-      '<div class="panel"><h2>النشرة البريدية</h2><a href="' + formUrl('vXDORl') + '">جرّب قائمة الاهتمام</a><a href="https://github.com/supergreatwin/boudieeats/tree/main/editorial/newsletter">مسودات الأعداد</a><p>Beehiiv: نشرة BoudieEats المنفصلة لم تُنشأ بعد.</p></div></div>' +
-      '<p class="muted">بيانات القراء محفوظة داخل Tally وليست معروضة في صفحة عامة. لا تضع مفاتيح GitHub أو Supabase هنا.</p>'
+    slug:'editorial-desk',title:'Editorial desk',
+    description:'Manage BoudieEats ideas, drafts, reviews, and publishing. Editor permissions and authentication are handled by GitHub.',
+    noindex:true,
+    content:'<div class="panel"><h2>Editor sign-in</h2><p>Editorial access uses <strong>GitHub usernames and repository permissions</strong>. The authenticated repository owner is <strong>@supergreatwin</strong>. A username displayed here is not proof of authorization; GitHub enforces access when you open the links below.</p><a class="button" href="https://github.com/login">Sign in to GitHub</a></div>' +
+      '<div class="grid"><section class="panel"><h2>Pitch board</h2><a href="https://github.com/supergreatwin/boudieeats/issues/new/choose">Create an assignment</a><a href="https://github.com/supergreatwin/boudieeats/issues">Browse assignments</a></section>' +
+      '<section class="panel"><h2>Review & publish</h2><a href="https://github.com/supergreatwin/boudieeats/pulls">Review pull requests</a><a href="https://github.com/supergreatwin/boudieeats/actions/workflows/pages.yml">Check deploy status</a></section>' +
+      '<section class="panel"><h2>Reader inbox</h2><a href="https://tally.so/forms">Open Tally dashboard (login required)</a><a href="' + feedback + '">View feedback form</a></section>' +
+      '<section class="panel"><h2>Newsletter</h2><a href="' + waitlist + '">Launch interest form</a><a href="https://github.com/supergreatwin/boudieeats/tree/main/editorial/newsletter">Newsletter drafts</a><p>Beehiiv sending is not connected to BoudieEats yet.</p></section></div>' +
+      '<p class="muted">Workflow: idea → draft → editorial review → approved pull request → deployment. No passwords, API keys, or private reader submissions are stored on this public page.</p>'
   });
 
-  // Include public reader pages in the canonical Cloudflare sitemap. Admin gateway is private to search engines.
-  const sitemapFile = join(directory, 'sitemap.xml');
-  const sitemap = readFileSync(sitemapFile, 'utf8');
-  if (!sitemap.includes(canonical + 'reader-responses/')) {
-    const urls = ['reader-responses/', 'newsletter-signup/']
-      .map(slug => '<url><loc>' + canonical + slug + '</loc></url>').join('');
-    if (!sitemap.includes('</urlset>')) throw new Error('Expected an XML sitemap closing tag');
-    writeFileSync(sitemapFile, sitemap.replace('</urlset>', urls + '</urlset>'));
+  const sitemapFile=join(directory,'sitemap.xml');
+  const sitemap=readFileSync(sitemapFile,'utf8');
+  if (!sitemap.includes(origin+'reader-responses/')){
+    if (!sitemap.includes('</urlset>')) throw new Error('Sitemap has no closing urlset tag');
+    writeFileSync(sitemapFile,sitemap.replace('</urlset>',['reader-responses/','newsletter-signup/'].map(s=>'<url><loc>'+origin+s+'</loc></url>').join('')+'</urlset>'));
   }
 }
