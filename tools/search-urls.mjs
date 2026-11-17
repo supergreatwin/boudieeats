@@ -1,7 +1,7 @@
 import { copyFileSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export function alignSearchUrls({ directory, deployed, canonical, indexable, analyticsId }) {
+export function alignSearchUrls({ directory, deployed, canonical, indexable, analyticsId, language = 'en-US' }) {
   if (!indexable) return;
   const useAnalytics = deployed.href === canonical.href && /^G-[A-Z0-9]{10}$/.test(analyticsId);
   if (useAnalytics) {
@@ -22,7 +22,7 @@ export function alignSearchUrls({ directory, deployed, canonical, indexable, ana
     }
     if (entry === 'index.html') {
       const journal = { '@context': 'https://schema.org', '@type': 'WebSite',
-        name: 'boudieeats.', url: canonical.href, inLanguage: 'ar-EG' };
+        name: 'boudieeats.', url: canonical.href, inLanguage: language };
       head += `<script type="application/ld+json">${JSON.stringify(journal)}</script>`;
     }
     writeFileSync(path, head + html.slice(end));
