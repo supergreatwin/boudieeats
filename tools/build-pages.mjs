@@ -3,6 +3,7 @@ import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { alignSearchUrls } from './search-urls.mjs';
+import { addEngagementPages } from './engagement-pages.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -43,6 +44,10 @@ alignSearchUrls({
   indexable: env.PUBLIC_INDEXABLE === 'true',
   analyticsId: 'G-F35G5DT9NH',
 });
+
+// Add editorial workspace gateway and embedded reader forms to the built site.
+// This runs after canonical/analytics rewrites, preserving existing Astro output.
+addEngagementPages({ directory: join(project, 'dist'), basePath: env.SITE_BASE_PATH });
 
 // Publish Google Search Console verification at the Cloudflare site root.
 const verificationFile = 'google7cba358329a08d09.html';

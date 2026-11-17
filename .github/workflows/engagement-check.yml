@@ -1,0 +1,41 @@
+name: Validate BoudieEats editorial integration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tools/**'
+      - '.github/workflows/engagement-check.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: tools/astro/package-lock.json
+      - name: Check engagement code syntax
+        run: |
+          node --check tools/engagement-pages.mjs
+          node --check tools/build-pages.mjs
+      - name: Build static website
+        run: node tools/build-pages.mjs
+        env:
+          SITE_URL: https://boudieeats.pages.dev
+          SITE_BASE_PATH: /
+      - name: Check public pages, privacy and links
+        run: |
+          test -f boudieeats/dist/reader-responses/index.html
+          test -f boudieeats/dist/newsletter-signup/index.html
+          test -f boudieeats/dist/editorial-desk/index.html
+          grep -q 'tally.so/embed/kbG7Lo' boudieeats/dist/reader-responses/index.html
+          grep -q 'tally.so/embed/vXDORl' boudieeats/dist/newsletter-signup/index.html
+          grep -q 'noindex,nofollow' boudieeats/dist/editorial-desk/index.html
+          grep -q 'reader-responses/' boudieeats/dist/sitemap.xml
+          grep -q 'class="be-reader-links"' boudieeats/dist/index.html
