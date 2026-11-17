@@ -7,6 +7,7 @@ import { alignSearchUrls } from './search-urls.mjs';
 import { addEngagementPages } from './engagement-pages.mjs';
 import { localizeSource } from './localize-source.mjs';
 import { restoreArabicVisitorPages, finishLanguageLinks } from './bilingual-pages.mjs';
+import { addAccountPages } from './account-pages.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -93,6 +94,12 @@ cpSync(arabicBackup, join(dist, 'ar'), { recursive: true });
 
 // Every page links to the equivalent URL in the other language; sitemap
 // and hreflang include the two independent canonical editions.
+addAccountPages({
+  directory: dist,
+  basePath: originalBase,
+  supabaseUrl: process.env.BE_SUPABASE_URL || '',
+  supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || '',
+});
 finishLanguageLinks({ directory: dist, basePath: originalBase });
 
 // Publish Google Search Console verification at the Cloudflare site root.
