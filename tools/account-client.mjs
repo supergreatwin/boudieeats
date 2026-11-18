@@ -100,6 +100,146 @@ function draftView(){
  area('body',tr('Article text','نص المقال'),'',50),tr('Save draft','حفظ المسودة'))+
  '</section><section class="be-panel"><h2>'+tr('Saved drafts','المسودات المحفوظة')+'</h2><div id="be-draft-list" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section></div>';
 }
+
+/* The bilingual desk uses the existing two language-specific draft rows.
+   A shared author, section and slug connect the translations; no database
+   or authorization changes are required. */
+function bilingualDraftView(){
+ const pane=(lang,title,subtitle)=>{
+  const isAr=lang==='ar';
+  return '<section class="be-language-pane be-language-'+lang+'" lang="'+lang+'" dir="'+(isAr?'rtl':'ltr')+'">'+
+    '<header class="be-pane-heading"><h3>'+title+'</h3><p>'+subtitle+'</p>'+
+    '<span class="be-pane-state" data-state-for="'+lang+'">'+tr('Not saved yet','لسه متحفظتش')+'</span></header>'+
+    '<label class="be-field"><span>'+(isAr?'العنوان':'Title')+'</span>'+
+    '<input name="title_'+lang+'" maxlength="160" dir="'+(isAr?'rtl':'ltr')+
+    '" placeholder="'+(isAr?'عنوان المقال بالعربي':'Article title in English')+'"></label>'+
+    '<label class="be-field"><span>'+(isAr?'نص المقال':'Article text')+'</span>'+
+    '<textarea name="body_'+lang+'" dir="'+(isAr?'rtl':'ltr')+'" maxlength="100000" spellcheck="true" '+
+    'placeholder="'+(isAr?'اكتب النسخة العربية هنا…':'Write the English version here…')+'"></textarea></label>'+
+    '<div class="be-pane-tools"><span data-word-count="'+lang+'">'+(isAr?'٠ كلمة':'0 words')+'</span>'+
+    '<button type="button" data-action="toggle-preview" data-lang="'+lang+'">'+
+    (isAr?'معاينة':'Preview')+'</button></div>'+
+    '<div class="be-pane-preview" data-preview="'+lang+'" hidden></div></section>';
+ };
+ return '<div class="be-bilingual-workspace"><section class="be-panel be-bilingual-intro">'+
+  '<h2>'+tr('Write both language versions','اكتب النسختين جنب بعض')+'</h2>'+
+  '<p class="be-muted">'+tr(
+    'English on the left, Arabic on the right. Each translation is saved as its own private draft. Enter one or both; you can finish the other later.',
+    'النسخة الإنجليزية على الشمال والعربية على اليمين. كل نسخة بتتحفظ كمسودة مستقلة. ممكن تحفظ واحدة وترجع تكمل التانية بعدين.'
+   )+'</p>'+
+  '<form class="be-form be-bilingual-form" data-form="bilingual-draft">'+
+  '<div class="be-bilingual-shared">'+
+   select('kind',tr('Section','القسم'),kindOptions)+
+   input('slug',tr('Shared URL slug (Latin letters and hyphens)','الرابط المشترك (إنجليزي وشرطة)'),{
+    required:true,pattern:'[a-z0-9]+(-[a-z0-9]+)*',maxlength:90,placeholder:'my-food-story'
+   })+
+  '</div><p class="be-muted be-pair-hint">'+tr(
+    'The section and URL slug identify this bilingual article. They are fixed after the first save.',
+    'القسم والرابط بيربطوا النسختين ببعض، ومش بيتغيروا بعد أول حفظ.'
+  )+'</p>'+
+  '<div class="be-bilingual-grid">'+
+   pane('en','English version','Left-to-right article')+
+   pane('ar','النسخة العربية','المقال من اليمين للشمال')+
+  '</div><div class="be-bilingual-actions"><button class="be-primary" type="submit">'+
+  tr('Save article versions','حفظ نسخ المقال')+'</button>'+
+  '<button type="button" data-action="cancel-edit">'+tr('New article','مقال جديد')+'</button></div>'+
+  '</form></section></div>'+
+  '<section class="be-panel be-drafts-panel"><h2>'+tr('Saved articles','المقالات المحفوظة')+
+  '</h2><div id="be-draft-list" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
+}
+function updateBilingualCounts(form){
+ for(const lang of ['en','ar']){
+  const words=String(form.elements.namedItem('body_'+lang)?.value||'').trim().split(/\s+/).filter(Boolean).length;
+  const counter=form.querySelector('[data-word-count="'+lang+'"]');
+  if(counter)counter.textContent=lang==='ar'?new Intl.NumberFormat('ar-EG').format(words)+' كلمة':
+    words+' '+(words===1?'word':'words');
+  const preview=form.querySelector('[data-preview="'+lang+'"]');
+  if(preview&&!preview.hidden){
+   const title=String(form.elements.namedItem('title_'+lang)?.value||'').trim();
+   const text=String(form.elements.namedItem('body_'+lang)?.value||'').trim();
+   preview.replaceChildren();
+   const heading=document.createElement('h4');heading.textContent=title||((lang==='ar')?'بدون عنوان':'Untitled');
+   const body=document.createElement('p');body.textContent=text||((lang==='ar')?'لسه مفيش نص':'No text yet');
+   preview.append(heading,body);
+  }
+ }
+}
+function setPairFormMeta(form,records){
+ form.dataset.pairIds='';
+ const byLang=Object.fromEntries(records.map(item=>[item.language,item]));
+ if(records.length){
+  const slug=records[0].slug,kind=records[0].kind;
+  const slugField=form.elements.namedItem('slug'),kindField=form.elements.namedItem('kind');
+  slugField.value=slug;slugField.readOnly=true;
+  kindField.value=kind;kindField.disabled=true;
+  form.dataset.pairSlug=slug;form.dataset.pairKind=kind;
+ }
+ for(const lang of ['en','ar']){
+  const item=byLang[lang],locked=item&&!['draft','needs_changes'].includes(item.state);
+  form.elements.namedItem('title_'+lang).value=item?.title||'';
+  form.elements.namedItem('body_'+lang).value=item?.body||'';
+  form.elements.namedItem('title_'+lang).readOnly=!!locked;
+  form.elements.namedItem('body_'+lang).readOnly=!!locked;
+  const pane=form.querySelector('.be-language-'+lang);
+  pane.dataset.draftId=item?.id||'';
+  pane.dataset.locked=locked?'true':'false';
+  const marker=form.querySelector('[data-state-for="'+lang+'"]');
+  marker.textContent=item?statusLabel(item.state):tr('Not saved yet','لسه متحفظتش');
+ }
+ form.querySelector('button[type="submit"]').textContent=tr('Save article versions','حفظ نسخ المقال');
+ updateBilingualCounts(form);
+}
+async function saveBilingualDrafts(form){
+ if(!canWrite())throw Error(tr('Contributor access required.','لازم صلاحية مساهم.'));
+ const kind=form.dataset.pairKind||value(form,'kind');
+ const slug=form.dataset.pairSlug||value(form,'slug');
+ if(!kindOptions.some(([key])=>key===kind)||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)||slug.length>90)
+   throw Error(tr('Enter a valid article section and URL slug.','اختر القسم واكتب رابط صحيح.'));
+ const entries=[];
+ for(const lang of ['en','ar']){
+  const title=value(form,'title_'+lang),body=value(form,'body_'+lang);
+  const pane=form.querySelector('.be-language-'+lang);
+  if(pane?.dataset.locked==='true')continue;
+  if(!title&&!body)continue;
+  if(title.length<4||title.length>160||body.length<50||body.length>100000)
+   throw Error(lang==='ar'?tr('Arabic needs a title of at least 4 characters and article text of at least 50 characters.','النسخة العربية محتاجة عنوان ٤ حروف على الأقل ونص ٥٠ حرف على الأقل.'):
+      tr('English needs a title of at least 4 characters and article text of at least 50 characters.','النسخة الإنجليزية محتاجة عنوان ٤ حروف على الأقل ونص ٥٠ حرف على الأقل.'));
+  entries.push({language:lang,title,body});
+ }
+ if(!entries.length)throw Error(tr('Write a complete Arabic or English version before saving.','اكتب نسخة عربية أو إنجليزية كاملة الأول قبل الحفظ.'));
+ // Restrict matches to this author and exact shared section + slug. The RLS
+ // policies continue to prevent changes to other authors and reviewed drafts.
+ const {data:existing,error:lookupError}=await client.from('be_drafts')
+  .select('id,kind,slug,language,state,title,body').eq('author_id',user.id)
+  .eq('kind',kind).eq('slug',slug);
+ if(lookupError)throw lookupError;
+ const byLang=Object.fromEntries((existing||[]).map(item=>[item.language,item]));
+ const saved=[],failures=[];
+ for(const entry of entries){
+  const old=byLang[entry.language],payload={title:entry.title,body:entry.body};
+  if(old&&!['draft','needs_changes'].includes(old.state)){
+   failures.push(entry.language+': '+tr('Already submitted or approved','اتبعثت أو اتوافق عليها'));
+   continue;
+  }
+  const response=old
+   ?await client.from('be_drafts').update(payload).eq('id',old.id).eq('author_id',user.id)
+      .in('state',['draft','needs_changes']).select('id,kind,slug,language,state,title,body').single()
+   :await client.from('be_drafts').insert({...payload,author_id:user.id,kind,slug,language:entry.language})
+      .select('id,kind,slug,language,state,title,body').single();
+  if(response.error)failures.push(entry.language+': '+response.error.message);
+  else{byLang[entry.language]=response.data;saved.push(entry.language);}
+ }
+ if(saved.length){
+  setPairFormMeta(form,Object.values(byLang));
+  await loadDrafts();
+ }
+ if(failures.length)throw Error(
+  (saved.length?tr('Saved: ','اتحفظت: ')+saved.join(', ')+'. ':'')+
+  tr('Other versions failed: ','فشل حفظ نسخ: ')+failures.join('; '));
+ if(saved.length)say(tr('Saved: ','اتحفظت: ')+saved.join(' + ')+
+  tr('. Both versions remain private drafts.','. النسختين مسودات خاصة.'));
+}
+
 function staffView(){
  return '<section class="be-panel"><h2>'+tr('Editorial review queue','قائمة مراجعة التحرير')+'</h2><p class="be-muted">'+tr('Review and approve submitted drafts; approval does not publish to the public site.','راجع المسودات ووافق عليها؛ الموافقة مش بتنشر المقال تلقائيًا على الموقع.')+'</p><div id="be-review-list">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
 }
@@ -138,7 +278,7 @@ function deskArticles(){
  return deskHeading(tr('Articles & drafts','المقالات والمسودات'),
    tr('Prepare recipes, reviews and food stories. Review is required before approval.',
       'حضّر الوصفات والتجارب وحكايات الأكل، وابعث المسودات للمراجعة.'))+
-   draftView()+(isStaff()?staffView():'')+
+   bilingualDraftView()+(isStaff()?staffView():'')+
    '<p class="be-workflow-note">'+tr('Approval does not publish content to the public website until publishing integration is enabled.',
      'الموافقة على المقال مش معناها نشره تلقائيًا على الموقع لحد تفعيل ربط النشر.')+'</p>';
 }
@@ -359,10 +499,32 @@ async function loadPitches(){
 }
 async function loadDrafts(){
  const target=document.getElementById('be-draft-list');if(!target)return;
- const {data,error}=await client.from('be_drafts').select('id,title,kind,language,state,created_at').eq('author_id',user.id).order('created_at',{ascending:false}).limit(40);
+ const {data,error}=await client.from('be_drafts').select('id,title,slug,kind,language,state,created_at').eq('author_id',user.id).order('created_at',{ascending:false}).limit(80);
  if(!target.isConnected)return;
  target.textContent=error?error.message:'';
- if(!error)target.innerHTML=data.length?data.map(x=>row(x.title,x.kind+' · '+x.language+' · '+x.state,
+ if(error)return;
+ if(deskMode){
+  const groups=new Map();
+  for(const item of data){
+   const key=item.kind+':'+item.slug+':'+user.id;
+   if(!groups.has(key))groups.set(key,{kind:item.kind,slug:item.slug,langs:{}});
+   groups.get(key).langs[item.language]=item;
+  }
+  target.innerHTML=groups.size?[...groups.values()].map(g=>{
+   const en=g.langs.en,arabic=g.langs.ar;
+   const editable=!![en,arabic].find(x=>x&&['draft','needs_changes'].includes(x.state));
+   const details=[
+    'EN: '+(en?statusLabel(en.state):tr('Missing','مش موجودة')),
+    'AR: '+(arabic?statusLabel(arabic.state):tr('Missing','مش موجودة'))
+   ].join(' · ');
+   const actions=(editable||!en||!arabic?option(tr('Edit both','تعديل النسختين'),'edit-draft',(en||arabic).id):'')+
+     (en&&['draft','needs_changes'].includes(en.state)?' '+option(tr('Submit EN','إرسال EN'),'submit-draft',en.id):'')+
+     (arabic&&['draft','needs_changes'].includes(arabic.state)?' '+option(tr('Submit AR','إرسال AR'),'submit-draft',arabic.id):'');
+   return row(en?.title||arabic?.title||g.slug,g.kind+' · '+g.slug+' · '+details,actions);
+  }).join(''):'<p>'+tr('No articles saved yet.','مفيش مقالات محفوظة لسه.')+'</p>';
+  return;
+ }
+ target.innerHTML=data.length?data.map(x=>row(x.title,x.kind+' · '+x.language+' · '+statusLabel(x.state),
  (x.state==='draft'||x.state==='needs_changes')?option(tr('Edit','تعديل'),'edit-draft',x.id)+' '+option(tr('Submit for review','إرسال للمراجعة'),'submit-draft',x.id):'')).join(''):'<p>'+tr('No drafts saved yet.','مفيش مسودات محفوظة لسه.')+'</p>';
 }
 async function loadReview(){
@@ -396,6 +558,15 @@ root.addEventListener('click',async event=>{
  if(action==='logout'){await client.auth.signOut();user=profile=null;say(tr('Signed out.','تم تسجيل الخروج.'));render();return;}
  if(action==='cancel-edit'){say('');render();return;}
 
+ if(action==='toggle-preview'){
+  const lang=button.dataset.lang;
+  if(!['en','ar'].includes(lang))return;
+  const form=root.querySelector('[data-form="bilingual-draft"]');
+  if(!form)return;
+  const preview=form.querySelector('[data-preview="'+lang+'"]');
+  if(preview){preview.hidden=!preview.hidden;updateBilingualCounts(form);}
+  return;
+ }
  const id=button.dataset.id;if(!id)return;
  if(action==='edit-draft'){
    button.disabled=true;
@@ -404,8 +575,20 @@ root.addEventListener('click',async event=>{
        .select('id,title,kind,language,slug,body,state').eq('id',id).eq('author_id',user.id).single();
      if(error)throw error;
      if(!['draft','needs_changes'].includes(data.state))throw Error(tr('This draft is no longer editable.','المسودة دي مبقتش قابلة للتعديل.'));
-     if(deskMode){tab='articles';}else{tab='drafts';}
-     render();
+     if(deskMode){
+       tab='articles';render();
+       const form=root.querySelector('[data-form="bilingual-draft"]');
+       if(!form)throw Error(tr('The bilingual editor is unavailable.','محرر اللغتين مش متاح.'));
+       const pair=await client.from('be_drafts')
+         .select('id,title,kind,language,slug,body,state').eq('author_id',user.id)
+         .eq('kind',data.kind).eq('slug',data.slug);
+       if(pair.error)throw pair.error;
+       setPairFormMeta(form,pair.data||[data]);
+       form.querySelector('[name="title_'+data.language+'"]')?.focus();
+       say(tr('Editing the linked English and Arabic versions.','بتعدّل النسختين الإنجليزية والعربية جنب بعض.'));
+       return;
+     }
+     tab='drafts';render();
      const form=root.querySelector('[data-form="draft"]');
      if(!form)throw Error(tr('The draft editor is unavailable.','محرر المسودات مش متاح.'));
      form.dataset.draftId=data.id;
@@ -437,6 +620,10 @@ root.addEventListener('click',async event=>{
   if(response?.error)throw response.error;
   say(tr('Updated successfully.','تم التحديث بنجاح.'));render();
  }catch(error){say(error.message,true);}finally{button.disabled=false;}
+});
+root.addEventListener('input',event=>{
+ const form=event.target.closest('[data-form="bilingual-draft"]');
+ if(form)updateBilingualCounts(form);
 });
 root.addEventListener('submit',async event=>{
  const form=event.target.closest('[data-form]');if(!form)return;event.preventDefault();
@@ -481,6 +668,10 @@ root.addEventListener('submit',async event=>{
   if(action==='apply'){
     const {error}=await client.from('be_applications').insert({user_id:user.id,statement:value(form,'statement')});
     if(error)throw error;render();say(tr('Application sent.','تم إرسال الطلب.'));return;
+  }
+  if(action==='bilingual-draft'){
+    await saveBilingualDrafts(form);
+    return;
   }
   if(action==='draft'){
     if(!canWrite())throw Error(tr('Contributor access required.','لازم صلاحية مساهم.'));
