@@ -48,7 +48,7 @@ function authPanel(){
  '<p class="be-muted">'+button(tr('Back to sign in','الرجوع لتسجيل الدخول'),'login')+'</p></section>';
  if(authMode==='recovery')return '<section class="be-panel"><h2>'+tr('Choose a new password','اختيار كلمة مرور جديدة')+'</h2>'+
  formFrame('recovery',input('password',tr('New password','كلمة المرور الجديدة'),{type:'password',required:true,minlength:12,autocomplete:'new-password'}),tr('Update password','تحديث كلمة المرور'))+'</section>';
- return '<section class="be-panel"><h2>'+tr('Sign in','تسجيل الدخول')+'</h2>'+(document.body.dataset.mode==='desk'?'':'<p>'+tr('Your independent BoudieEats account. No GitHub login required.','حساب مستقل داخل موقع بودي إيتس. مش محتاج GitHub.')+'</p>')+
+ return '<section class="be-panel"><h2>'+tr('Sign in','تسجيل الدخول')+'</h2>'+
   formFrame('login',email+password,tr('Sign in','دخول'))+
   '<div class="be-actions">'+button(tr('Create account','إنشاء حساب'),'signup')+button(tr('Forgot password?','نسيت كلمة المرور؟'),'forgot')+'</div></section>';
 }
