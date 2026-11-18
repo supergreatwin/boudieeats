@@ -9,6 +9,7 @@ import { localizeSource } from './localize-source.mjs';
 import { restoreArabicVisitorPages, finishLanguageLinks } from './bilingual-pages.mjs';
 import { addAccountPages } from './account-pages.mjs';
 import { bePublicConfig } from './be-public-config.mjs';
+import { polishVisitorPages } from './site-polish.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -102,6 +103,8 @@ addAccountPages({
   supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey,
 });
 finishLanguageLinks({ directory: dist, basePath: originalBase });
+// Apply responsive brand-safe corrections to both complete language editions.
+polishVisitorPages({ directory: dist, basePath: originalBase });
 
 // Publish Google Search Console verification at the Cloudflare site root.
 const verificationFile = 'google7cba358329a08d09.html';
