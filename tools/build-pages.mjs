@@ -49,7 +49,7 @@ execFileSync('npm', ['run', 'build'], { cwd: project, env, stdio: 'inherit' });
 alignSearchUrls({
   directory: join(project, 'dist'),
   deployed: new URL((env.SITE_BASE_PATH.replace(/\/?$/, '/')), site),
-  canonical: new URL('https://boudieeats.pages.dev/'),
+  canonical: new URL('https://boudieeats.com/'),
   indexable: env.PUBLIC_INDEXABLE === 'true',
   analyticsId: 'G-F35G5DT9NH',
   language: 'en-US',
@@ -80,7 +80,7 @@ execFileSync('npm', ['run', 'build'], { cwd: project, env: arabicEnv, stdio: 'in
 alignSearchUrls({
   directory: dist,
   deployed: new URL(arabicBase.replace(/^\//, ''), site),
-  canonical: new URL('https://boudieeats.pages.dev/ar/'),
+  canonical: new URL('https://boudieeats.com/ar/'),
   indexable: arabicEnv.PUBLIC_INDEXABLE === 'true',
   analyticsId: 'G-F35G5DT9NH',
   language: 'ar-EG',
