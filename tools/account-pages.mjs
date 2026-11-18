@@ -21,7 +21,7 @@ function render({arabic,desk,base,config}){
    '<a href="'+localBase+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a>')+'</nav></div></header>'+
  '<main class="be-shell be-main"><p class="be-overline">'+(arabic?'المجتمع والتحرير':'COMMUNITY & EDITORIAL')+'</p><h1>'+title+'.</h1>'+
  '<p class="be-intro">'+description+'</p><div id="be-account-status" class="be-status" role="status" aria-live="polite"></div><div id="be-account-app"></div></main>'+
- '<footer class="be-footer"><div class="be-shell"><span>© BoudieEats</span><span>'+(arabic?'حسابات الموقع مستقلة عن GitHub وعن Without Permission.':'Accounts are separate from GitHub and Without Permission.')+'</span></div></footer>'+
+ '<footer class="be-footer"><div class="be-shell"><span>© BoudieEats</span><span>'+(arabic?'يومية أكل مصرية.':'An Egyptian food journal.')+'</span></div></footer>'+
  '<script>window.BE_AUTH_CONFIG='+publicConfig+';</script><script type="module" src="'+base+'be-account.js"></script></body></html>';
 }
 export function addAccountPages({directory,basePath='/',supabaseUrl='',supabasePublishableKey=''}){
