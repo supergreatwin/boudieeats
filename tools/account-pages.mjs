@@ -10,7 +10,7 @@ function render({arabic,desk,base,config}){
  const localBase=base+(arabic?'ar/':'');
  const publicConfig=JSON.stringify({url:config.url||'',publishableKey:config.key||'',basePath:base}).replace(/</g,'\\u003c');
  return '<!doctype html><html lang="'+language+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#315b4b">'+
- '<title>'+title+' | BoudieEats</title><meta name="description" content="'+esc(description)+'"><link rel="canonical" href="https://boudieeats.pages.dev/'+(arabic?'ar/':'')+(desk?'editorial-desk/':'account/')+'">'+css+(desk?deskCss:'')+'</head>'+
+ '<title>'+title+' | BoudieEats</title><meta name="description" content="'+esc(description)+'"><link rel="canonical" href="https://boudieeats.com/'+(arabic?'ar/':'')+(desk?'editorial-desk/':'account/')+'">'+css+(desk?deskCss:'')+'</head>'+
  '<body data-mode="'+(desk?'desk':'account')+'"><header class="be-top"><div class="be-shell"><a class="be-brand" href="'+localBase+'">'+(arabic?'بودي إيتس.':'boudieeats.')+'</a><nav>'+
  (desk ? '<a href="'+localBase+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
    '<a href="'+base+(arabic?'':'ar/')+'editorial-desk/">'+(arabic?'English':'AR')+'</a>' :
