@@ -23,7 +23,7 @@ for(const required of ['ar/index.html','ar/recipes/shaareya-bel-laban/index.html
  if(!pages.includes(required))errors.push('missing '+required);
 }
 const sitemap=readFileSync(join(dist,'sitemap.xml'),'utf8');
-for(const path of ['https://boudieeats.pages.dev/ar/','https://boudieeats.pages.dev/ar/reader-responses/','https://boudieeats.pages.dev/ar/newsletter-signup/']){
+for(const path of ['https://boudieeats.com/ar/','https://boudieeats.com/ar/reader-responses/','https://boudieeats.com/ar/newsletter-signup/']){
  if(!sitemap.includes('<loc>'+path+'</loc>'))errors.push('Arabic sitemap missing '+path);
 }
 const arabicFeedback=readFileSync(join(dist,'ar/reader-responses/index.html'),'utf8');
