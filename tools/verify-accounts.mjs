@@ -25,6 +25,14 @@ const source=readFileSync(join(dist,'be-account.js'),'utf8');
 for(const name of ['signInWithPassword','signUp','resetPasswordForEmail','updateUser','be_profiles','be_drafts','be_pitches','be_applications']){
  if(!source.includes(name))errors.push('Account app missing '+name);
 }
+for(const name of ['renderDesk','deskNav','deskArticles','deskPitches','deskAlerts','deskAnalytics','deskActivity','deskAccounts','loadIncomingPitches','loadDeskMetrics','loadTeamAccounts','edit-draft','be_review_pitch']){
+ if(!source.includes(name))errors.push('Editorial desk structure missing '+name);
+}
+for(const page of ['editorial-desk/index.html','ar/editorial-desk/index.html']){
+ const html=readFileSync(join(dist,page),'utf8');
+ if(!html.includes('be-workspace-head'))errors.push(page+': editorial workspace layout CSS missing');
+ if(!html.includes('be-tabs'))errors.push(page+': editorial menu stylesheet missing');
+}
 const english=readFileSync(join(dist,'index.html'),'utf8');
 const arabic=readFileSync(join(dist,'ar/index.html'),'utf8');
 if(!/class="be-account-nav" href="[^"]*\/account\/"/.test(english))errors.push('English account menu missing');
