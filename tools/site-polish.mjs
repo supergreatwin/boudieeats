@@ -144,12 +144,16 @@ function putHeaderControlsTogether(html){
 
 function polishPage(html,{isArabic,isHome,base}){
   html=removeBookmarkUi(html);
-  html=html.replace(/<div aria-hidden="true" class="cover-seal">[\s\S]*?<\/div>/g,'');
+  html=html.replace(/<div\b(?=[^>]*\bclass="[^"]*\bcover-seal\b)[^>]*>[\s\S]*?<\/div>/g,'');
   if(isArabic){
     for(const [english,arabic] of arabicUiLabels)html=html.replaceAll(english,arabic);
     html=html.replace(
-      /<a class="wordmark" dir="ltr" href="([^"]+)" lang="en">boudieeats<span>\.<\/span><\/a>/g,
-      '<a class="wordmark be-arabic-wordmark" dir="rtl" href="$1" lang="ar">بودي إيتس<span>.</span></a>'
+      /<a\b(?=[^>]*\bclass="[^"]*\bwordmark\b)[^>]*>[\s\S]*?<\/a>/g,
+      match=>{
+        const href=match.match(/\bhref="([^"]+)"/)?.[1];
+        if(!href)throw new Error('Arabic wordmark link lost its target');
+        return '<a class="wordmark be-arabic-wordmark" dir="rtl" href="'+href+'" lang="ar">بودي إيتس<span>.</span></a>';
+      }
     );
     html=html.replace(/(<a class="be-brand"[^>]*>)BoudieEats\.(<\/a>)/g,'$1بودي إيتس.$2');
     html=html.replace(/(<(?:span|p)\b[^>]*?)dir="ltr" lang="en"([^>]*>)(?=[\u0600-\u06ff])/g,'$1dir="rtl" lang="ar"$2');
@@ -178,7 +182,8 @@ export function polishVisitorPages({directory,basePath='/'}){
     const after=polishPage(before,{isArabic,isHome,base});
     if(after.includes('class="icon-button saved-link"'))throw new Error('Bookmark still in header: '+path);
     if(after.includes(' data-save='))throw new Error('Bookmark still in article: '+path);
-    if(isArabic && before.includes('class="wordmark"') && !after.includes('be-arabic-wordmark'))
+    if(isHome && /class="[^"]*\bcover-seal\b/.test(after))throw new Error('Akil badge still shown: '+path);
+    if(isArabic && /class="[^"]*\bwordmark\b/.test(before) && !after.includes('be-arabic-wordmark'))
       throw new Error('Arabic wordmark not rendered: '+path);
     if(isHome && !after.includes('be-home-intro'))throw new Error('Home intro missing: '+path);
     writeFileSync(file,after);
