@@ -438,6 +438,8 @@ function polishPage(html,{isArabic,isHome,base}){
     html=html.replace(/(<(?:span|p)\b[^>]*?)dir="ltr" lang="en"([^>]*>)(?=[\u0600-\u06ff])/g,'$1dir="rtl" lang="ar"$2');
   }
   html=html.replace(/(<div class="about-insignia">[\s\S]*?<span>)(?:أكيل\.|Always hungry\.)(<\/span>)/g,'$1'+(isArabic?'بودي إيتس.':'Boudie Eats.')+'$2');
+  // Non-visual marker lets production checks distinguish new CSS from a stale Cloudflare build.
+  html=html.replace('<div class="entry-grid taste-grid">','<div class="entry-grid taste-grid" data-layout-revision="taste-grid-six-wide">');
   html=putHeaderControlsTogether(html);
   html=html.replace('</head>',css+'</head>');
   if(isHome){
