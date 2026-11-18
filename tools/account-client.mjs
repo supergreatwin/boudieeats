@@ -8,7 +8,7 @@ const tr=(en,arabic)=>ar?arabic:en;
 const root=document.getElementById('be-account-app');
 const status=document.getElementById('be-account-status');
 const base=config.basePath||'/';
-const here=location.origin+base+(ar?'ar/':'')+'account/';
+const here=location.origin+base+(ar?'ar/':'')+(document.body.dataset.mode==='desk'?'editorial-desk/':'account/');
 let client=null, user=null, profile=null, tab=document.body.dataset.mode==='desk'?'articles':'profile', authMode='login', recovery=false, refreshing=false;
 
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -363,7 +363,7 @@ async function loadDrafts(){
  if(!target.isConnected)return;
  target.textContent=error?error.message:'';
  if(!error)target.innerHTML=data.length?data.map(x=>row(x.title,x.kind+' · '+x.language+' · '+x.state,
- (x.state==='draft'||x.state==='needs_changes')?option(tr('Submit for review','إرسال للمراجعة'),'submit-draft',x.id):'')).join(''):'<p>'+tr('No drafts saved yet.','مفيش مسودات محفوظة لسه.')+'</p>';
+ (x.state==='draft'||x.state==='needs_changes')?option(tr('Edit','تعديل'),'edit-draft',x.id)+' '+option(tr('Submit for review','إرسال للمراجعة'),'submit-draft',x.id):'')).join(''):'<p>'+tr('No drafts saved yet.','مفيش مسودات محفوظة لسه.')+'</p>';
 }
 async function loadReview(){
  const target=document.getElementById('be-review-list');if(!target)return;
@@ -394,7 +394,37 @@ root.addEventListener('click',async event=>{
  if(action.startsWith('tab:')){tab=action.slice(4);say('');render();return;}
  if(['login','signup','forgot','recovery'].includes(action)){authMode=action;say('');render();return;}
  if(action==='logout'){await client.auth.signOut();user=profile=null;say(tr('Signed out.','تم تسجيل الخروج.'));render();return;}
+ if(action==='cancel-edit'){say('');render();return;}
+
  const id=button.dataset.id;if(!id)return;
+ if(action==='edit-draft'){
+   button.disabled=true;
+   try{
+     const {data,error}=await client.from('be_drafts')
+       .select('id,title,kind,language,slug,body,state').eq('id',id).eq('author_id',user.id).single();
+     if(error)throw error;
+     if(!['draft','needs_changes'].includes(data.state))throw Error(tr('This draft is no longer editable.','المسودة دي مبقتش قابلة للتعديل.'));
+     if(deskMode){tab='articles';}else{tab='drafts';}
+     render();
+     const form=root.querySelector('[data-form="draft"]');
+     if(!form)throw Error(tr('The draft editor is unavailable.','محرر المسودات مش متاح.'));
+     form.dataset.draftId=data.id;
+     for(const name of ['title','kind','language','slug','body']){
+       const field=form.elements.namedItem(name);
+       if(field)field.value=data[name]||'';
+     }
+     const save=form.querySelector('[type="submit"]');
+     if(save)save.textContent=tr('Update draft','حفظ تعديل المسودة');
+     const controls=document.createElement('div');
+     controls.className='be-actions';
+     controls.innerHTML='<button type="button" data-action="cancel-edit">'+tr('Cancel editing','إلغاء التعديل')+'</button>';
+     form.append(controls);
+     form.querySelector('[name="title"]')?.focus();
+     say(tr('Editing your draft. Changes are saved when you submit.', 'بتعدّل مسودتك. التغييرات بتتحفظ لما تضغط حفظ.'));
+   }catch(error){say(error.message,true);}
+   finally{button.disabled=false;}
+   return;
+ }
  button.disabled=true;
  try{
   let response;
@@ -454,8 +484,12 @@ root.addEventListener('submit',async event=>{
   }
   if(action==='draft'){
     if(!canWrite())throw Error(tr('Contributor access required.','لازم صلاحية مساهم.'));
-    const {error}=await client.from('be_drafts').insert({author_id:user.id,kind:value(form,'kind'),language:value(form,'language'),title:value(form,'title'),slug:value(form,'slug'),body:value(form,'body')});
-    if(error)throw error;render();say(tr('Draft saved privately.','تم حفظ المسودة بشكل خاص.'));return;
+    const payload={kind:value(form,'kind'),language:value(form,'language'),title:value(form,'title'),slug:value(form,'slug'),body:value(form,'body')};
+    const draftId=form.dataset.draftId;
+    const response=draftId
+      ?await client.from('be_drafts').update(payload).eq('id',draftId).eq('author_id',user.id).select('id').single()
+      :await client.from('be_drafts').insert({...payload,author_id:user.id}).select('id').single();
+    if(response.error)throw response.error;render();say(draftId?tr('Draft updated.','تم تعديل المسودة.'):tr('Draft saved privately.','تم حفظ المسودة بشكل خاص.'));return;
   }
  }catch(error){say(error?.message||tr('Please try again.','جرّب تاني.'),true);}
  finally{submit.disabled=false;}
