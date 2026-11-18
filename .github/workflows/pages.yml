@@ -26,6 +26,10 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         id: pages
+      - name: Validate editorial desk scripts
+        run: |
+          node --check tools/account-client.mjs
+          node --check tools/account-pages.mjs
       - name: Build and verify the site
         run: node tools/build-pages.mjs
         env:
