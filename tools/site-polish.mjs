@@ -19,7 +19,17 @@ const arabicUiLabels = [
   ['An Egyptian food journal', 'يومية أكل مصرية'],
   ['The recipe box', 'دفتر الوصفات'],
   ['The review desk', 'دفتر التجارب'],
-  ['The story archive', 'أرشيف الحكايات']
+  ['The story archive', 'أرشيف الحكايات'],
+  ['THE BOUDIE LETTER', 'جواب من بودي'],
+  ['TASTE TEST', 'اختبار الطعم'],
+  ['RESTAURANTS &amp; CAFÉS', 'المطاعم والكافيهات'],
+  ['RESTAURANTS & CAFÉS', 'المطاعم والكافيهات'],
+  ['Food &amp; memory', 'الأكل والذكريات'],
+  ['Food & memory', 'الأكل والذكريات'],
+  ['At the table', 'على السفرة'],
+  ['Behind the journal', 'وراء اليومية'],
+  ['Write to Boudie', 'اكتب لبودي'],
+  ['Search the journal', 'دوّر في اليومية']
 ];
 
 const css = [
@@ -48,6 +58,50 @@ const css = [
   '.be-home-intro .be-home-links a{color:inherit;text-decoration:underline;text-underline-offset:5px}',
   'html[lang^="ar"] .be-home-intro h2{font-family:"Aref Ruqaa",serif}',
   '@media(max-width:800px){.be-home-intro{width:calc(100% - 32px);margin:12px auto 20px;padding:12px 0 18px}.masthead .header-inner .utilities{gap:9px}.be-language{gap:8px!important}}',
+  "/* Responsive three-column editorial cards; preserve the existing color palette. */",
+  "@media (min-width:1100px){.entry-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}",
+  "@media (min-width:700px) and (max-width:1099px){.entry-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}",
+  "@media (max-width:699px){.entry-grid{grid-template-columns:minmax(0,1fr)!important}}",
+  ".entry-grid{display:grid!important;gap:clamp(15px,2vw,25px)!important;align-items:stretch!important}",
+  ".entry-grid>.entry-card{min-width:0!important;height:100%!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}",
+  ".entry-grid>.entry-card>.entry-image-link{display:block!important;max-width:100%!important}",
+  ".entry-grid>.entry-card .editorial-image{width:100%!important;max-width:100%!important;margin:0!important;overflow:hidden!important}",
+  ".entry-grid>.entry-card .entry-image-link img{display:block!important;width:100%!important;height:clamp(160px,17vw,225px)!important;object-fit:cover!important}",
+  ".entry-grid>.entry-card .entry-copy{min-width:0!important;flex:1;display:flex!important;flex-direction:column!important;gap:8px!important;padding:clamp(12px,1.4vw,19px)!important}",
+  ".entry-grid>.entry-card h3{font-size:clamp(1.18rem,1.55vw,1.48rem)!important;line-height:1.35!important;overflow-wrap:anywhere!important;margin:0!important;letter-spacing:normal!important}",
+  ".entry-grid>.entry-card .entry-label{font-size:.79rem!important;line-height:1.5!important;margin:0!important}",
+  ".entry-grid>.entry-card .entry-description{font-size:clamp(.87rem,1vw,.97rem)!important;line-height:1.55!important;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin:0!important}",
+  ".entry-grid>.entry-card .preview-note{font-size:.83rem!important;margin:0!important}",
+  ".entry-grid>.entry-card .text-link{font-size:.87rem!important;margin-top:auto!important;align-self:flex-start}",
+  "html[dir=\"rtl\"] .entry-grid>.entry-card .text-link{align-self:flex-start}",
+  ".page-headline h1{font-size:clamp(2.3rem,5vw,4.8rem)!important;line-height:1.15!important;letter-spacing:normal!important}",
+  ".page-dek{font-size:clamp(1rem,1.32vw,1.16rem)!important;line-height:1.65!important;max-width:66ch!important}",
+  ".page-headline .eyebrow,.section-heading .eyebrow,.home-intro .eyebrow{font-size:clamp(.72rem,.9vw,.85rem)!important;line-height:1.4!important}",
+  ".section-heading h2,.home-intro h2{font-size:clamp(1.75rem,2.7vw,2.65rem)!important;line-height:1.34!important}",
+  ".section-heading{align-items:end!important;gap:15px!important;flex-wrap:wrap!important}",
+  ".home-intro{align-items:start!important;gap:clamp(18px,3vw,38px)!important}",
+  ".home-intro p{font-size:clamp(1rem,1.35vw,1.12rem)!important;line-height:1.7!important}",
+  ".cover-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)!important;align-items:center!important;gap:clamp(15px,2.4vw,36px)!important}",
+  ".cover-copy,.cover-picture{min-width:0!important}",
+  ".cover-copy h1{font-size:clamp(2.4rem,5.2vw,5.4rem)!important;line-height:1.16!important;max-width:15ch!important;letter-spacing:normal!important;text-wrap:balance}",
+  ".cover-copy .cover-phrase{font-size:clamp(1.22rem,2vw,1.75rem)!important;line-height:1.38!important;text-wrap:balance}",
+  ".cover-copy .cover-dek{font-size:clamp(.97rem,1.25vw,1.13rem)!important;line-height:1.66!important;max-width:57ch!important;text-wrap:pretty}",
+  ".cover-copy .kicker{font-size:clamp(.75rem,1.05vw,.94rem)!important;line-height:1.4!important;flex-wrap:wrap!important;gap:8px}",
+  ".cover-picture .editorial-image{max-width:100%!important}",
+  ".cover-picture .editorial-image img{display:block;max-width:100%;width:100%;object-fit:cover;max-height:600px}",
+  ".edition-line{display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important;font-size:clamp(.69rem,.84vw,.78rem)!important}",
+  ".manifesto-inner{display:flex;align-items:center;justify-content:space-between;gap:clamp(12px,2vw,25px);flex-wrap:wrap}",
+  ".manifesto-inner>p{min-width:0!important;flex:1 1 260px!important;font-size:clamp(1.05rem,1.55vw,1.35rem)!important;line-height:1.45!important}",
+  ".manifesto-inner>span{max-width:27ch!important;white-space:normal!important;font-size:clamp(.76rem,1vw,.91rem)!important;line-height:1.45!important}",
+  "html[lang=\"en\"] .cover-copy,html[lang=\"en\"] .page-headline,html[lang=\"en\"] .home-intro{direction:ltr!important;text-align:left!important}",
+  "html[lang^=\"ar\"] .cover-copy,html[lang^=\"ar\"] .page-headline,html[lang^=\"ar\"] .home-intro{direction:rtl!important;text-align:right!important}",
+  "html[lang^=\"ar\"] .entry-grid>.entry-card h3{font-size:clamp(1.32rem,1.7vw,1.63rem)!important;line-height:1.55!important}",
+  "html[lang^=\"ar\"] .entry-grid>.entry-card .entry-description{font-size:clamp(.96rem,1.12vw,1.1rem)!important;line-height:1.6!important}",
+  "html[lang^=\"ar\"] .cover-copy h1{font-size:clamp(2.9rem,5.6vw,5.5rem)!important;line-height:1.5!important}",
+  "html[lang^=\"ar\"] .cover-copy .cover-dek{font-size:clamp(1.02rem,1.26vw,1.19rem)!important;line-height:1.75!important}",
+  "html[lang^=\"ar\"] .be-home-eyebrow{letter-spacing:normal!important}",
+  "@media(max-width:1099px){.cover-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}.entry-grid>.entry-card .entry-image-link img{height:clamp(180px,24vw,240px)!important}}",
+  "@media(max-width:699px){.cover-grid{grid-template-columns:1fr!important;gap:16px!important}.cover-copy h1{max-width:none!important}.cover-picture .editorial-image img{max-height:450px}.entry-grid>.entry-card .entry-image-link img{height:clamp(190px,55vw,275px)!important}.manifesto-inner{align-items:start!important}.be-home-intro .be-home-links{gap:13px}}",
   '</style>'
 ].join('');
 
@@ -90,6 +144,7 @@ function putHeaderControlsTogether(html){
 
 function polishPage(html,{isArabic,isHome,base}){
   html=removeBookmarkUi(html);
+  html=html.replace(/<div aria-hidden="true" class="cover-seal">[\s\S]*?<\/div>/g,'');
   if(isArabic){
     for(const [english,arabic] of arabicUiLabels)html=html.replaceAll(english,arabic);
     html=html.replace(
@@ -97,12 +152,14 @@ function polishPage(html,{isArabic,isHome,base}){
       '<a class="wordmark be-arabic-wordmark" dir="rtl" href="$1" lang="ar">بودي إيتس<span>.</span></a>'
     );
     html=html.replace(/(<a class="be-brand"[^>]*>)BoudieEats\.(<\/a>)/g,'$1بودي إيتس.$2');
+    html=html.replace(/(<(?:span|p)\b[^>]*?)dir="ltr" lang="en"([^>]*>)(?=[\u0600-\u06ff])/g,'$1dir="rtl" lang="ar"$2');
   }
   html=putHeaderControlsTogether(html);
   html=html.replace('</head>',css+'</head>');
   if(isHome){
     if(!html.includes('<main'))throw new Error('Home page has no main landmark');
-    html=html.replace(/<main\b[^>]*>/,match=>match+homeIntroduction(isArabic,base));
+    if(!html.includes('<div class="manifesto">'))throw new Error('Home manifesto landmark missing');
+    html=html.replace('<div class="manifesto">',homeIntroduction(isArabic,base)+'<div class="manifesto">');
   }
   return html;
 }
