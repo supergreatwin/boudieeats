@@ -1,45 +1,46 @@
-# Boudie Eats × What To Eat — standalone prototype
+# Boudie Eats × What To Eat — Interactive Prototype
 
-This is an **isolated, non-production** UI prototype stored on branch `prototype/what-to-eat-community`.
+**Status:** isolated non-production prototype. **Branch:** `prototype/what-to-eat-community`. No files in `main` were changed.
 
-## Open the prototype
+## Preview
 
-1. On GitHub, switch to branch `prototype/what-to-eat-community`.
-2. Open `prototypes/what-to-eat/index.html` and download the raw file.
-3. Open the HTML file directly in Safari, Chrome, or Firefox.
+Open: https://raw.githack.com/supergreatwin/boudieeats/prototype/what-to-eat-community/prototypes/what-to-eat/index.html
 
-The file has embedded HTML, CSS, and JavaScript; Google Fonts is the only optional external dependency. There is **no build step, backend integration, API key, analytics tracking, or deployment requirement**.
+Or download `index.html`, `enhancements.js` and the `assets/` directory together, then open `index.html` in a modern browser.
 
-## Experience
+**Demo access code:** `BOUDIE` (display-only gate, not a real security mechanism).
 
-- Bilingual Arabic/English, responsive design based on Boudie Eats' current editorial branding.
-- A proposed What To Eat entry directly on the Boudie Eats-style homepage.
-- Demo access code: `BOUDIE` (client-side presentation only).
-- Community overview and six interactive sections:
-  - Mama Approved (criteria concepts and empty states).
-  - Besor3a Map (sample dish search, city filter, **schematic map only**).
-  - What To Eat From (location-first sample filtering).
-  - Food Guide (preview of contents; no real PDF).
-  - Community badge (downloadable **preview-only** SVG).
-  - Monthly Spotlight (local nomination form, **no submission stored**).
+## Boudie Eats' ORIGINAL photography
 
-## Data and design limitations
+The original repository retains source content in `boudieeats-source.tar.gz`. A one-time GitHub Action extracted and converted **24 real, original site photos** into `assets/photo-01.jpg` through `photo-24.jpg`. The manifest records each source path and selected hero. The original photo of the vermicelli dessert now appears in the home-page cover, replacing the mock illustration.
 
-The four restaurant examples are editorial references / demo records, **not imported Facebook posts, community votes, rankings, validated coordinates, or current restaurant recommendations**. All example results are explicitly marked.
+Images have been inserted into the Boudie Eats-style homepage, original photography gallery, gate, community dashboard, guide cover and spotlight preview. No generated stock or AI photography is used.
 
-The cover recipe image is an illustration stand-in rather than reproducing the existing website's original photo. The layout and color system echo the website design, but this is not a byte-for-byte copy of the production build.
+Extractor: `extract-original-photos.py`. Workflow: `.github/workflows/what-to-eat-photos.yml`. Only the prototype branch receives derived assets.
 
-Facebook group membership verification is **not implemented**; the demo gate is not authentication and does not protect actual data. No Supabase connection is made. No personal data is sent anywhere by the nomination form.
+## Working prototype interactions
 
-The concept is independent and unofficial; What To Eat co-branding and official membership labels should require prior administrator approval before a production launch.
+- Arabic/English navigation and branded homepage entry.
+- Demo access with `BOUDIE`.
+- Six community navigation sections.
+- **Besor3a**: searchable demo restaurant index by dish and area, an actual interactive Leaflet/OpenStreetMap map, an optional geolocation button, and Google Maps search links for external discovery.
+- **What To Eat From**: location-first filters over the same demo records.
+- **Contributions**: submit restaurant/dish/area to a **local-only** index using browser localStorage; filter results immediately and clear additions.
+- **Food Guide**: open a printable preview and use the browser's Print / Save as PDF functionality.
+- **Badges**: downloadable, clearly marked concept-only SVG.
+- **Spotlight**: local-only nomination form with confirmation (no submission sent/stored).
+- **Mama Approved**: transparent concepts, criteria and empty states. No invented approvals.
 
-## Safety / isolation
+## Not yet implemented
 
-- All prototype code is contained inside `prototypes/what-to-eat/` on a non-main branch.
-- No production files or the current Astro build are changed.
-- **Do not merge the branch into main** or deploy the experience until explicitly approved.
-- Existing Cloudflare, GitHub Pages, accounts, Supabase, editorial CMS, and newsletter configuration are untouched.
+This is a functional **front-end prototype**, not a production community platform. Facebook group membership **cannot be verified** by the mock password gate. There is no actual Supabase authorization, admin approval, private group import, real group sourced ranking, verified restaurant pin coordinates, user account persistence, moderation workflow or backend-submitted spotlight nominations.
 
-## Scope of later production work
+The map shows real tiles and optional user location, but **does not make up restaurant pins**. The Google Maps buttons open external restaurant search results, **not** community rankings. Sample entries are editorial references, not verified members' recommendations.
 
-Real Supabase authorization and invite handling, RLS, user consent, attributed community submissions, verified geocoding, actual search indices, PDF guide generation, moderation and branding permissions would be needed for a launch.
+Publishing a co-branded official What To Eat service requires permission from group administrators, data permissions, content moderation, and proper access control.
+
+## Privacy and production isolation
+
+No credentials, API keys, or Supabase connection are used. Location is requested only on explicit user action and is not stored. Local recommendations remain in the same browser until cleared. Form demo submissions are not sent to servers.
+
+**Do not merge this branch into `main` or deploy to the live site without explicit approval.**
