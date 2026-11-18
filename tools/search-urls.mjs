@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 export function alignSearchUrls({ directory, deployed, canonical, indexable, analyticsId, language = 'en-US' }) {
   if (!indexable) return;
-  const useAnalytics = deployed.href === canonical.href && /^G-[A-Z0-9]{10}$/.test(analyticsId);
+  const useAnalytics = (deployed.href === canonical.href || (canonical.hostname === 'boudieeats.com' && deployed.hostname === 'boudieeats.pages.dev')) && /^G-[A-Z0-9]{10}$/.test(analyticsId);
   if (useAnalytics) {
     for (const file of ['analytics.css', 'analytics.js']) {
       copyFileSync(new URL(file, import.meta.url), join(directory, file));
