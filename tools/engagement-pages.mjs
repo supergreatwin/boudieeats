@@ -5,7 +5,7 @@ export function addEngagementPages({ directory, basePath = '/' }) {
   const normalized = '/' + String(basePath).replace(/^\/+|\/+$/g, '');
   const base = normalized === '/' ? '/' : normalized + '/';
   const link = slug => base + slug;
-  const origin = 'https://boudieeats.pages.dev/';
+  const origin = 'https://boudieeats.com/';
   const feedback = 'https://tally.so/r/kbG7Lo';
   const waitlist = 'https://tally.so/r/vXDORl';
   const menu = '<nav class="be-reader-links" aria-label="Reader participation">' +
