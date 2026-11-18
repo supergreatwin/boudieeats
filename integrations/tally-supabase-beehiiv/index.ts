@@ -171,6 +171,20 @@ Deno.serve(async (request) => {
     return new Response("Newsletter consent needs a valid email", { status: 422 });
   }
 
+  // A previously completed delivery must not trigger another confirmation email.
+  // A prior failed delivery remains 'pending' and can be retried safely.
+  const statusResponse = await fetch(
+    `${projectUrl.replace(/\/$/, "")}/rest/v1/be_tally_submissions?select=newsletter_sync_status&form_id=eq.${encodeURIComponent(d.formId)}&submission_id=eq.${encodeURIComponent(submissionId)}`,
+    {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    },
+  );
+  if (!statusResponse.ok) return new Response("Sync status unavailable", { status: 502 });
+  const statusRows = await statusResponse.json() as { newsletter_sync_status: string }[];
+  if (statusRows[0]?.newsletter_sync_status === "synced") {
+    return Response.json({ received: true, stored: true, newsletter: "already_synced" });
+  }
+
   const beehiivToken = Deno.env.get("BE_BEEHIIV_API_KEY");
   if (!beehiivToken) return new Response("beehiiv secret not configured", { status: 503 });
   const beehiiv = await fetch(
