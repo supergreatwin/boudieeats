@@ -9,7 +9,7 @@ const root=document.getElementById('be-account-app');
 const status=document.getElementById('be-account-status');
 const base=config.basePath||'/';
 const here=location.origin+base+(ar?'ar/':'')+'account/';
-let client=null, user=null, profile=null, tab=document.body.dataset.mode==='desk'?'desk':'profile', authMode='login', recovery=false, refreshing=false;
+let client=null, user=null, profile=null, tab=document.body.dataset.mode==='desk'?'articles':'profile', authMode='login', recovery=false, refreshing=false;
 
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const roleLabel=r=>({
@@ -106,6 +106,178 @@ function staffView(){
 function applicationView(){
  return '<section class="be-panel"><h2>'+tr('Contributor applications','طلبات المساهمة')+'</h2><div id="be-admin-apps">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
 }
+
+const deskMode=document.body.dataset.mode==='desk';
+const statusLabel=state=>({
+ draft:tr('Draft','مسودة'),submitted:tr('Submitted','اتبعثت'),
+ needs_changes:tr('Changes requested','تعديلات مطلوبة'),
+ approved:tr('Approved','اتوافقت'),
+ received:tr('Received','وصلت'),in_review:tr('In review','قيد المراجعة'),
+ accepted:tr('Accepted','اتقبلت'),declined:tr('Declined','اعتذرنا عنها'),
+ pending:tr('Pending','قيد المراجعة')
+})[state]||state;
+const formatDate=date=>date?new Date(date).toLocaleDateString(ar?'ar-EG':'en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+function deskNav(){
+ const items=[
+  ...(canWrite()?[['articles',tr('Articles','المقالات')]]:[['apply',tr('Contribute','المساهمة')]]),
+  ['alerts',tr('Notifications','الإشعارات')],
+  ['profile',tr('Profile','الملف الشخصي')],
+  ['pitches',tr('Pitches','الأفكار الواردة')],
+  ...(isStaff()?[
+   ['review',tr('Review queue','المراجعة')],
+   ['analytics',tr('Analytics','الإحصائيات')],
+   ['activity',tr('Recent activity','النشاط الأخير')]
+  ]:[]),
+  ...(profile?.role==='admin'?[['accounts',tr('Accounts','الحسابات')]]:[])
+ ];
+ return '<nav class="be-tabs" aria-label="'+tr('Editorial desk sections','أقسام مكتب التحرير')+'">'+
+  items.map(([key,label])=>button(label,'tab:'+key,tab===key?'be-active':'')).join('')+'</nav>';
+}
+const deskHeading=(title,desc)=>'<header class="be-view-heading"><div><h2>'+title+'</h2><p>'+desc+'</p></div></header>';
+function deskArticles(){
+ return deskHeading(tr('Articles & drafts','المقالات والمسودات'),
+   tr('Prepare recipes, reviews and food stories. Review is required before approval.',
+      'حضّر الوصفات والتجارب وحكايات الأكل، وابعث المسودات للمراجعة.'))+
+   draftView()+(isStaff()?staffView():'')+
+   '<p class="be-workflow-note">'+tr('Approval does not publish content to the public website until publishing integration is enabled.',
+     'الموافقة على المقال مش معناها نشره تلقائيًا على الموقع لحد تفعيل ربط النشر.')+'</p>';
+}
+function deskPitches(){
+ return deskHeading(tr('Pitches & ideas','الأفكار والاقتراحات'),
+   tr('Review incoming food ideas and keep your own submissions in one place.',
+      'راجع أفكار الأكل الواردة وتابع الاقتراحات اللي بعتهـا.'))+
+   (isStaff()?'<section class="be-panel"><h2>'+tr('Incoming pitches','الأفكار الواردة')+
+     '</h2><div id="be-incoming-pitches" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section>':'')+
+   pitchView();
+}
+function deskAlerts(){
+ return deskHeading(tr('Notifications','الإشعارات'),
+  tr('Live editorial items that need attention, drawn from your Boudie Eats records.',
+     'متابعة مباشرة للمسودات والاقتراحات اللي محتاجة اهتمام في بودي إيتس.'))+
+  '<section class="be-panel"><h2>'+tr('Items requiring attention','حاجات محتاجة متابعة')+
+  '</h2><div id="be-desk-alerts" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
+}
+function deskAnalytics(){
+ return deskHeading(tr('Editorial analytics','إحصائيات التحرير'),
+ tr('Counts of editorial records, not website traffic or newsletter performance.',
+    'أعداد السجلات التحريرية فقط، مش زيارات الموقع أو أداء النشرة.'))+
+ '<div id="be-analytics-metrics" class="be-metrics" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div>';
+}
+function deskActivity(){
+ return deskHeading(tr('Recent editorial activity','النشاط التحريري الأخير'),
+ tr('Recent drafts and pitches; this is not a security audit log.',
+    'آخر المسودات والأفكار، وده مش سجل تدقيق أمني.'))+
+ '<section class="be-panel"><div id="be-activity-list" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
+}
+function deskAccounts(){
+ return deskHeading(tr('Accounts & contributors','الحسابات والمساهمين'),
+ tr('Review contributor requests and view account roles. Existing permissions remain unchanged.',
+    'راجع طلبات المساهمة واطلع على صلاحيات الحسابات من غير تغيير الأذونات الحالية.'))+
+ '<div class="be-columns">'+applicationView()+
+ '<section class="be-panel"><h2>'+tr('Team accounts','حسابات الفريق')+
+ '</h2><div id="be-team-accounts" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section></div>';
+}
+function renderDesk(){
+ if(!['articles','apply','alerts','profile','pitches','review','analytics','activity','accounts'].includes(tab))
+   tab=canWrite()?'articles':'apply';
+ if(tab==='articles'&&!canWrite())tab='apply';
+ if(tab==='review'&&!isStaff())tab=canWrite()?'articles':'apply';
+ if(['analytics','activity'].includes(tab)&&!isStaff())tab='profile';
+ if(tab==='accounts'&&profile.role!=='admin')tab='profile';
+ if(tab==='apply'&&profile.role!=='reader')tab=canWrite()?'articles':'profile';
+ const who=escapeHtml(profile.display_name||profile.username||tr('contributor','مساهم'));
+ const handle=profile.username?'@'+escapeHtml(profile.username):tr('Username not set','اسم المستخدم غير محدد');
+ root.innerHTML='<div class="be-workspace"><div class="be-workspace-head">'+
+ '<div class="be-greeting"><div><div class="be-workspace-meta"><span>'+who+
+ '</span><span>'+roleLabel(profile.role)+'</span><span dir="ltr">'+handle+'</span></div>'+
+ '<h2>'+tr('Welcome to your editorial desk','أهلاً بيك في مكتب التحرير')+'</h2></div></div>'+
+ button(tr('Sign out','تسجيل الخروج'),'logout')+'</div>'+
+ deskNav()+'<div class="be-dashboard" id="be-editorial-view">'+(
+ tab==='articles'?deskArticles():tab==='apply'?applyView():tab==='alerts'?deskAlerts():
+ tab==='profile'?profileView():tab==='pitches'?deskPitches():tab==='review'?staffView():
+ tab==='analytics'?deskAnalytics():tab==='activity'?deskActivity():deskAccounts()
+ )+'</div></div>';
+ if(tab==='articles'){loadDrafts();if(isStaff())loadReview();}
+ if(tab==='apply')loadApplicationState();
+ if(tab==='pitches'){loadPitches();if(isStaff())loadIncomingPitches();}
+ if(tab==='review')loadReview();
+ if(tab==='accounts'){loadApplications();loadTeamAccounts();}
+ if(tab==='alerts')loadDeskAlerts();
+ if(tab==='analytics')loadDeskMetrics();
+ if(tab==='activity')loadDeskActivity();
+}
+async function loadIncomingPitches(){
+ const target=document.getElementById('be-incoming-pitches');if(!target||!isStaff())return;
+ const {data,error}=await client.from('be_pitches').select('id,title,kind,state,created_at').order('created_at',{ascending:false}).limit(70);
+ if(!target.isConnected)return;
+ if(error){target.textContent=error.message;return;}
+ const actions=item=>item.state==='received'?
+  pitchOption(tr('Start review','ابدأ المراجعة'),'in_review',item.id)+pitchOption(tr('Decline','اعتذار'),'declined',item.id):
+  item.state==='in_review'?
+  pitchOption(tr('Accept','موافقة'),'accepted',item.id)+pitchOption(tr('Decline','اعتذار'),'declined',item.id):'';
+ target.innerHTML=data.length?data.map(x=>row(x.title,x.kind+' · '+statusLabel(x.state)+' · '+formatDate(x.created_at),actions(x))).join(''):
+  '<p>'+tr('No incoming pitches.','مفيش أفكار واردة دلوقتي.')+'</p>';
+}
+function pitchOption(label,decision,id){
+ return '<button type="button" data-action="pitch-decision" data-decision="'+decision+'" data-id="'+escapeHtml(id)+'">'+label+'</button>';
+}
+async function loadDeskAlerts(){
+ const target=document.getElementById('be-desk-alerts');if(!target)return;
+ const q=client.from('be_drafts').select('id,title,state,updated_at').in('state',isStaff()?['submitted','needs_changes']:['submitted','needs_changes']);
+ const draftQuery=isStaff()?q:q.eq('author_id',user.id);
+ const results=await Promise.all([
+  draftQuery.order('updated_at',{ascending:false}).limit(20),
+  isStaff()?client.from('be_pitches').select('id,title,state,created_at').in('state',['received','in_review']).order('created_at',{ascending:false}).limit(12):
+   client.from('be_pitches').select('id,title,state,created_at').eq('author_id',user.id).order('created_at',{ascending:false}).limit(8)
+ ]);
+ if(!target.isConnected)return;
+ for(const x of results)if(x.error){target.textContent=x.error.message;return;}
+ const items=[
+  ...results[0].data.map(x=>({title:x.title,meta:tr('Article','مقال')+' · '+statusLabel(x.state),date:x.updated_at})),
+  ...results[1].data.map(x=>({title:x.title,meta:tr('Pitch','فكرة')+' · '+statusLabel(x.state),date:x.created_at}))
+ ].sort((a,b)=>new Date(b.date)-new Date(a.date));
+ target.innerHTML=items.length?items.map(x=>row(x.title,x.meta+' · '+formatDate(x.date))).join(''):
+ '<p>'+tr('No items need attention right now.','مفيش حاجات محتاجة متابعة دلوقتي.')+'</p>';
+}
+async function loadDeskMetrics(){
+ const target=document.getElementById('be-analytics-metrics');if(!target||!isStaff())return;
+ const queries=[
+  [tr('All drafts','كل المسودات'),client.from('be_drafts').select('id',{head:true,count:'exact'})],
+  [tr('Submitted for review','بانتظار المراجعة'),client.from('be_drafts').select('id',{head:true,count:'exact'}).eq('state','submitted')],
+  [tr('Approved','الموافق عليها'),client.from('be_drafts').select('id',{head:true,count:'exact'}).eq('state','approved')],
+  [tr('Incoming pitches','الأفكار الواردة'),client.from('be_pitches').select('id',{head:true,count:'exact'})],
+  [tr('Contributors','المساهمين'),client.from('be_profiles').select('id',{head:true,count:'exact'}).in('role',['contributor','editor','admin'])]
+ ];
+ const results=await Promise.all(queries.map(([,q])=>q));
+ if(!target.isConnected)return;
+ target.innerHTML=results.map((r,i)=>'<section><span>'+queries[i][0]+'</span><strong>'+(
+ r.error?tr('Unavailable','غير متاح'):String(r.count??0))+'</strong></section>').join('');
+}
+async function loadDeskActivity(){
+ const target=document.getElementById('be-activity-list');if(!target||!isStaff())return;
+ const rr=await Promise.all([
+ client.from('be_drafts').select('title,state,updated_at').order('updated_at',{ascending:false}).limit(20),
+ client.from('be_pitches').select('title,state,created_at').order('created_at',{ascending:false}).limit(20)
+ ]);
+ if(!target.isConnected)return;
+ for(const r of rr)if(r.error){target.textContent=r.error.message;return;}
+ const items=[
+  ...rr[0].data.map(x=>({title:x.title,meta:tr('Article','مقال')+' · '+statusLabel(x.state),date:x.updated_at})),
+  ...rr[1].data.map(x=>({title:x.title,meta:tr('Pitch','فكرة')+' · '+statusLabel(x.state),date:x.created_at}))
+ ].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);
+ target.innerHTML=items.length?items.map(x=>row(x.title,x.meta+' · '+formatDate(x.date))).join(''):
+ '<p>'+tr('No editorial records yet.','لسه مفيش سجلات تحريرية.')+'</p>';
+}
+async function loadTeamAccounts(){
+ const target=document.getElementById('be-team-accounts');if(!target||profile?.role!=='admin')return;
+ const {data,error}=await client.from('be_profiles').select('username,display_name,role,joined_at').order('joined_at',{ascending:false}).limit(80);
+ if(!target.isConnected)return;
+ if(error){target.textContent=error.message;return;}
+ target.innerHTML=data.length?data.map(x=>row(x.display_name||x.username||tr('Unnamed account','حساب من غير اسم'),
+  roleLabel(x.role)+' · '+formatDate(x.joined_at))).join(''):
+ '<p>'+tr('No team accounts found.','مفيش حسابات ظاهرة.')+'</p>';
+}
+
 function render(){
  if(!root)return;
  if(!client){
@@ -116,6 +288,7 @@ function render(){
  }
  if(recovery){root.innerHTML=authPanel();return;}
  if(!user||!profile){root.innerHTML=authPanel();return;}
+ if(deskMode){renderDesk();return;}
  if(!['profile','desk','pitches','drafts','review','applications','apply'].includes(tab))tab='profile';
  if(tab==='drafts'&&!canWrite())tab='desk';
  if(tab==='review'&&!isStaff())tab='desk';
@@ -230,6 +403,7 @@ root.addEventListener('click',async event=>{
   if(action==='review-change')response=await client.rpc('be_review_draft',{_id:id,_decision:'needs_changes'});
   if(action==='approve-application')response=await client.rpc('be_review_application',{_user:id,_approve:true});
   if(action==='decline-application')response=await client.rpc('be_review_application',{_user:id,_approve:false});
+  if(action==='pitch-decision'&&isStaff()&&['in_review','accepted','declined'].includes(button.dataset.decision))response=await client.rpc('be_review_pitch',{_id:id,_decision:button.dataset.decision});
   if(response?.error)throw response.error;
   say(tr('Updated successfully.','تم التحديث بنجاح.'));render();
  }catch(error){say(error.message,true);}finally{button.disabled=false;}
