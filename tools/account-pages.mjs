@@ -12,7 +12,7 @@ function render({arabic,desk,base,config}){
  '<title>'+title+' | BoudieEats</title><meta name="description" content="'+esc(description)+'"><link rel="canonical" href="https://boudieeats.pages.dev/'+(arabic?'ar/':'')+(desk?'editorial-desk/':'account/')+'">'+css+'</head>'+
  '<body data-mode="'+(desk?'desk':'account')+'"><header class="be-top"><div class="be-shell"><a class="be-brand" href="'+localBase+'">BoudieEats.</a><nav>'+
  (desk ? '<a href="'+localBase+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
-   '<a href="'+base+(arabic?'':'ar/')+'editorial-desk/">'+(arabic?'English':'العربية')+'</a>' :
+   '<a href="'+base+(arabic?'':'ar/')+'editorial-desk/">'+(arabic?'English':'AR')+'</a>' :
    '<a href="'+localBase+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
    '<a href="'+localBase+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
    '<a href="'+localBase+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
