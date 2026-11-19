@@ -106,6 +106,19 @@ finishLanguageLinks({ directory: dist, basePath: originalBase });
 // Apply responsive brand-safe corrections to both complete language editions.
 polishVisitorPages({ directory: dist, basePath: originalBase });
 
+// Cloudflare Pages: keep XML discovery available but out of normal search
+// results, and keep the pages.dev mirror from competing with our own domain.
+// Host-specific rules do not apply to https://boudieeats.com/.
+const headersPath = join(dist, '_headers');
+let headerRules = existsSync(headersPath) ? readFileSync(headersPath, 'utf8').trimEnd() + '\n\n' : '';
+if (!headerRules.includes('/sitemap.xml\n')) {
+  headerRules += '/sitemap.xml\n  X-Robots-Tag: noindex\n\n';
+}
+if (!headerRules.includes('https://boudieeats.pages.dev/*')) {
+  headerRules += 'https://boudieeats.pages.dev/*\n  X-Robots-Tag: noindex\n';
+}
+writeFileSync(headersPath, headerRules);
+
 // Publish Google Search Console verification at the Cloudflare site root.
 const verificationFile = 'google7cba358329a08d09.html';
 copyFileSync(join(root, verificationFile), join(project, 'dist', verificationFile));
