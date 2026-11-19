@@ -48,7 +48,7 @@ BoudieEats accounts are independent of GitHub and other publications. Do not dep
 - **Editor:** review queue; request changes or approve submitted drafts.
 - **Admin:** editorial privileges plus approval of contributor applications. The first admin must be provisioned from the dedicated Supabase project.
 
-Draft approval in the private database **does not automatically publish a public article**. A separate renderer/deployment integration is still needed before calling this a publishing CMS. Reader submissions remain private under RLS.
+Draft approval remains private until an editor clicks **Publish article**. The published copy is stored in `public.be_publications` and rendered on the corresponding English or Arabic recipes, reviews, or stories page. Editors can unpublish without deleting the approved draft. Private pitches, applications, and unpublished drafts remain protected by RLS. This is client-rendered publication; server-rendered URLs and sitemap generation for optimal SEO are a separate future enhancement.
 
 ## Build checks
 
