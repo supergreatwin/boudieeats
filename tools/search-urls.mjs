@@ -21,8 +21,30 @@ export function alignSearchUrls({ directory, deployed, canonical, indexable, ana
       head += `<link rel="stylesheet" href="/analytics.css"><script defer src="/analytics.js" data-measurement-id="${analyticsId}"></script>`;
     }
     if (entry === 'index.html') {
+      // Site identity and editorial focus are explicit in both language editions.
+      const arabic = language.toLowerCase().startsWith('ar');
+      const title = arabic
+        ? 'بودي إيتس | وصفات أكل ومراجعات مطاعم وكافيهات'
+        : 'Boudie Eats | Egyptian Recipes & Restaurant Reviews';
+      const description = arabic
+        ? 'بودي إيتس مجلة أكل مصرية بتقدم وصفات منزلية ومراجعات مطاعم وكافيهات وتجارب أكل وحكايات من مصر.'
+        : 'Boudie Eats is an Egyptian food journal featuring homemade recipes, restaurant and café reviews, and stories about food in Egypt.';
+      const escaped = value => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
+      const setMeta = (attribute, key, content) => {
+        const expression = new RegExp('<meta[^>]*' + attribute + '="' + key + '"[^>]*>', 'i');
+        const value = `<meta ${attribute}="${key}" content="${escaped(content)}">`;
+        head = expression.test(head) ? head.replace(expression, value) : head + value;
+      };
+      const titlePattern = new RegExp('<title[^>]*>.*?</title>', 'is');
+      const titleTag = `<title>${escaped(title)}</title>`;
+      head = titlePattern.test(head) ? head.replace(titlePattern, titleTag) : head + titleTag;
+      setMeta('name', 'description', description);
+      setMeta('property', 'og:title', title);
+      setMeta('property', 'og:description', description);
+      setMeta('property', 'og:site_name', 'Boudie Eats');
       const journal = { '@context': 'https://schema.org', '@type': 'WebSite',
-        name: 'boudieeats.', url: canonical.href, inLanguage: language };
+        name: 'Boudie Eats', alternateName: 'بودي إيتس',
+        url: canonical.href, inLanguage: language };
       head += `<script type="application/ld+json">${JSON.stringify(journal)}</script>`;
     }
     writeFileSync(path, head + html.slice(end));
