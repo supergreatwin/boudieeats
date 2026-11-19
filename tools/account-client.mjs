@@ -86,8 +86,8 @@ function deskView(){
  '<section><span>'+tr('Your role','صلاحيتك')+'</span><strong>'+roleLabel(profile.role)+'</strong></section>'+
  '<section><span>'+tr('Your username','اسم المستخدم')+'</span><strong dir="ltr">@'+escapeHtml(profile.username||tr('not set','غير محدد'))+'</strong></section></div>'+
  '<div class="be-columns"><section class="be-panel"><h2>'+tr('Editorial workflow','سير عمل التحرير')+'</h2><p>'+
- tr('Ideas → drafts → review → approval. Approved content is not automatically published to the website until publishing integration is enabled.',
- 'أفكار ← مسودات ← مراجعة ← موافقة. الموافقة مش معناها نشر تلقائي على الموقع لحد ربط نظام النشر.')+'</p>'+
+ tr('Ideas → drafts → review → approval → Publish. Editors control when an approved article goes live.',
+ 'أفكار ← مسودات ← مراجعة ← موافقة ← نشر. المحرر هو اللي بينشر المقال بعد الموافقة.')+'</p>'+
  (canWrite()?button(tr('Open drafts','افتح المسودات'),'tab:drafts','be-primary'):button(tr('Apply to contribute','قدّم طلب مساهمة'),'tab:apply','be-primary'))+
  '</section><section class="be-panel"><h2>'+tr('Incoming ideas','الأفكار الواردة')+'</h2><p>'+tr('Your ideas are private; editors can review them.','أفكارك خاصة، والمحررين يقدروا يراجعوها.')+'</p>'+
  button(tr('View ideas','عرض الأفكار'),'tab:pitches')+'</section></div>';
@@ -241,7 +241,7 @@ async function saveBilingualDrafts(form){
 }
 
 function staffView(){
- return '<section class="be-panel"><h2>'+tr('Editorial review queue','قائمة مراجعة التحرير')+'</h2><p class="be-muted">'+tr('Review and approve submitted drafts; approval does not publish to the public site.','راجع المسودات ووافق عليها؛ الموافقة مش بتنشر المقال تلقائيًا على الموقع.')+'</p><div id="be-review-list">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
+ return '<section class="be-panel"><h2>'+tr('Editorial review queue','قائمة مراجعة التحرير')+'</h2><p class="be-muted">'+tr('Review drafts, then explicitly publish or unpublish approved articles.','راجع المسودات، وبعد الموافقة انشر المقال أو شيله من الموقع.')+'</p><div id="be-review-list">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
 }
 function applicationView(){
  return '<section class="be-panel"><h2>'+tr('Contributor applications','طلبات المساهمة')+'</h2><div id="be-admin-apps">'+tr('Loading…','جارٍ التحميل…')+'</div></section>';
@@ -279,8 +279,8 @@ function deskArticles(){
    tr('Prepare recipes, reviews and food stories. Review is required before approval.',
       'حضّر الوصفات والتجارب وحكايات الأكل، وابعث المسودات للمراجعة.'))+
    bilingualDraftView()+(isStaff()?staffView():'')+
-   '<p class="be-workflow-note">'+tr('Approval does not publish content to the public website until publishing integration is enabled.',
-     'الموافقة على المقال مش معناها نشره تلقائيًا على الموقع لحد تفعيل ربط النشر.')+'</p>';
+   '<p class="be-workflow-note">'+tr('Approval keeps a draft private until an editor selects Publish.',
+     'الموافقة بتخلي المسودة خاصة لحد ما المحرر يضغط نشر.')+'</p>';
 }
 function deskPitches(){
  return deskHeading(tr('Pitches & ideas','الأفكار والاقتراحات'),
@@ -385,6 +385,7 @@ async function loadDeskMetrics(){
   [tr('All drafts','كل المسودات'),client.from('be_drafts').select('id',{head:true,count:'exact'})],
   [tr('Submitted for review','بانتظار المراجعة'),client.from('be_drafts').select('id',{head:true,count:'exact'}).eq('state','submitted')],
   [tr('Approved','الموافق عليها'),client.from('be_drafts').select('id',{head:true,count:'exact'}).eq('state','approved')],
+   [tr('Published','المنشورة'),client.from('be_publications').select('draft_id',{head:true,count:'exact'})],
   [tr('Incoming pitches','الأفكار الواردة'),client.from('be_pitches').select('id',{head:true,count:'exact'})],
   [tr('Contributors','المساهمين'),client.from('be_profiles').select('id',{head:true,count:'exact'}).in('role',['contributor','editor','admin'])]
  ];
@@ -528,12 +529,34 @@ async function loadDrafts(){
  (x.state==='draft'||x.state==='needs_changes')?option(tr('Edit','تعديل'),'edit-draft',x.id)+' '+option(tr('Submit for review','إرسال للمراجعة'),'submit-draft',x.id):'')).join(''):'<p>'+tr('No drafts saved yet.','مفيش مسودات محفوظة لسه.')+'</p>';
 }
 async function loadReview(){
- const target=document.getElementById('be-review-list');if(!target)return;
- const {data,error}=await client.from('be_drafts').select('id,title,kind,language,state,body,created_at').eq('state','submitted').order('created_at',{ascending:true}).limit(40);
+ const target=document.getElementById('be-review-list');if(!target||!isStaff())return;
+ const [drafts,publications]=await Promise.all([
+  client.from('be_drafts').select('id,title,slug,kind,language,state,body,created_at')
+   .in('state',['submitted','approved']).order('created_at',{ascending:false}).limit(100),
+  client.from('be_publications').select('draft_id').limit(300)
+ ]);
  if(!target.isConnected)return;
- target.textContent=error?error.message:'';
- if(!error)target.innerHTML=data.length?data.map(x=>row(x.title,x.kind+' · '+x.language+' · '+x.body.slice(0,120),
- option(tr('Approve draft','الموافقة'),'review-approve',x.id)+' '+option(tr('Request changes','طلب تعديل'),'review-change',x.id))).join(''):'<p>'+tr('Review queue is empty.','مفيش مسودات للمراجعة.')+'</p>';
+ const error=drafts.error||publications.error;
+ if(error){target.textContent=error.message;return;}
+ const liveIds=new Set((publications.data||[]).map(x=>x.draft_id));
+ target.innerHTML=(drafts.data||[]).length?(drafts.data||[]).map(x=>{
+  const live=liveIds.has(x.id);
+  const summary=x.kind+' · '+x.language+' · '+(live?tr('Published','منشور'):statusLabel(x.state))+' · '+x.body.slice(0,100);
+  let actions='';
+  if(x.state==='submitted'){
+   actions=option(tr('Approve draft','الموافقة'),'review-approve',x.id)+' '+
+    option(tr('Request changes','طلب تعديل'),'review-change',x.id);
+  }else if(live){
+   actions=option(tr('Unpublish','إلغاء النشر'),'unpublish-draft',x.id);
+   const link=base+(x.language==='ar'?'ar/':'')+'published/read/?kind='+
+     encodeURIComponent(x.kind)+'&slug='+encodeURIComponent(x.slug);
+   actions+=' <a href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">'+
+    tr('View live article','عرض المقال')+'</a>';
+  }else{
+   actions=option(tr('Publish article','نشر المقال'),'publish-draft',x.id);
+  }
+  return row(x.title,summary,actions);
+ }).join(''):'<p>'+tr('No articles await review or publishing.','مفيش مقالات للمراجعة أو النشر دلوقتي.')+'</p>';
 }
 async function loadApplications(){
  const target=document.getElementById('be-admin-apps');if(!target)return;
@@ -614,6 +637,8 @@ root.addEventListener('click',async event=>{
   if(action==='submit-draft')response=await client.rpc('be_submit_draft',{_id:id});
   if(action==='review-approve')response=await client.rpc('be_review_draft',{_id:id,_decision:'approved'});
   if(action==='review-change')response=await client.rpc('be_review_draft',{_id:id,_decision:'needs_changes'});
+   if(action==='publish-draft'&&isStaff())response=await client.rpc('be_publish_draft',{_id:id});
+   if(action==='unpublish-draft'&&isStaff())response=await client.rpc('be_unpublish_draft',{_id:id});
   if(action==='approve-application')response=await client.rpc('be_review_application',{_user:id,_approve:true});
   if(action==='decline-application')response=await client.rpc('be_review_application',{_user:id,_approve:false});
   if(action==='pitch-decision'&&isStaff()&&['in_review','accepted','declined'].includes(button.dataset.decision))response=await client.rpc('be_review_pitch',{_id:id,_decision:button.dataset.decision});
