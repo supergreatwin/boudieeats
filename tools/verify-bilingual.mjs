@@ -22,6 +22,17 @@ for(const path of pages){
 for(const required of ['ar/index.html','ar/recipes/shaareya-bel-laban/index.html','ar/reviews/takeaway-bowls/index.html','ar/stories/cilantro-betna-el-tany/index.html','ar/reader-responses/index.html','ar/newsletter-signup/index.html','ar/editorial-desk/index.html']){
  if(!pages.includes(required))errors.push('missing '+required);
 }
+// Preserve the independent Arabic homepage identity in every production build.
+const arabicHome=readFileSync(join(dist,'ar/index.html'),'utf8');
+for(const [label,required] of [
+ ['Arabic SEO title','<title>بودي إيتس — يومية أكل مصرية</title>'],
+ ['Arabic description','يومية أكل مصرية من بودي: وصفات بيتية، مراجعات صريحة للمطاعم والكافيهات، وحكايات عن الأكل اللي بنحبه.'],
+ ['Arabic canonical','<link rel="canonical" href="https://boudieeats.com/ar/">'],
+ ['Arabic hreflang','hreflang="ar-EG" href="https://boudieeats.com/ar/"'],
+ ['English hreflang','hreflang="en" href="https://boudieeats.com/"']
+]) {
+ if(!arabicHome.includes(required))errors.push(label+' missing from Arabic homepage');
+}
 const sitemap=readFileSync(join(dist,'sitemap.xml'),'utf8');
 for(const path of ['https://boudieeats.com/ar/','https://boudieeats.com/ar/reader-responses/','https://boudieeats.com/ar/newsletter-signup/']){
  if(!sitemap.includes('<loc>'+path+'</loc>'))errors.push('Arabic sitemap missing '+path);
