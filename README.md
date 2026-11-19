@@ -15,12 +15,12 @@ BoudieEats has a bilingual private account interface at `/account/` and `/ar/acc
 
 The dedicated BoudieEats Supabase project **vktegxiycqwqnnqpxiuh** is active and the account schema was applied successfully. The bilingual site is configured to use this project's public publishable key, with RLS protecting all account and editorial data. **Email-confirmation redirects, SMTP delivery, and end-to-end signup have not yet been verified; do not announce public registration as launch-ready until those checks pass.**
 
-BoudieEats accounts are independent of GitHub and of the **Without Permission** publication. Do not deploy the schema to the latter's project.
+BoudieEats accounts are independent of GitHub and other publications. Do not deploy the schema to another project's backend.
 
 ## Verify production authentication and launch
 
 1. The separate project is already created at [BoudieEats Supabase](https://supabase.com/dashboard/project/vktegxiycqwqnnqpxiuh), with initial cost quoted at $0/month. Its four RLS-enabled tables and policies are deployed as migration `boudieeats_independent_accounts_initial`. **Do not rerun the initial schema.**
-2. The site has the dedicated project's public URL and publishable key in `tools/be-public-config.mjs`. This key is public by design, not a secret. The GitHub build no longer needs repository variables; Cloudflare may optionally override using matching `BE_SUPABASE_URL` and `BE_SUPABASE_PUBLISHABLE_KEY`. Never use the Without Permission project.
+2. The site has the dedicated project's public URL and publishable key in `tools/be-public-config.mjs`. This key is public by design, not a secret. The GitHub build no longer needs repository variables; Cloudflare may optionally override using matching `BE_SUPABASE_URL` and `BE_SUPABASE_PUBLISHABLE_KEY`. Never use another project's Supabase instance.
 3. The next steps are Auth configuration and a controlled real-email signup test; they cannot be confirmed through the available Supabase project-management connector.
 4. Auth settings: enable Email provider and **Confirm email**, minimum password length at least 12, rate limits, and CAPTCHA if appropriate. Configure a verified SMTP provider; do **not** open public registration until confirmation and password-reset messages arrive successfully.
 5. Set the Supabase Auth Site URL to the chosen production site. Add **both** language return URLs to the redirect allowlist:
