@@ -10,6 +10,7 @@ import { restoreArabicVisitorPages, finishLanguageLinks } from './bilingual-page
 import { addAccountPages } from './account-pages.mjs';
 import { bePublicConfig } from './be-public-config.mjs';
 import { polishVisitorPages } from './site-polish.mjs';
+import { addPublishedPages } from './published-pages.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -97,6 +98,12 @@ cpSync(arabicBackup, join(dist, 'ar'), { recursive: true });
 // Every page links to the equivalent URL in the other language; sitemap
 // and hreflang include the two independent canonical editions.
 addAccountPages({
+  directory: dist,
+  basePath: originalBase,
+  supabaseUrl: process.env.BE_SUPABASE_URL || bePublicConfig.url,
+  supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey,
+});
+addPublishedPages({
   directory: dist,
   basePath: originalBase,
   supabaseUrl: process.env.BE_SUPABASE_URL || bePublicConfig.url,
