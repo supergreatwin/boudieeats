@@ -41,9 +41,10 @@ export function alignSearchUrls({ directory, deployed, canonical, indexable, ana
       setMeta('name', 'description', description);
       setMeta('property', 'og:title', title);
       setMeta('property', 'og:description', description);
-      setMeta('property', 'og:site_name', 'Boudie Eats');
+      setMeta('property', 'og:site_name', arabic ? 'بودي إيتس' : 'Boudie Eats');
       const journal = { '@context': 'https://schema.org', '@type': 'WebSite',
-        name: 'Boudie Eats', alternateName: 'بودي إيتس',
+        name: arabic ? 'بودي إيتس' : 'Boudie Eats',
+        ...(arabic ? { alternateName: 'Boudie Eats' } : {}),
         url: canonical.href, inLanguage: language };
       head += `<script type="application/ld+json">${JSON.stringify(journal)}</script>`;
     }
