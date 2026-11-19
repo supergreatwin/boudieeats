@@ -30,6 +30,7 @@ jobs:
         run: |
           node --check tools/account-client.mjs
           node --check tools/account-pages.mjs
+          node --check tools/published-pages.mjs
       - name: Build and verify the site
         run: node tools/build-pages.mjs
         env:
@@ -42,6 +43,7 @@ jobs:
           node tools/verify-english.mjs
           node tools/verify-bilingual.mjs
           node tools/verify-accounts.mjs
+          node tools/verify-publishing.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist
