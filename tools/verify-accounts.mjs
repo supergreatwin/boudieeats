@@ -19,7 +19,7 @@ const authArabic=readFileSync(join(dist,'ar/account/index.html'),'utf8');
 for(const [label,html] of [['English',authEnglish],['Arabic',authArabic]]){
  if(!html.includes('https://vktegxiycqwqnnqpxiuh.supabase.co'))errors.push(label+': dedicated Supabase URL missing');
  if(!html.includes('sb_publishable_'))errors.push(label+': browser publishable API key missing');
- if(html.includes('fxnvjjguxdqvfspsghmi'))errors.push(label+': wrong Without Permission backend detected');
+ if(html.includes('fxnvjjguxdqvfspsghmi'))errors.push(label+': unexpected backend detected');
 }
 const source=readFileSync(join(dist,'be-account.js'),'utf8');
 for(const name of ['signInWithPassword','signUp','resetPasswordForEmail','updateUser','be_profiles','be_drafts','be_pitches','be_applications']){
