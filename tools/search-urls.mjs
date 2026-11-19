@@ -24,10 +24,10 @@ export function alignSearchUrls({ directory, deployed, canonical, indexable, ana
       // Site identity and editorial focus are explicit in both language editions.
       const arabic = language.toLowerCase().startsWith('ar');
       const title = arabic
-        ? 'بودي إيتس | وصفات أكل ومراجعات مطاعم وكافيهات'
+        ? 'بودي إيتس — يومية أكل مصرية'
         : 'Boudie Eats | Egyptian Recipes & Restaurant Reviews';
       const description = arabic
-        ? 'بودي إيتس مجلة أكل مصرية بتقدم وصفات منزلية ومراجعات مطاعم وكافيهات وتجارب أكل وحكايات من مصر.'
+        ? 'يومية أكل مصرية من بودي: وصفات بيتية، مراجعات صريحة للمطاعم والكافيهات، وحكايات عن الأكل اللي بنحبه.'
         : 'Boudie Eats is an Egyptian food journal featuring homemade recipes, restaurant and café reviews, and stories about food in Egypt.';
       const escaped = value => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
       const setMeta = (attribute, key, content) => {
