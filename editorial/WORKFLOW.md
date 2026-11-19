@@ -17,7 +17,9 @@ Do not use or modify the Without Permission database. For the remaining Auth con
 2. Readers can save their profile, submit private food ideas, and apply to become contributors.
 3. A verified administrator can approve contributor applications, after which a contributor can create private recipe, review or food-story drafts in Arabic or English.
 4. The contributor submits the draft for review; an editor requests changes or approves it.
-5. **Approving a draft is not public publishing.** A separate deployment integration is needed before editorial approval can put content onto the static site. Until then the existing GitHub PR workflow remains the manual way to publish editorial content.
+5. A verified editor uses **Publish article** on an approved draft. This copies the article into `public.be_publications`, which is readable publicly under separate RLS policies without exposing private drafts.
+6. The article appears in the matching live English/Arabic recipe, review, or story list and opens in `/published/read/?kind=...&slug=...` (or `/ar/published/read/`). The editor can use **Unpublish** to withdraw it immediately. Approval alone is deliberately private.
+7. New articles use browser-side public rendering. For best SEO (server-rendered individual articles and sitemap entries), a future build-time publishing integration is still recommended. Existing reviewed Markdown articles continue through GitHub PRs.
 
 ## Existing editorial source workflow
 
