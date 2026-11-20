@@ -22,6 +22,22 @@ for(const path of pages){
 for(const required of ['ar/index.html','ar/recipes/shaareya-bel-laban/index.html','ar/reviews/takeaway-bowls/index.html','ar/stories/cilantro-betna-el-tany/index.html','ar/reader-responses/index.html','ar/newsletter-signup/index.html','ar/editorial-desk/index.html']){
  if(!pages.includes(required))errors.push('missing '+required);
 }
+// Brand regression checks: the Arabic identity must never be replaced by the English SVG.
+const englishHome=readFileSync(join(dist,'index.html'),'utf8');
+const arabicHomepage=readFileSync(join(dist,'ar/index.html'),'utf8');
+const englishAbout=readFileSync(join(dist,'about/index.html'),'utf8');
+const arabicAbout=readFileSync(join(dist,'ar/about/index.html'),'utf8');
+if(!englishHome.includes('class="be-wordmark-image"'))errors.push('English header SVG wordmark missing');
+if(!englishAbout.includes('class="be-exact-about-logo"'))errors.push('English About SVG wordmark missing');
+if(!arabicHomepage.includes('be-arabic-wordmark'))errors.push('Arabic header wordmark missing');
+if(arabicHomepage.includes('class="be-wordmark-image"'))errors.push('Arabic header incorrectly replaced with English logo');
+if(!arabicAbout.includes('class="be-arabic-about-logo"'))errors.push('Arabic About logo missing');
+if(arabicAbout.includes('class="be-exact-about-logo"'))errors.push('Arabic About incorrectly replaced with English logo');
+if(!existsSync(join(dist,'media/boudieeats-wordmark.svg')))errors.push('Shared English wordmark SVG missing');
+const logo=existsSync(join(dist,'media/boudieeats-wordmark.svg')) ? readFileSync(join(dist,'media/boudieeats-wordmark.svg'),'utf8') : '';
+if(!logo.includes('fill="#fffaf2"')||!logo.includes('fill="#ebc57b"'))errors.push('English SVG cream lettering and gold dot missing');
+if(englishHome.includes('background:#c6003d')||arabicHomepage.includes('background:#c6003d'))errors.push('Erroneous red background reintroduced');
+
 // Preserve the independent Arabic homepage identity in every production build.
 const arabicHome=readFileSync(join(dist,'ar/index.html'),'utf8');
 for(const [label,required] of [
