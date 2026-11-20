@@ -23,7 +23,7 @@ function page({arabic,editor,base,url,key}){
     '<link rel="alternate" hreflang="en" href="https://boudieeats.com/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="alternate" hreflang="ar-EG" href="https://boudieeats.com/ar/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="stylesheet" href="'+base+'be-what-to-eat.css"></head>'+
-    '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+guidePath+'" aria-label="what to eat?">'+brand+'</a>'+
+    '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+(editor?editorPath+'?preview=1':guidePath)+'" aria-label="what to eat?">'+brand+'</a>'+
     '<nav class="be-language" aria-label="'+(arabic?'روابط القسم':'Section navigation')+'">'+nav+
     '<a href="'+altPath+'" hreflang="'+(arabic?'en':'ar-EG')+'">'+(arabic?'EN':'عربي')+'</a></nav></header>'+
     '<main class="wte-shell" id="wte-root" aria-live="polite"><p>'+(arabic?'جارٍ التحميل…':'Loading private guide…')+'</p></main>'+
