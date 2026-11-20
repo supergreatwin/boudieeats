@@ -58,7 +58,7 @@ export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabas
         short_name:'what to eat?',description:editor?'Private food-guide editing workspace':'Food and restaurant recommendations, awaiting launch',
         lang:arabic?'ar-EG':'en',dir:arabic?'rtl':'ltr',start_url:start,scope:start,
         display:'standalone',background_color:'#f7f7f5',theme_color:'#f36e2d',
-        icons:[192,512].map(size=>({src:base+'be-what-to-eat-app-'+size+'.png',sizes:size+'x'+size,type:'image/png',purpose:'any maskable'})),
+        icons:[192,512].map(size=>({src:base+'be-what-to-eat-app-'+size+'.png',sizes:size+'x'+size,type:'image/png',purpose:'any'})),
         shortcuts:editor?[{name:arabic?'معاينة خاصة':'Private preview',short_name:arabic?'معاينة':'Preview',url:start+'?preview=1'}]:[]
       };
       writeFileSync(join(folder,'manifest.webmanifest'),JSON.stringify(manifest,null,2));
