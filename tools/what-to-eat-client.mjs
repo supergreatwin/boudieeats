@@ -33,6 +33,10 @@ function login(){
   panel(t('Editorial sign-in','دخول فريق التحرير'),'<form id="wte-login" class="wte-form">'+field('email',t('Email','البريد الإلكتروني'),'','email',true)+field('password',t('Password','كلمة المرور'),'','password',true)+'<button class="wte-primary" type="submit">'+t('Sign in','دخول')+'</button></form>')+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>';
 }
+function notFound(){
+  // Do not reveal the unreleased partnership even when someone guesses the URL.
+  root.innerHTML='<div class="wte-intro"><h1>'+t('Page not found','الصفحة غير موجودة')+'</h1><p>'+t('The page you requested is unavailable.','الصفحة المطلوبة غير متاحة.')+'</p><a href="'+esc(cfg.basePath+(ar?'ar/':''))+'">'+t('Return home','العودة للرئيسية')+'</a></div>';
+}
 function denied(){
   root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Not published','لم يُنشر بعد')+'</p><h1>'+t('What to Eat','ناكل إيه؟')+'</h1><p>'+t('This section is reserved for the collaboration team until approval.','القسم ده مخصص لفريق التعاون لحد الموافقة النهائية.')+'</p><a href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Editorial desk','مكتب التحرير')+'</a></div><p id="wte-status" class="wte-status"></p>';
 }
@@ -172,7 +176,7 @@ function renderEditor(){
 }
 function render(){
   if(editor){if(staff())renderEditor();else if(state.user)denied();else login();return;}
-  if(!live()&&!staff()){if(state.user)denied();else login();return;}
+  if(!live()&&!staff()){notFound();return;}
   browse();
 }
 async function refresh(){
