@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, cpSync, rmSync, mkdtempSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, rmSync, mkdtempSync, existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -125,6 +125,27 @@ if (!headerRules.includes('https://boudieeats.pages.dev/*')) {
   headerRules += 'https://boudieeats.pages.dev/*\n  X-Robots-Tag: noindex\n';
 }
 writeFileSync(headersPath, headerRules);
+
+// Retire the old GitHub Pages mirror without changing Cloudflare production.
+// Every generated HTML route points to its matching branded-domain URL.
+if (site.hostname.endsWith('.github.io')) {
+  const walk = directory => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) { walk(path); continue; }
+      if (!entry.isFile() || !entry.name.endsWith('.html') || entry.name.startsWith('google')) continue;
+      const route = path.slice(dist.length).replaceAll('\\\\', '/').replace(/^\\//, '')
+        .replace(/index\\.html$/, '').replace(/\\.html$/, '');
+      const target = new URL(route, 'https://boudieeats.com/').href;
+      const html = readFileSync(path, 'utf8');
+      if (!/<head[^>]*>/i.test(html)) continue;
+      const redirect = '<meta name="robots" content="noindex,follow">' +
+        '<script>location.replace(' + JSON.stringify(target) + '+location.search+location.hash)</script>';
+      writeFileSync(path, html.replace(/<head([^>]*)>/i, '<head$1>' + redirect));
+    }
+  };
+  walk(dist);
+}
 
 // Publish Google Search Console verification at the Cloudflare site root.
 const verificationFile = 'google7cba358329a08d09.html';
