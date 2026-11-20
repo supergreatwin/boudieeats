@@ -11,6 +11,7 @@ for(const prefix of ['', 'ar/']){
       if(!html.includes(marker))errors.push(prefix+mode+' missing '+marker);
     }
     if(!html.includes('what to eat?')||!html.includes('wte-logotype'))errors.push(prefix+mode+' wrong What to Eat wordmark');
+    if(mode==='editorial-desk/what-to-eat'&&!html.includes('editorial-desk/what-to-eat/?preview=1'))errors.push('Editor route has no private preview navigation: '+prefix);
     for(const brandMarker of ['be-what-to-eat-favicon.svg','<nav class="be-language"','what to eat?</span>'])if(!html.includes(brandMarker))errors.push(prefix+mode+' missing independent brand marker '+brandMarker);
     if(html.includes('<title>what to eat? | Boudie Eats</title>'))errors.push(prefix+mode+' uses parent brand title');
     if(html.includes('sb_secret_')||html.includes('service_role'))errors.push(prefix+mode+' exposes private key');
@@ -31,6 +32,7 @@ if(!script.includes('brandHero()')||!script.includes('s.slug===\'community\''))e
 for(const marker of ['be_wte_settings','be_wte_terms','be_wte_places','be_wte_place_notes','be_wte_sections','be_wte_photos','signInWithPassword','createSignedUrl','partner_approved','site_enabled','image_rights_confirmed','city_id','cuisine_id']){
   if(!script.includes(marker))errors.push('Guide client missing '+marker);
 }
+for(const marker of ['wte-preview-toolbar','previewMode()','editorial-desk/what-to-eat/?preview=1'])if(!script.includes(marker))errors.push('Private preview client missing '+marker);
 for(const marker of ['wte-brand-form','community_instagram_url','brand_hero_url','brand_hero_rights_confirmed','function brandHero(compact=false)','wte-community-link'])if(!script.includes(marker))errors.push('Full brand client missing '+marker);
 for(const marker of ['service_role','sb_secret_']){
   if(script.includes(marker))errors.push('Guide client contains private key marker '+marker);
