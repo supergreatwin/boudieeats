@@ -64,7 +64,7 @@
     if(!shown())return;
     const dialog=ensureModal();
     const iframe=dialog.querySelector('iframe');
-    if(iframe&&!iframe.src)iframe.src=iframe.dataset.formUrl;
+    if(iframe&&!iframe.hasAttribute('src'))iframe.setAttribute('src',iframe.dataset.formUrl);
     if(!dialog.open){
       if(typeof dialog.showModal==='function')dialog.showModal();
       else dialog.setAttribute('open','');
