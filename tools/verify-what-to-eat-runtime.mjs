@@ -24,6 +24,7 @@ for(const marker of ['wte-place-form','wte-section-form','wte-photo-form','wte-t
  assert(root.innerHTML.includes(marker),'Editor missing '+marker);
 }
 // Authenticated staff can preview the FULL branded visitor view on the same private URL.
+runInContext("state.search=''",ctx,{timeout:3000});
 sandbox.window.location={search:'?preview=1'};
 runInContext('render()',ctx,{timeout:3000});
 assert.equal(runInContext('previewMode()',ctx),true,'Secure preview mode was not recognized.');
