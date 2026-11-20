@@ -134,8 +134,8 @@ if (site.hostname.endsWith('.github.io')) {
       const path = join(directory, entry.name);
       if (entry.isDirectory()) { walk(path); continue; }
       if (!entry.isFile() || !entry.name.endsWith('.html') || entry.name.startsWith('google')) continue;
-      const route = path.slice(dist.length).replaceAll('\\\\', '/').replace(/^\\//, '')
-        .replace(/index\\.html$/, '').replace(/\\.html$/, '');
+      const route = path.slice(dist.length).replaceAll('\\', '/').replace(/^\//, '')
+        .replace(/index\.html$/, '').replace(/\.html$/, '');
       const target = new URL(route, 'https://boudieeats.com/').href;
       const html = readFileSync(path, 'utf8');
       if (!/<head[^>]*>/i.test(html)) continue;
