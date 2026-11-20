@@ -388,6 +388,7 @@ const css = [
   ".entry-grid:not(.taste-grid)>.entry-card:first-child:nth-last-child(n+3) h3{font-size:clamp(1.4rem,2.2vw,1.95rem)!important;line-height:1.25!important}",
   ".entry-grid:not(.taste-grid)>.entry-card:first-child:nth-last-child(n+3) .entry-description{-webkit-line-clamp:5!important}",
   "@media(max-width:659px){.entry-grid:not(.taste-grid)>.entry-card:first-child:nth-last-child(n+3){grid-column:auto!important;display:flex!important;flex-direction:column!important}}",
+  "\n/* Restrained editorial cover for the two language editions. */\n.be-landing{width:min(1220px,calc(100% - 64px));margin:0 auto;padding:clamp(22px,3vw,42px) 0 clamp(46px,6vw,90px);color:#33232b}\n.be-landing-cover{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:center;gap:clamp(28px,5vw,74px);min-height:530px}\n.be-landing-copy{padding:30px 0;min-width:0}\n.be-landing-eyebrow{display:block;color:#8f3152;text-transform:uppercase;font:700 12px/1.4 \"DM Sans\",sans-serif;letter-spacing:.16em;margin:0 0 20px}\n.be-landing-copy h1{font:600 clamp(3rem,6.4vw,6.7rem)/1.04 \"Fraunces\",Georgia,serif;letter-spacing:-.05em;max-width:11ch;margin:0}\n.be-landing-copy p{font:400 clamp(1rem,1.35vw,1.2rem)/1.7 \"DM Sans\",sans-serif;max-width:43ch;margin:22px 0 29px}\n.be-landing-actions{display:flex;flex-wrap:wrap;gap:14px 23px;align-items:center}\n.be-landing-primary{background:#51283e;color:#fff!important;display:inline-block;padding:13px 21px;text-decoration:none!important;border:1px solid #51283e;border-radius:0!important;font:700 13px \"DM Sans\",sans-serif}\n.be-landing-secondary{background:none;color:#51283e!important;border:0;border-bottom:1px solid #51283e;padding:9px 0;cursor:pointer;font:700 13px \"DM Sans\",sans-serif}\n.be-landing-photo{margin:0;overflow:hidden;min-width:0;align-self:stretch;max-height:610px}\n.be-landing-photo img{width:100%;height:100%;min-height:480px;max-height:610px;display:block;object-fit:cover;object-position:center}\n.be-landing-feature{display:grid;grid-template-columns:minmax(0,.43fr) minmax(0,1fr);gap:clamp(18px,4vw,65px);margin-top:clamp(35px,5vw,75px);padding:30px 0;border-top:1px solid #c9afb6;align-items:start}\n.be-landing-feature h2{font:600 clamp(1.5rem,2.8vw,2.8rem)/1.25 \"Fraunces\",Georgia,serif;letter-spacing:-.025em;margin:0 0 13px;max-width:24ch}\n.be-landing-feature p{font:400 16px/1.65 \"DM Sans\",sans-serif;max-width:56ch;margin:0 0 16px}\n.be-landing-link{color:#51283e!important;text-decoration:underline;text-underline-offset:5px;font:700 13px/1.5 \"DM Sans\",sans-serif}\n.be-landing-directories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #c9afb6;border-bottom:1px solid #c9afb6;margin-top:30px}\n.be-landing-directories a{color:inherit;text-decoration:none;padding:26px 12px 28px;display:flex;justify-content:space-between;align-items:center;gap:8px;font:600 clamp(1.2rem,2vw,1.8rem)/1.2 \"Fraunces\",Georgia,serif}\n.be-landing-directories a+a{border-inline-start:1px solid #c9afb6;padding-inline-start:25px}\n.be-landing-directories a:hover,.be-landing-directories a:focus-visible{text-decoration:underline;text-underline-offset:5px}\n.be-landing-directories a span{font:400 22px \"DM Sans\",sans-serif;color:#8f3152}\nhtml[lang^=\"ar\"] .be-landing{direction:rtl;text-align:right}\nhtml[lang^=\"ar\"] .be-landing-copy h1,html[lang^=\"ar\"] .be-landing-feature h2,html[lang^=\"ar\"] .be-landing-directories a{font-family:\"Aref Ruqaa\",serif;letter-spacing:normal;line-height:1.42}\nhtml[lang^=\"ar\"] .be-landing-copy h1{font-size:clamp(3rem,6vw,6.1rem);max-width:12ch}\nhtml[lang^=\"ar\"] .be-landing-copy p,html[lang^=\"ar\"] .be-landing-feature p{font-family:\"Lalezar\",sans-serif;line-height:1.8}\nhtml[lang^=\"ar\"] .be-landing-eyebrow{font-family:\"Lalezar\",sans-serif;letter-spacing:normal;font-size:16px}\nhtml[lang^=\"ar\"] .be-landing-directories a{font-size:clamp(1.5rem,2.1vw,2.15rem)}\nhtml[lang^=\"ar\"] .be-landing-primary,html[lang^=\"ar\"] .be-landing-secondary,html[lang^=\"ar\"] .be-landing-link{font-family:\"Lalezar\",sans-serif;font-size:17px}\n.be-letter-dialog{width:min(900px,calc(100% - 30px));max-height:calc(100dvh - 26px);border:1px solid #51283e;border-radius:0!important;background:#fffaf2;color:#33232b;padding:0;overflow:auto;box-shadow:0 26px 90px rgba(33,17,26,.22)}\n.be-letter-dialog::backdrop{background:rgba(27,18,24,.62)}\n.be-letter-layout{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr)}\n.be-letter-side{background:#51283e;color:#fffaf2;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(24px,4vw,47px);min-height:380px}\n.be-letter-side strong{font:600 clamp(2.8rem,5vw,5rem)/1 \"Fraunces\",Georgia,serif;letter-spacing:-.05em}\n.be-letter-side span{font:700 12px/1.5 \"DM Sans\",sans-serif;letter-spacing:.16em}\n.be-letter-body{position:relative;padding:clamp(26px,4vw,48px);min-width:0}\n.be-letter-close{position:absolute;top:15px;right:19px;border:0;background:none;font-size:28px;color:#51283e;cursor:pointer;line-height:1}\n.be-letter-body h2{font:600 clamp(1.9rem,3vw,2.8rem)/1.12 \"Fraunces\",Georgia,serif;letter-spacing:-.025em;margin:8px 34px 12px 0}\n.be-letter-body p{font:400 15px/1.6 \"DM Sans\",sans-serif;margin:0 0 14px}\n.be-letter-body small{font:400 12px/1.5 \"DM Sans\",sans-serif;display:block;margin-top:10px;color:#665660}\n.be-letter-body iframe{display:block;border:0;width:100%;height:280px;background:transparent}\n.be-letter-body a{color:#51283e}\nhtml[lang^=\"ar\"] .be-letter-layout{direction:rtl}\nhtml[lang^=\"ar\"] .be-letter-side strong,html[lang^=\"ar\"] .be-letter-body h2{font-family:\"Aref Ruqaa\",serif;letter-spacing:0;line-height:1.5}\nhtml[lang^=\"ar\"] .be-letter-body p,html[lang^=\"ar\"] .be-letter-body small{font-family:\"Lalezar\",sans-serif}\nhtml[lang^=\"ar\"] .be-letter-close{right:auto;left:19px}\n@media(max-width:760px){.be-landing{width:calc(100% - 34px)}.be-landing-cover{grid-template-columns:1fr;gap:21px;min-height:0}.be-landing-copy{padding:8px 0}.be-landing-copy h1{font-size:clamp(2.9rem,11vw,4.8rem)}.be-landing-photo{max-height:400px}.be-landing-photo img{height:340px;min-height:0;max-height:400px}.be-landing-feature{grid-template-columns:1fr;gap:12px}.be-landing-directories{grid-template-columns:1fr}.be-landing-directories a{padding:18px 4px}.be-landing-directories a+a{border-inline-start:0;border-top:1px solid #c9afb6;padding-inline-start:4px}.be-letter-layout{grid-template-columns:1fr}.be-letter-side{min-height:0;padding:19px 26px;gap:12px}.be-letter-side strong{font-size:2.3rem}.be-letter-body{padding:23px 25px}.be-letter-body iframe{height:250px}}\n",
   '</style>'
 ].join('');
 
@@ -404,6 +405,83 @@ function homeIntroduction(isArabic,base){
   return '<section class="be-home-intro" aria-label="'+(isArabic?'أهلاً بيك':'Welcome')+'">'+
     '<div class="be-home-copy"><span class="be-home-eyebrow">'+(isArabic?'الرئيسية':'HOME')+'</span>'+
     '<h2>'+title+'</h2><p>'+desc+'</p></div><nav class="be-home-links" aria-label="'+(isArabic?'استكشف اليومية':'Explore the journal')+'">'+items+'</nav></section>';
+}
+
+
+function editorialHomepage(html,{isArabic,base}){
+  const prefix=base+(isArabic?'ar/':'');
+  const coverMatch=html.match(/class="[^"]*\bcover-picture\b[^"]*"/i);
+  const imageStart=coverMatch?html.indexOf(coverMatch[0]):0;
+  const imageTag=(html.slice(imageStart,imageStart+20000).match(/<img\b[^>]*>/i)||[])[0];
+  if(!imageTag)throw new Error('Boudie Eats homepage image missing: refusing to publish a photo-free replacement');
+  const featuredPhoto=imageTag.replace(/\sloading="lazy"/i,' loading="eager"').replace(/\sdecoding="async"/i,' decoding="async"');
+  const copy=isArabic?{
+    eyebrow:'بودي إيتس • أكّيل',heading:'من مطبخي لسفرتك.',
+    intro:'وصفات بعملها، وأماكن برجع لها، وحكايات أكل تستاهل تتحكي.',
+    explore:'افتح دفتر الوصفات',letter:'جواب من بودي',
+    featureLabel:'من المطبخ',featureTitle:'شعرية باللبن، على مزاجي.',
+    featureText:'مش كل وصفة محتاجة مقادير صارمة. دي شعرية باللبن زي ما بحبها: دسمة، كريمي، ومتظبطة بالتذوق.',
+    read:'اقرأ الوصفة',recipes:'الوصفات',reviews:'التجارب',stories:'الحكايات',
+    modalKicker:'قريبًا في البريد',modalLogo:'جواب من بودي.',
+    modalTitle:'في حاجة بتستوي.',modalText:'وصفات وتجارب وحكايات أكل، لما النشرة تبدأ. سيب إيميلك في قائمة الإطلاق.',
+    modalNote:'دي قائمة انتظار، مش اشتراك في نشرة شغالة دلوقتي. مفيش إيميلات بتتبعت لسه.',
+    fallback:'افتح استمارة التسجيل',close:'اقفل',iframeTitle:'قائمة انتظار نشرة بودي إيتس'
+  }:{
+    eyebrow:'AN EGYPTIAN FOOD JOURNAL',heading:'From my kitchen to the table.',
+    intro:'Recipes I actually cook. Places I go back to. Food stories that stay with me.',
+    explore:'Explore recipes',letter:'Get the Boudie Letter',
+    featureLabel:'FROM THE KITCHEN',featureTitle:'Vermicelli milk pudding, my way.',
+    featureText:'Golden vermicelli, creamy milk, and a texture I adjust by tasting rather than measuring everything to the gram.',
+    read:'Read the recipe',recipes:'Recipes',reviews:'Reviews',stories:'Food stories',
+    modalKicker:'A LETTER IS COMING',modalLogo:'The Boudie Letter.',
+    modalTitle:'Something good is simmering.',modalText:'Recipes, honest café notes, and food stories from Egypt. Be first to know when the letter begins.',
+    modalNote:'This is a prelaunch interest list. No newsletter emails are being sent yet.',
+    fallback:'Open the signup form',close:'Close',iframeTitle:'Boudie Eats newsletter launch list'
+  };
+  const formId=isArabic?'7XK9Dz':'vXDORl';
+  const formUrl='https://tally.so/embed/'+formId+'?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1';
+  const fallbackUrl='https://tally.so/r/'+formId;
+  const photo='<figure class="be-landing-photo">'+featuredPhoto+'</figure>';
+  const introduction=[
+    '<div class="be-landing"><section class="be-landing-cover" aria-labelledby="be-landing-title">',
+    '<div class="be-landing-copy"><span class="be-landing-eyebrow">'+copy.eyebrow+'</span>',
+    '<h1 id="be-landing-title">'+copy.heading+'</h1><p>'+copy.intro+'</p>',
+    '<div class="be-landing-actions"><a class="be-landing-primary" href="'+prefix+'recipes/">'+copy.explore+'</a>',
+    '<button class="be-landing-secondary" type="button" data-be-letter-open>'+copy.letter+'</button></div></div>',
+    photo,'</section>',
+    '<section class="be-landing-feature" aria-labelledby="be-landing-feature-title">',
+    '<div class="be-landing-eyebrow">'+copy.featureLabel+'</div>',
+    '<div><h2 id="be-landing-feature-title">'+copy.featureTitle+'</h2><p>'+copy.featureText+'</p>',
+    '<a class="be-landing-link" href="'+prefix+'recipes/shaareya-bel-laban/">'+copy.read+'</a></div></section>',
+    '<nav class="be-landing-directories" aria-label="'+(isArabic?'أقسام اليومية':'Journal sections')+'">',
+    '<a href="'+prefix+'recipes/">'+copy.recipes+' <span aria-hidden="true">↗</span></a>',
+    '<a href="'+prefix+'reviews/">'+copy.reviews+' <span aria-hidden="true">↗</span></a>',
+    '<a href="'+prefix+'stories/">'+copy.stories+' <span aria-hidden="true">↗</span></a>',
+    '</nav></div>',
+    '<dialog class="be-letter-dialog" id="be-letter-dialog" aria-labelledby="be-letter-title">',
+    '<div class="be-letter-layout"><div class="be-letter-side"><span>'+copy.modalKicker+'</span><strong>'+copy.modalLogo+'</strong><span>BOUDIE EATS</span></div>',
+    '<div class="be-letter-body"><button class="be-letter-close" type="button" aria-label="'+copy.close+'" data-be-letter-close>×</button>',
+    '<span class="be-landing-eyebrow">'+copy.eyebrow+'</span><h2 id="be-letter-title">'+copy.modalTitle+'</h2>',
+    '<p>'+copy.modalText+'</p>',
+    '<iframe title="'+copy.iframeTitle+'" data-src="'+formUrl+'" loading="lazy" width="100%" height="280"></iframe>',
+    '<small>'+copy.modalNote+' <a href="'+fallbackUrl+'" target="_blank" rel="noopener noreferrer">'+copy.fallback+'</a></small>',
+    '</div></div></dialog>',
+    '<script>(function(){',
+    'var d=document.getElementById("be-letter-dialog");if(!d||!d.showModal)return;',
+    'var memoryKey="be-letter-dismissed-v1",shownKey="be-letter-shown-session-v1";',
+    'var frame=d.querySelector("iframe");var dismiss=d.querySelector("[data-be-letter-close]");',
+    'function track(eventName){if(typeof window.gtag==="function")window.gtag("event",eventName)}',
+    'function show(){if(d.open)return;if(!frame.src)frame.src=frame.dataset.src;d.showModal();try{sessionStorage.setItem(shownKey,"1")}catch(e){}track("newsletter_popup_open")}',
+    'document.querySelectorAll("[data-be-letter-open]").forEach(function(b){b.addEventListener("click",show)});',
+    'dismiss.addEventListener("click",function(){d.close()});',
+    'd.addEventListener("close",function(){try{localStorage.setItem(memoryKey,String(Date.now()))}catch(e){}});',
+    'var last=0,shown=false;try{last=Number(localStorage.getItem(memoryKey)||0);shown=sessionStorage.getItem(shownKey)==="1"}catch(e){}',
+    'if(!shown&&(!last||Date.now()-last>21*86400000)){setTimeout(function(){if(document.visibilityState==="visible"&&!d.open)show()},12000)}',
+    '})();</script>'
+  ].join('');
+  const main=html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i);
+  if(!main)throw new Error('Boudie Eats homepage main landmark missing');
+  return html.replace(main[0],main[0].replace(/(<main\b[^>]*>)[\s\S]*?(<\/main>)/i,'$1'+introduction+'$2'));
 }
 
 function removeBookmarkUi(html){
@@ -452,8 +530,7 @@ function polishPage(html,{isArabic,isHome,base}){
   html=html.replace('</head>',css+'</head>');
   if(isHome){
     if(!html.includes('<main'))throw new Error('Home page has no main landmark');
-    if(!html.includes('<div class="manifesto">'))throw new Error('Home manifesto landmark missing');
-    html=html.replace('<div class="manifesto">',homeIntroduction(isArabic,base)+'<div class="manifesto">');
+    html=editorialHomepage(html,{isArabic,base});
   }
   return html;
 }
