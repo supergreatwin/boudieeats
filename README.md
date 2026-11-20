@@ -55,3 +55,17 @@ Draft approval remains private until an editor clicks **Publish article**. The p
 The standard static build creates both language routes, a language selector, and account menu links. CI runs `node tools/verify-accounts.mjs` plus the existing bilingual and English validation.
 
 Documentation: [Supabase password auth](https://supabase.com/docs/guides/auth/passwords), [email and SMTP](https://supabase.com/docs/guides/auth/auth-smtp), [row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+
+## What to Eat collaboration (private by default)
+
+Routes: `/what-to-eat/` and `/ar/what-to-eat/` are private visitor previews until approved. Their editors are at `/editorial-desk/what-to-eat/` and `/ar/editorial-desk/what-to-eat/`, linked from the existing Editorial Desk.
+
+Editors and admins can add bilingual cities, cuisine types, places, pricing, recommendations, original photographs, credits, source references and notes. Search, city, cuisine and price filters replace the map. No restaurants or AI-generated images were fabricated.
+
+Security: Pages are excluded from the sitemap and public navigation and use noindex/nofollow. A guessed URL does not grant access: Supabase RLS hides the catalogue and private photo bucket until the administrator enables BOTH site_enabled and partner_approved. Each public listing also needs published status, partner sign-off, and image-use rights if applicable. Private notes are in a staff-only table.
+
+PDF: The URL is intentionally blank until the collaboration and future PDF are finalized. Adding the PDF is optional and separate.
+
+Cost: Uses the existing static hosting and dedicated free Supabase project, subject to free-tier quotas; no paid map, CMS or extra service. The upload size limit is 5 MB per image.
+
+Database schema: `supabase/what-to-eat.sql` applied only to the dedicated Boudie Eats project as migration `boudieeats_private_what_to_eat_guide`. Do not rerun the migration. Build checks: `tools/verify-what-to-eat.mjs`. Keep both launch switches OFF until formal approval.
