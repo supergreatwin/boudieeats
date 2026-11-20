@@ -115,6 +115,7 @@ polishVisitorPages({ directory: dist, basePath: originalBase });
 // Ship the original supplied logo artwork as a shared English/Arabic asset.
 mkdirSync(join(dist, 'media'), { recursive: true });
 copyFileSync(join(root, 'assets', 'boudieeats-wordmark.svg'), join(dist, 'media', 'boudieeats-wordmark.svg'));
+copyFileSync(join(root, 'assets', 'boudieeats-wordmark-cream-gold-v2.svg'), join(dist, 'media', 'boudieeats-wordmark-cream-gold-v2.svg'));
 
 // Cloudflare Pages: keep XML discovery available but out of normal search
 // results, and keep the pages.dev mirror from competing with our own domain.
