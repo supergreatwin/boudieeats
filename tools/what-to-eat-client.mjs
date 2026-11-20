@@ -308,14 +308,44 @@ async function savePlace(form){
   const note={place_id:record.id,editorial_notes:String(new FormData(form).get('editorial_notes')||''),source_reference:String(new FormData(form).get('source_reference')||''),updated_by:state.user.id,updated_at:new Date().toISOString()};
   const result=await state.client.from('be_wte_place_notes').upsert(note,{onConflict:'place_id'});
   if(result.error)throw Error(t('Entry saved, but private notes failed: ','المكان اتحفظ لكن الملاحظات لم تُحفظ: ')+result.error.message);
-  state.editing=null;await refresh();message(t('Entry saved privately.','تم حفظ المكان في الدليل الخاص.'));
+  await refresh();state.editing=state.places.find(p=>p.id===record.id)||null;state.editingPhoto=null;renderEditor();message(t('Entry saved privately. Add gallery photos below.','تم حفظ المكان بشكل خاص. تقدر تضيف صور المعرض تحت.'));
 }
-async function uploadPhoto(form){
-  const file=document.getElementById('wte-upload-file')?.files?.[0];
+
+async function saveSection(form){
+ const names=['kind','slug','title_en','title_ar','body_en','body_ar','filter_tag','status'];
+ const data=payload(form,names);data.slug=data.slug.toLowerCase();
+ if(!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(data.slug))throw Error(t('Use a lowercase hyphenated code.','اكتب كود بالإنجليزي صغير مع شرطات.'));
+ data.position=Number(new FormData(form).get('position'))||0;
+ data.active=form.elements.active.checked;
+ data.partner_reviewed=form.elements.partner_reviewed.checked;
+ if(data.status==='published'&&!data.partner_reviewed)throw Error(t('Partner approval is required before publishing.','لازم موافقة الشريك قبل النشر.'));
+ if(data.status==='published'&&data.kind==='collection'&&!data.filter_tag)throw Error(t('A published collection needs a matching restaurant tag.','المجموعة المنشورة لازم يكون لها وسم.'));
+ const id=new FormData(form).get('id');
+ const q=id?state.client.from('be_wte_sections').update({...data,updated_at:new Date().toISOString()}).eq('id',id):
+   state.client.from('be_wte_sections').insert(data);
+ const {error}=await q;if(error)throw error;
+ state.editingSection=null;await refresh();message(t('Page section saved privately.','تم حفظ القسم بشكل خاص.'));
+}
+async function savePhoto(form){
+ if(!state.editing?.id)throw Error(t('Select a restaurant first.','اختار مكان الأول.'));
+ const names=['image_url','caption_en','caption_ar','image_alt_en','image_alt_ar','image_credit'];
+ const data=payload(form,names);
+ if(!data.image_url||(!data.image_url.startsWith('storage:')&&!validUrl(data.image_url)))throw Error(t('Provide an uploaded image or secure HTTPS URL.','ارفع صورة أو استخدم رابط HTTPS.'));
+ data.place_id=state.editing.id;
+ data.position=Number(new FormData(form).get('position'))||0;
+ data.image_rights_confirmed=form.elements.image_rights_confirmed.checked;
+ const id=new FormData(form).get('id');
+ const q=id?state.client.from('be_wte_photos').update(data).eq('id',id):state.client.from('be_wte_photos').insert(data);
+ const {error}=await q;if(error)throw error;
+ state.editingPhoto=null;await refresh();message(t('Photo saved privately.','تم حفظ الصورة بشكل خاص.'));
+}
+
+async function uploadPhoto(form,fileId='wte-upload-file'){
+  const file=document.getElementById(fileId)?.files?.[0];
   if(!file)throw Error(t('Choose a photo first.','اختار صورة الأول.'));
   const allowed={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'};
   if(!allowed[file.type]||file.size>5242880)throw Error(t('Use JPG, PNG, WebP or AVIF, under 5 MB.','الصورة لازم JPG أو PNG أو WebP أو AVIF وأقل من ٥ ميجا.'));
-  const slug=String(new FormData(form).get('slug')||'').toLowerCase();
+  const slug=String(new FormData(form).get('slug')||state.editing?.slug||'').toLowerCase();
   if(!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug))throw Error(t('Enter a valid URL code first.','اكتب الكود الصحيح الأول.'));
   const path=slug+'/'+crypto.randomUUID()+'.'+allowed[file.type];
   const {error}=await state.client.storage.from('be-wte-media').upload(path,file,{contentType:file.type,upsert:false});
@@ -324,7 +354,7 @@ async function uploadPhoto(form){
   message(t('Photo uploaded privately. Save the entry to attach it.','الصورة اترفعت بشكل خاص. احفظ المكان علشان تربطها بيه.'));
 }
 root.addEventListener('submit',async ev=>{
-  const form=ev.target;if(!['wte-login','wte-settings-form','wte-term-form','wte-place-form'].includes(form.id))return;
+  const form=ev.target;if(!['wte-login','wte-settings-form','wte-term-form','wte-place-form','wte-section-form','wte-photo-form'].includes(form.id))return;
   ev.preventDefault();const b=form.querySelector('button[type=submit]');if(b)b.disabled=true;
   try{
     if(form.id==='wte-login'){
@@ -341,6 +371,8 @@ root.addEventListener('submit',async ev=>{
     }
     if(form.id==='wte-term-form')await saveTerm(form);
     if(form.id==='wte-place-form')await savePlace(form);
+    if(form.id==='wte-section-form')await saveSection(form);
+    if(form.id==='wte-photo-form')await savePhoto(form);
   }catch(e){message(e.message||t('Request failed.','فيه مشكلة في الطلب.'),true);}
   finally{if(b&&b.isConnected)b.disabled=false;}
 });
@@ -359,7 +391,22 @@ root.addEventListener('click',async e=>{
     if(action==='edit-term'){state.editingTerm=state.terms.find(x=>x.id===id);renderEditor();getForm('wte-term-form')?.scrollIntoView({block:'start',behavior:'smooth'});return;}
     if(action==='reset-place'){state.editing=null;renderEditor();return;}
     if(action==='reset-term'){state.editingTerm=null;renderEditor();return;}
+    if(action==='edit-section'){state.editingSection=state.sections.find(x=>x.id===id);renderEditor();getForm('wte-section-form')?.scrollIntoView({block:'start',behavior:'smooth'});return;}
+    if(action==='reset-section'){state.editingSection=null;renderEditor();return;}
+    if(action==='edit-photo'){state.editingPhoto=state.photos.find(x=>x.id===id);renderEditor();getForm('wte-photo-form')?.scrollIntoView({block:'start',behavior:'smooth'});return;}
+    if(action==='reset-photo'){state.editingPhoto=null;renderEditor();return;}
     if(action==='upload'){b.disabled=true;await uploadPhoto(getForm('wte-place-form'));return;}
+    if(action==='upload-gallery'){b.disabled=true;await uploadPhoto(getForm('wte-photo-form'),'wte-gallery-file');return;}
+    if(action==='delete-section'){
+      if(!confirm(t('Delete this section permanently?','حذف القسم نهائياً؟')))return;
+      const {error}=await state.client.from('be_wte_sections').delete().eq('id',id);if(error)throw error;
+      state.editingSection=null;await refresh();message(t('Section deleted.','تم حذف القسم.'));return;
+    }
+    if(action==='delete-photo'){
+      if(!confirm(t('Delete this gallery photo record?','حذف الصورة من المعرض؟')))return;
+      const {error}=await state.client.from('be_wte_photos').delete().eq('id',id);if(error)throw error;
+      state.editingPhoto=null;await refresh();message(t('Photo record deleted.','تم حذف سجل الصورة.'));return;
+    }
     if(action==='delete-place'){
       if(!confirm(t('Permanently delete this entry and its private notes?','حذف المكان وملاحظاته الخاصة نهائياً؟')))return;
       const {error}=await state.client.from('be_wte_places').delete().eq('id',id);if(error)throw error;
