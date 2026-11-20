@@ -1,4 +1,5 @@
-// Boudie Eats | What to Eat. Public key only; database RLS is authoritative.
+// what to eat? independent branded guide hosted by Boudie Eats.
+// Public Supabase key only; database RLS is authoritative.
 const cfg=window.BE_WTE_CONFIG||{};
 const ar=document.documentElement.lang.startsWith('ar');
 const t=(en,arabic)=>ar?arabic:en;
@@ -89,7 +90,14 @@ function sectionHTML(){
   return ordered.map(s=>{
     const title=esc(localized(s,'title')),description=body(localized(s,'body'));
     const status=staff()?'<span class="wte-state">'+esc(s.status)+(s.partner_reviewed?' · reviewed':'')+'</span>':'';
-    if(s.slug==='community')return '<section class="wte-content-section wte-community"><p class="wte-community-kicker">'+t('Community','المجتمع')+'</p><h2>'+title+'</h2>'+status+description+'</section>';
+    if(s.slug==='community'){
+      const profile=validUrl(state.settings?.community_instagram_url);
+      const handle=esc(state.settings?.community_handle||'@whattocommunity');
+      const social=profile?'<a class="wte-community-link" href="'+esc(profile)+'" target="_blank" rel="noopener noreferrer">'+t('Visit the community','شوف المجتمع على إنستجرام')+' <span aria-hidden="true">↗</span></a>':'';
+      return '<section class="wte-content-section wte-community" id="wte-community"><p class="wte-community-kicker">'+t('What To? Community®','مجتمع وات تو؟')+'</p>'+
+      '<div class="wte-community-brand"><span class="wte-community-mark" lang="en">wha</span><div><h2>'+title+'</h2><span class="wte-community-handle">'+handle+'</span></div></div>'+
+      status+description+social+'</section>';
+    }
     if(s.kind==='faq')return '<details class="wte-faq"><summary>'+title+status+'</summary>'+description+'</details>';
     if(s.kind==='collection'){
       const picked=visiblePlaces().filter(p=>(p.tags||[]).some(tag=>tag.toLowerCase()===s.filter_tag.trim().toLowerCase()));
@@ -100,14 +108,21 @@ function sectionHTML(){
   }).join('');
 }
 
-function brandHero(){return '<div class="wte-brand-hero" role="img" aria-label="Original what to eat? monochrome dining photograph with orange wordmark"><img src="'+esc(cfg.basePath+'be-what-to-eat-brand.jpg')+'" alt="what to eat? original orange logo across a black and white dining photograph" loading="eager"></div>';}
+function brandHero(compact=false){
+  const original=cfg.basePath+'be-what-to-eat-brand.jpg';
+  const alternate=state.settings?.brand_hero_rights_confirmed&&validUrl(state.settings?.brand_hero_url);
+  const src=alternate||original;
+  return '<div class="wte-brand-hero" data-compact="'+String(compact)+'"><img src="'+esc(src)+'" alt="'+t('The original what to eat? orange wordmark over black and white food photography','هوية what to eat? البرتقالية على صورة طعام بالأبيض والأسود')+'" loading="eager" fetchpriority="high"></div>';
+}
 function browse(){
   const isPreview=staff()&&!live();
-  root.innerHTML=brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? · the food guide','what to eat? · دليل الأكل')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1>'+
-    '<p>'+t('Find places by cuisine and city, with carefully written recommendations.','اختار أكلتك ومدينتك، وشوف ترشيحات مكتوبة بعناية.')+'</p>'+
-    (isPreview?'<div class="wte-private">'+t('PRIVATE PREVIEW — Not visible to visitors. Launch approval is still off.','معاينة خاصة — مش ظاهرة للزوار. الموافقة على النشر لسه مقفولة.')+'</div>':'')+
-    '</div>'+filterBar()+'<p class="wte-count" id="wte-count"></p><div class="wte-results" id="wte-results"></div>'+
-    '<div id="wte-sections" class="wte-sections"></div>'+ (validUrl(state.settings?.pdf_url)?'<div class="wte-pdf"><h2>'+t('Download the guide','حمّل الدليل')+'</h2><a href="'+esc(validUrl(state.settings.pdf_url))+'" target="_blank" rel="noopener noreferrer" class="wte-button">'+t('Open PDF edition','افتح نسخة PDF')+'</a></div>':'')+
+  const intro=localized(state.settings||{},'guide_intro')||t('Find places by cuisine and city, with carefully written recommendations.','اختار أكلتك ومدينتك، وشوف ترشيحات مكتوبة بعناية.');
+  root.innerHTML=brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / the guide','what to eat? / الدليل')+'</p>'+
+    '<h1>'+t('the guide<span class="wte-orange-dot">.</span>','دليل الأكل<span class="wte-orange-dot">.</span>')+'</h1>'+
+    '<p>'+esc(intro)+'</p>'+
+    (isPreview?'<div class="wte-private">'+t('PRIVATE PREVIEW / not published','معاينة خاصة / لم يتم النشر')+'</div>':'')+
+    '</div><section id="wte-guide" class="wte-guide"><p class="wte-section-heading">'+t('Find a place','اختار مكان')+'</p>'+filterBar()+'<p class="wte-count" id="wte-count"></p><div class="wte-results" id="wte-results"></div></section>'+
+    '<div id="wte-sections" class="wte-sections"></div>'+(validUrl(state.settings?.pdf_url)?'<div class="wte-pdf"><h2>'+t('the guide, to go.','الدليل معاك.')+'</h2><a href="'+esc(validUrl(state.settings.pdf_url))+'" target="_blank" rel="noopener noreferrer" class="wte-button">'+t('Open PDF guide','افتح دليل PDF')+' ↗</a></div>':'')+
     '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>';
   updateCards();
 }
@@ -234,7 +249,7 @@ function launchEditor(){
 }
 function renderEditor(){
   if(!staff()){denied();return;}
-  root.innerHTML=brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('Editorial desk / Private workspace','مكتب التحرير / مساحة خاصة')+'</p><h1 class="wte-orange-title" lang="en">what to eat? <span class="wte-editor-sub">/ editorial</span></h1><p>'+t('A complete editable directory, ready to be reviewed without making it public.','دليل قابل للتحرير بالكامل، جاهز للمراجعة من غير نشر للجمهور.')+'</p>'+
+  root.innerHTML=brandHero(true)+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / private editorial','what to eat? / التحرير الخاص')+'</p><h1>'+t('the studio<span class="wte-orange-dot">.</span>','مكتب التحرير<span class="wte-orange-dot">.</span>')+'</h1><p>'+t('Edit the guide, stories, community and recommendations before launch.','عدّل الدليل والمحتوى والمجتمع والترشيحات قبل الإطلاق.')+'</p>'+
   '<div class="wte-private">'+(live()?t('PUBLIC LAUNCH ENABLED','النشر العام مفتوح'):t('HIDDEN & LIVE IN PRIVATE MODE','القسم شغال وخاص لحد الموافقة'))+'</div></div>'+
   '<div class="wte-buttons"><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'what-to-eat/')+'">'+t('Open visitor preview','معاينة صفحة الزائر')+'</a><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>'+
