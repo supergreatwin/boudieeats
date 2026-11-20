@@ -23,6 +23,29 @@ runInContext('renderEditor()',ctx,{timeout:3000});
 for(const marker of ['wte-place-form','wte-section-form','wte-photo-form','wte-term-form','wte-settings-form','wte-brand-form','Launch readiness','Sample Private']){
  assert(root.innerHTML.includes(marker),'Editor missing '+marker);
 }
+// Authenticated staff can preview the FULL branded visitor view on the same private URL.
+sandbox.window.location={search:'?preview=1'};
+runInContext('render()',ctx,{timeout:3000});
+assert.equal(runInContext('previewMode()',ctx),true,'Secure preview mode was not recognized.');
+for(const marker of ['wte-preview-toolbar','wte-brand-hero','wte-filters','wte-results','wte-sections','Sample Private','Back to content studio']){
+ assert(root.innerHTML.includes(marker),'Private branded preview missing '+marker);
+}
+assert(!root.innerHTML.includes('wte-card-actions'),'Visitor preview should not expose edit/delete buttons.');
+sandbox.window.location={search:''};
+runInContext('render()',ctx,{timeout:3000});
+assert(root.innerHTML.includes('wte-brand-form'),'Leaving preview did not return to Editorial Desk');
+// Anonymous users trying to guess ?preview=1 must see a sign-in, not draft data.
+const anonymousEditorRoot={innerHTML:'',addEventListener:()=>{}};
+const anonymousEditorCtx=createContext({
+ window:{BE_WTE_CONFIG:{basePath:'/'},location:{search:'?preview=1'}},
+ document:{documentElement:{lang:'en'},body:{dataset:{wteMode:'editor'}},
+   getElementById:()=>anonymousEditorRoot,querySelectorAll:()=>[]},
+ URL,console
+});
+runInContext(source,anonymousEditorCtx,{timeout:3000});
+runInContext("state.role=null;state.user=null;state.settings={site_enabled:false,partner_approved:false};state.sections=[{title_en:'Secret Draft'}];render()",anonymousEditorCtx,{timeout:3000});
+assert(anonymousEditorRoot.innerHTML.includes('Editorial sign-in'),'Preview must require authentication.');
+assert(!anonymousEditorRoot.innerHTML.includes('Secret Draft'),'Anonymous editor preview leaked private content.');
 const html=runInContext('sectionHTML()',ctx,{timeout:3000});
 assert(root.innerHTML.includes('brand_hero_url'),'Admin branding controls missing');
 for(const marker of ['Intro draft','FAQ draft','Breakfast collection','Sample Private']){
