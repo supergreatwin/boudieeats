@@ -29,9 +29,15 @@ for(const marker of ['Intro draft','FAQ draft','Breakfast collection','Sample Pr
 }
 runInContext("state.search='nonexistent'",ctx,{timeout:3000});
 assert.equal(runInContext('visiblePlaces().length',ctx),0,'Search must filter the result list.');
-runInContext("state.search='';state.role=null;state.user=null;render()",ctx,{timeout:3000});
-assert(root.innerHTML.includes('Page not found'),'Guest must see unavailable page.');
-assert(!root.innerHTML.includes('Sample Private'),'Guest HTML leaked private entries.');
-assert(!root.innerHTML.includes('Private description'),'Guest HTML leaked private sections.');
-assert.equal(runInContext('sectionHTML()',ctx),'','Unauthenticated guest must not see draft sections.');
+// Reinitialize the module in guest mode; the editor flag is captured at startup.
+const guestRoot={innerHTML:'',addEventListener:()=>{}};
+const guestDocument={documentElement:{lang:'en'},body:{dataset:{wteMode:'guide'}},
+ getElementById:()=>guestRoot,querySelectorAll:()=>[]};
+const guestCtx=createContext({window:{BE_WTE_CONFIG:{basePath:'/'}},document:guestDocument,URL,console});
+runInContext(source,guestCtx,{timeout:3000});
+runInContext("state.settings={site_enabled:false,partner_approved:false};state.role=null;state.user=null;state.places=[{name_en:'Sample Private'}];state.sections=[{title_en:'Private description'}];render()",guestCtx,{timeout:3000});
+assert(guestRoot.innerHTML.includes('Page not found'),'Guest must see unavailable page.');
+assert(!guestRoot.innerHTML.includes('Sample Private'),'Guest HTML leaked private entries.');
+assert(!guestRoot.innerHTML.includes('Private description'),'Guest HTML leaked private sections.');
+assert.equal(runInContext('sectionHTML()',guestCtx),'','Unauthenticated guest must not see draft sections.');
 console.log('PASS: Admin tools, editable sections, galleries, category filters, collection matching and private guest visibility.');
