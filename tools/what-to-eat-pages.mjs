@@ -22,18 +22,25 @@ function page({arabic,editor,base,url,key}){
     '<link rel="canonical" href="https://boudieeats.com/'+prefix+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="alternate" hreflang="en" href="https://boudieeats.com/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="alternate" hreflang="ar-EG" href="https://boudieeats.com/ar/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
+    '<link rel="manifest" href="manifest.webmanifest">'+
+    '<link rel="apple-touch-icon" href="'+base+'be-what-to-eat-app-192.png">'+
+    '<meta name="apple-mobile-web-app-capable" content="yes">'+
+    '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'+
     '<link rel="stylesheet" href="'+base+'be-what-to-eat.css"></head>'+
     '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+(editor?editorPath+'?preview=1':guidePath)+'" aria-label="what to eat?">'+brand+'</a>'+
     '<nav class="be-language" aria-label="'+(arabic?'روابط القسم':'Section navigation')+'">'+nav+
     '<a href="'+altPath+'" hreflang="'+(arabic?'en':'ar-EG')+'">'+(arabic?'EN':'عربي')+'</a></nav></header>'+
     '<main class="wte-shell" id="wte-root" aria-live="polite"><p>'+(arabic?'جارٍ التحميل…':'Loading private guide…')+'</p></main>'+
     '<footer class="wte-site-footer"><span class="wte-footer-wordmark" lang="en">what to eat?</span><span>'+(arabic?'بالشراكة مع بودي إيتس':'In collaboration with Boudie Eats')+'</span></footer>'+
-    '<script>window.BE_WTE_CONFIG='+config+';</script><script type="module" src="'+base+'be-what-to-eat.js"></script></body></html>';
+    '<script>window.BE_WTE_CONFIG='+config+';</script><script type="module" src="'+base+'be-what-to-eat.js"></script>'+ 
+    '<script type="module" src="'+base+'be-what-to-eat-newsletter.js"></script></body></html>';
 }
 export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabasePublishableKey=''}){
   const base=basePath.endsWith('/')?basePath:basePath+'/';
   copyFileSync(new URL('./what-to-eat-client.mjs',import.meta.url),join(directory,'be-what-to-eat.js'));
   copyFileSync(new URL('./what-to-eat.css',import.meta.url),join(directory,'be-what-to-eat.css'));
+  copyFileSync(new URL('./what-to-eat-newsletter.mjs',import.meta.url),join(directory,'be-what-to-eat-newsletter.js'));
+  for(const size of [192,512])copyFileSync(new URL('../assets/what-to-eat-app-'+size+'.png',import.meta.url),join(directory,'be-what-to-eat-app-'+size+'.png'));
   copyFileSync(new URL('../assets/what-to-eat-original-reference.jpg',import.meta.url),join(directory,'be-what-to-eat-brand.jpg'));
   copyFileSync(new URL('../assets/what-to-eat-favicon.svg',import.meta.url),join(directory,'be-what-to-eat-favicon.svg'));
   for(const arabic of [false,true]){
@@ -43,6 +50,18 @@ export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabas
       const folder=join(directory,route);
       mkdirSync(folder,{recursive:true});
       writeFileSync(join(folder,'index.html'),page({arabic,editor,base,url:supabaseUrl,key:supabasePublishableKey}));
+      // Installable app without public release: app start URL requires a valid
+      // Supabase editor session; the visitor manifest is staged for later.
+      const start=base+route+'/';
+      const manifest={
+        id:start,name:editor?(arabic?'what to eat? | مساحة التحرير':'what to eat? | editorial studio'):(arabic?'what to eat? | دليل الأكل':'what to eat? | food guide'),
+        short_name:'what to eat?',description:editor?'Private food-guide editing workspace':'Food and restaurant recommendations, awaiting launch',
+        lang:arabic?'ar-EG':'en',dir:arabic?'rtl':'ltr',start_url:start,scope:start,
+        display:'standalone',background_color:'#f7f7f5',theme_color:'#f36e2d',
+        icons:[192,512].map(size=>({src:base+'be-what-to-eat-app-'+size+'.png',sizes:size+'x'+size,type:'image/png',purpose:'any maskable'})),
+        shortcuts:editor?[{name:arabic?'معاينة خاصة':'Private preview',short_name:arabic?'معاينة':'Preview',url:start+'?preview=1'}]:[]
+      };
+      writeFileSync(join(folder,'manifest.webmanifest'),JSON.stringify(manifest,null,2));
     }
     // Only the private Editorial Desk links to the manager, not the public site.
     const deskPath=join(directory,prefix,'editorial-desk','index.html');
