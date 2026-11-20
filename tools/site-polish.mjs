@@ -511,7 +511,7 @@ function putHeaderControlsTogether(html){
 
 
 function replaceLogoArtwork(html,{base,isArabic}){
-  const url=base+'media/boudieeats-wordmark.svg';
+  const url=base+'media/boudieeats-wordmark-cream-gold-v2.svg';
   const img='<img class="be-wordmark-image" src="'+url+'" width="400" height="65" alt="boudieeats.">';
   // The English wordmark is SVG artwork; Arabic retains its distinct, hand-set identity.
   if(!isArabic){
