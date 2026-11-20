@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, cpSync, rmSync, mkdtempSync, existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { copyFileSync, cpSync, rmSync, mkdtempSync, mkdirSync, existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -112,6 +112,9 @@ addPublishedPages({
 finishLanguageLinks({ directory: dist, basePath: originalBase });
 // Apply responsive brand-safe corrections to both complete language editions.
 polishVisitorPages({ directory: dist, basePath: originalBase });
+// Ship the original supplied logo artwork as a shared English/Arabic asset.
+mkdirSync(join(dist, 'media'), { recursive: true });
+copyFileSync(join(root, 'assets', 'boudieeats-wordmark.svg'), join(dist, 'media', 'boudieeats-wordmark.svg'));
 
 // Cloudflare Pages: keep XML discovery available but out of normal search
 // results, and keep the pages.dev mirror from competing with our own domain.
