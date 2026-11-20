@@ -1,22 +1,39 @@
-// Read-only, credential-free availability check for the editorial workspace.
-// No admin data is requested or revealed. Running this does not publish the collaboration.
-const checks=[
- {name:'Cloudflare custom domain',url:'https://boudieeats.com/editorial-desk/what-to-eat/'},
- {name:'GitHub Pages private fallback',url:'https://supergreatwin.github.io/boudieeats/editorial-desk/what-to-eat/'}
+// Read-only production check. Never request private editor records or credentials.
+// Verifies that the latest independent What to Eat identity reached BOTH hosts.
+const hosts=[
+ {name:'Cloudflare',root:'https://boudieeats.com/'},
+ {name:'GitHub private fallback',root:'https://supergreatwin.github.io/boudieeats/'}
 ];
+const paths=['editorial-desk/what-to-eat/','ar/editorial-desk/what-to-eat/'];
 let failed=0;
-for(const check of checks){
+const request=async url=>fetch(url,{redirect:'follow',signal:AbortSignal.timeout(15000),cache:'no-store',
+ headers:{'User-Agent':'BoudieEats-WhatToEat-Brandcheck/1.0'}});
+for(const host of hosts){
+ for(const route of paths){
   try{
-    const response=await fetch(check.url,{redirect:'follow',signal:AbortSignal.timeout(12000),headers:{'User-Agent':'BoudieEats-WhatToEat-Healthcheck/1.0'}});
-    const html=await response.text();
-    const ok=response.status===200&&html.includes('BE_WTE_CONFIG')&&html.includes('data-wte-mode="editor"')&&html.includes('noindex,nofollow,noarchive');
-    // A GitHub fallback must render in place and not redirect into stale Cloudflare.
-    const host=new URL(response.url).host;
-    const expected=new URL(check.url).host;
-    const stays=host===expected;
-    console.log(check.name+': HTTP '+response.status+', host '+host+', editor route '+(ok?'present':'missing')+', stays on original host '+stays);
-    if(!ok||!stays)failed++;
-  }catch(e){failed++;console.error(check.name+': '+String(e));}
+   const expected=new URL(route,host.root);
+   const response=await request(expected.href);
+   const html=await response.text();
+   const staying=new URL(response.url).host===expected.host;
+   const branded=response.ok&&staying&&html.includes('data-wte-mode="editor"')&&
+     html.includes('noindex,nofollow,noarchive')&&html.includes('wte-logotype')&&
+     html.includes('be-what-to-eat-favicon.svg')&&html.includes('BE_WTE_CONFIG')&&
+     !html.includes('<title>what to eat? | Boudie Eats</title>');
+   console.log(host.name+' '+route+': '+response.status+', independent brand '+(branded?'PASS':'FAIL')+', same host '+staying);
+   if(!branded)failed++;
+  }catch(e){failed++;console.error(host.name+' '+route+': '+String(e));}
+ }
+ for(const [asset,proof] of [
+   ['be-what-to-eat.css','--orange:#f36e2d'],
+   ['be-what-to-eat-favicon.svg','<svg'],
+   ['be-what-to-eat-brand.jpg',null]]){
+  try{
+   const response=await request(new URL(asset,host.root).href);
+   const ok=response.ok&&(asset.endsWith('.jpg')?(response.headers.get('content-type')||'').includes('image'): (await response.text()).includes(proof));
+   console.log(host.name+' '+asset+': '+response.status+', '+(ok?'PASS':'FAIL'));
+   if(!ok)failed++;
+  }catch(e){failed++;console.error(host.name+' '+asset+': '+String(e));}
+ }
 }
-if(failed){console.error('FAIL: '+failed+' private editorial URL(s) unavailable or redirected. GitHub Pages deploy and Cloudflare production must be checked separately.');process.exitCode=1;}
-else console.log('PASS: both private editorial shell routes are available (authenticated CRUD must still be tested interactively).');
+if(failed){console.error('FAIL: '+failed+' independent-branded What to Eat routes/assets are stale or unavailable. Verify Cloudflare and GitHub deployments separately.');process.exitCode=1;}
+else console.log('PASS: four private editor routes and all brand assets available on both hosts. Authenticated editor save/upload still requires a signed-in browser test.');
