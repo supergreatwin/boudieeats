@@ -122,3 +122,25 @@ grant select,update on public.be_wte_settings to authenticated;
 
 comment on table public.be_wte_places is 'Partner-controlled food guide; public rows appear only after dual launch gates and individual publication approval.';
 comment on column public.be_wte_settings.pdf_url is 'Reserved for final collaboration PDF; leave empty until signed off.';
+
+-- Private image bucket: only editorial staff can upload or edit.
+-- After launch, only images attached to approved published listings can be read.
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+values ('be-wte-media','be-wte-media',false,5242880,
+  array['image/jpeg','image/png','image/webp','image/avif'])
+on conflict (id) do nothing;
+
+create policy "wte images staff insert" on storage.objects for insert to authenticated
+  with check (bucket_id='be-wte-media' and (select public.be_my_role()) in ('editor','admin'));
+create policy "wte images staff read" on storage.objects for select to authenticated
+  using (bucket_id='be-wte-media' and (select public.be_my_role()) in ('editor','admin'));
+create policy "wte images staff update" on storage.objects for update to authenticated
+  using (bucket_id='be-wte-media' and (select public.be_my_role()) in ('editor','admin'))
+  with check (bucket_id='be-wte-media' and (select public.be_my_role()) in ('editor','admin'));
+create policy "wte images staff delete" on storage.objects for delete to authenticated
+  using (bucket_id='be-wte-media' and (select public.be_my_role()) in ('editor','admin'));
+create policy "wte images live read" on storage.objects for select to anon,authenticated
+  using (bucket_id='be-wte-media'
+    and exists(select 1 from public.be_wte_places p
+      where p.image_url='storage:'||name and p.status='published'
+      and p.partner_reviewed and p.image_rights_confirmed));
