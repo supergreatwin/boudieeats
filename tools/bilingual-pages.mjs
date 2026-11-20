@@ -21,7 +21,7 @@ const pages=[
   content:'<div class="panel"><h2>صلاحيات الفريق</h2><p>النسخة الحالية بتستخدم حسابات GitHub وصلاحيات المستودع، مش حسابات مستقلة جوه الموقع. الدخول للملفات الخاصة بيتم من GitHub نفسه.</p><a class="button" href="https://github.com/login">دخول GitHub</a></div>'+
    '<div class="grid"><div class="panel"><h2>الأفكار الواردة</h2><a href="https://github.com/supergreatwin/boudieeats/issues">مهام التحرير</a><a href="https://tally.so/forms">وارد Tally (الدخول مطلوب)</a></div>'+
    '<div class="panel"><h2>المقالات والمراجعات</h2><a href="https://github.com/supergreatwin/boudieeats/pulls">مراجعة التعديلات</a><a href="https://github.com/supergreatwin/boudieeats/tree/main/editorial">أرشيف التحرير</a></div>'+
-   '<div class="panel"><h2>النشرة البريدية</h2><a href="https://github.com/supergreatwin/boudieeats/tree/main/editorial/newsletter">مسودات النشرة</a><p>الإرسال الفعلي مش مفعّل قبل إنشاء نشرة منفصلة للمشروع.</p></div></div>'}
+   '<div class="panel"><h2>تحليلات الموقع</h2><a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener noreferrer">افتح Google Analytics (للمصرح لهم فقط)</a><p>التقارير خاصة بفريق التحرير، والتتبع بيحتاج موافقة الزائر.</p></div><div class="panel"><h2>النشرة البريدية</h2><a href="https://github.com/supergreatwin/boudieeats/tree/main/editorial/newsletter">مسودات النشرة</a><p>الإرسال الفعلي مش مفعّل قبل إنشاء نشرة منفصلة للمشروع.</p></div></div>'}
 ];
 export function restoreArabicVisitorPages({directory,basePath}){
  const base=basePath.endsWith('/')?basePath:basePath+'/';
