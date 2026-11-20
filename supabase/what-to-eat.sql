@@ -47,17 +47,21 @@ create table if not exists public.be_wte_places (
   website_url text,
   instagram_url text,
   booking_url text,
-  editorial_notes text not null default '',
-  source_reference text not null default '',
   partner_reviewed boolean not null default false,
   status text not null default 'draft' check (status in ('draft','ready','published')),
   featured boolean not null default false,
   position integer not null default 0,
-  updated_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint be_wte_picture_rights check (image_url is null or image_url='' or image_rights_confirmed or status<>'published'),
   constraint be_wte_partner_reviewed check (status<>'published' or partner_reviewed)
+);
+create table if not exists public.be_wte_place_notes (
+  place_id uuid primary key references public.be_wte_places(id) on delete cascade,
+  editorial_notes text not null default '',
+  source_reference text not null default '',
+  updated_by uuid references auth.users(id) on delete set null,
+  updated_at timestamptz not null default now()
 );
 create index if not exists be_wte_places_filters on public.be_wte_places(city_id,cuisine_id,status,position);
 create index if not exists be_wte_places_updated on public.be_wte_places(updated_at desc);
@@ -65,6 +69,7 @@ create index if not exists be_wte_places_updated on public.be_wte_places(updated
 alter table public.be_wte_settings enable row level security;
 alter table public.be_wte_terms enable row level security;
 alter table public.be_wte_places enable row level security;
+alter table public.be_wte_place_notes enable row level security;
 
 -- A public client can see the launch flag only AFTER the two launch gates pass.
 create policy "wte live flag public" on public.be_wte_settings for select to anon,authenticated
@@ -100,6 +105,17 @@ create policy "wte places staff update" on public.be_wte_places for update to au
 create policy "wte places staff delete" on public.be_wte_places for delete to authenticated
   using ((select public.be_my_role()) in ('editor','admin'));
 
+create policy "wte notes staff read" on public.be_wte_place_notes for select to authenticated
+  using ((select public.be_my_role()) in ('editor','admin'));
+create policy "wte notes staff insert" on public.be_wte_place_notes for insert to authenticated
+  with check ((select public.be_my_role()) in ('editor','admin'));
+create policy "wte notes staff update" on public.be_wte_place_notes for update to authenticated
+  using ((select public.be_my_role()) in ('editor','admin'))
+  with check ((select public.be_my_role()) in ('editor','admin'));
+create policy "wte notes staff delete" on public.be_wte_place_notes for delete to authenticated
+  using ((select public.be_my_role()) in ('editor','admin'));
+
+grant select,insert,update,delete on public.be_wte_place_notes to authenticated;
 grant select on public.be_wte_settings, public.be_wte_terms, public.be_wte_places to anon;
 grant select,insert,update,delete on public.be_wte_terms, public.be_wte_places to authenticated;
 grant select,update on public.be_wte_settings to authenticated;
