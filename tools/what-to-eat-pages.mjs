@@ -10,8 +10,10 @@ function page({arabic,editor,base,url,key}){
   const brand='<span class="wte-logotype" lang="en">what to eat?</span>';
   const altPath=base+(arabic?'':'ar/')+(editor?'editorial-desk/what-to-eat/':'what-to-eat/');
   const config=JSON.stringify({url,publishableKey:key,basePath:base}).replace(/</g,'\\u003c');
+  // Preview stays on the authenticated Editorial Desk route; the visitor
+  // URL intentionally remains unavailable until final partnership sign-off.
   const nav=editor?
-    '<a href="'+guidePath+'">'+(arabic?'معاينة الدليل':'Preview guide')+'</a><a href="'+editorPath+'">'+(arabic?'إدارة المحتوى':'Content studio')+'</a>':
+    '<a href="'+editorPath+'?preview=1" aria-label="'+(arabic?'فتح المعاينة الخاصة':'Open secure private preview')+'">'+(arabic?'المعاينة الخاصة':'Private preview')+'</a><a href="'+editorPath+'">'+(arabic?'إدارة المحتوى':'Content studio')+'</a>':
     '<a href="#wte-guide">'+(arabic?'استكشف':'Explore')+'</a><a href="#wte-sections">'+(arabic?'عن الدليل':'About the guide')+'</a>';
   return '<!doctype html><html lang="'+lang+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
     '<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#f36c2c">'+
