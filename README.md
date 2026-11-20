@@ -69,3 +69,9 @@ PDF: The URL is intentionally blank until the collaboration and future PDF are f
 Cost: Uses the existing static hosting and dedicated free Supabase project, subject to free-tier quotas; no paid map, CMS or extra service. The upload size limit is 5 MB per image.
 
 Database schema: `supabase/what-to-eat.sql` applied only to the dedicated Boudie Eats project as migration `boudieeats_private_what_to_eat_guide`. Do not rerun the migration. Build checks: `tools/verify-what-to-eat.mjs`. Keep both launch switches OFF until formal approval.
+
+## What to Eat — private collaboration completion
+
+The editorial workspace now supports structured bilingual page sections, FAQs, tag-curated collections, and optional photo galleries as well as restaurant records and cuisine/city filters. The added seed terms are editable labels, not fabricated restaurant recommendations. New editorial sections are draft placeholders that MUST be reviewed before any launch. The separate phase-two schema `supabase/what-to-eat-phase-two.sql` is deployed to the dedicated Boudie Eats project, including strict global image gating. Do not run it again.
+
+The unpublished workspace may be opened from `https://supergreatwin.github.io/boudieeats/editorial-desk/what-to-eat/` when the branded Cloudflare route is stale. The four private What to Eat GitHub Pages routes are excluded from the mirror redirect, remain noindexed, and continue to require Supabase editor/admin access for data. Everything else on the GitHub Pages mirror still redirects to the canonical branded site. A successful GitHub Pages build does NOT confirm Cloudflare deployment. Keep both global launch switches OFF until the collaboration is finalized; no final PDF or partner information has been added.
