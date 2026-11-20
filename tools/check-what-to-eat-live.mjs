@@ -18,6 +18,7 @@ for(const host of hosts){
    const branded=response.ok&&staying&&html.includes('data-wte-mode="editor"')&&
      html.includes('noindex,nofollow,noarchive')&&html.includes('wte-logotype')&&
      html.includes('be-what-to-eat-favicon.svg')&&html.includes('BE_WTE_CONFIG')&&
+     html.includes('manifest.webmanifest')&&html.includes('be-what-to-eat-newsletter.js')&&
      !html.includes('<title>what to eat? | Boudie Eats</title>');
    console.log(host.name+' '+route+': '+response.status+', independent brand '+(branded?'PASS':'FAIL')+', same host '+staying);
    if(!branded)failed++;
@@ -26,10 +27,13 @@ for(const host of hosts){
  for(const [asset,proof] of [
    ['be-what-to-eat.css','--orange:#f36e2d'],
    ['be-what-to-eat-favicon.svg','<svg'],
-   ['be-what-to-eat-brand.jpg',null]]){
+   ['be-what-to-eat-brand.jpg',null],
+   ['be-what-to-eat-newsletter.js','tally.so/embed'],
+   ['be-what-to-eat-app-192.png',null],
+   ['be-what-to-eat-app-512.png',null]]){
   try{
    const response=await request(new URL(asset,host.root).href);
-   const ok=response.ok&&(asset.endsWith('.jpg')?(response.headers.get('content-type')||'').includes('image'): (await response.text()).includes(proof));
+   const ok=response.ok&&((asset.endsWith('.jpg')||asset.endsWith('.png'))?(response.headers.get('content-type')||'').includes('image'): (await response.text()).includes(proof));
    console.log(host.name+' '+asset+': '+response.status+', '+(ok?'PASS':'FAIL'));
    if(!ok)failed++;
   }catch(e){failed++;console.error(host.name+' '+asset+': '+String(e));}
