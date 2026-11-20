@@ -235,6 +235,21 @@ function readiness(){
  '<div><strong>'+(state.settings?.pdf_url?t('Attached','مرفق'):t('Pending','منتظر'))+'</strong><span>'+t('PDF edition','نسخة PDF')+'</span></div></div>');
 }
 
+function brandEditor(){
+  if(!admin())return '';
+  const s=state.settings||{};
+  return panel(t('Brand identity / community','هوية العلامة / المجتمع'),
+    '<p class="wte-hint">'+t('What to eat? keeps its original orange wordmark and monochrome visual style. Customize copy, a licensed photo alternative, and the community link.','هوية What to Eat الأصلية من البرتقالي والأبيض والأسود. تقدر تعدّل المقدمة وصورة الغلاف المرخّصة ورابط المجتمع.')+'</p>'+
+    '<form id="wte-brand-form" class="wte-form">'+
+    '<div class="wte-form-grid">'+area('guide_intro_en',t('Introduction (English)','المقدمة بالإنجليزي'),s.guide_intro_en||'')+
+    area('guide_intro_ar',t('Introduction (Arabic)','المقدمة بالعربي'),s.guide_intro_ar||'')+'</div>'+
+    field('brand_hero_url',t('Alternative hero photo HTTPS URL (optional)','رابط HTTPS لصورة غلاف بديلة (اختياري)'),s.brand_hero_url||'','url')+
+    check('brand_hero_rights_confirmed',t('I have permission to display this alternative photo','عندي حقوق استخدام صورة الغلاف البديلة'),Boolean(s.brand_hero_rights_confirmed))+
+    '<div class="wte-form-grid">'+field('community_instagram_url',t('Community Instagram link','رابط إنستجرام المجتمع'),s.community_instagram_url||'https://www.instagram.com/whattocommunity/','url',true)+
+    field('community_handle',t('Community handle','اسم حساب المجتمع'),s.community_handle||'@whattocommunity','text',true)+'</div>'+
+    '<div class="wte-buttons"><button class="wte-primary" type="submit">'+t('Save brand identity','حفظ هوية العلامة')+'</button></div></form>');
+}
+
 function launchEditor(){
   const s=state.settings||{};
   if(!admin())return panel(t('Launch settings','إعدادات الإطلاق'),
@@ -253,7 +268,7 @@ function renderEditor(){
   '<div class="wte-private">'+(live()?t('PUBLIC LAUNCH ENABLED','النشر العام مفتوح'):t('HIDDEN & LIVE IN PRIVATE MODE','القسم شغال وخاص لحد الموافقة'))+'</div></div>'+
   '<div class="wte-buttons"><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'what-to-eat/')+'">'+t('Open visitor preview','معاينة صفحة الزائر')+'</a><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>'+
-  readiness()+launchEditor()+'<div class="wte-editor-columns">'+termEditor()+placeEditor()+'</div>'+sectionEditor()+photoEditor()+
+  brandEditor()+readiness()+launchEditor()+'<div class="wte-editor-columns">'+termEditor()+placeEditor()+'</div>'+sectionEditor()+photoEditor()+
   panel(t('Current entries','الأماكن المضافة'),'<p class="wte-hint">'+state.places.length+' '+t('entries saved','مكان محفوظ')+'</p><div class="wte-list">'+
   state.places.map(p=>'<div><span><strong>'+esc(placeName(p))+'</strong><small>'+esc(p.status)+' · '+esc(p.slug)+'</small></span><span><button data-action="edit-place" data-id="'+p.id+'">'+t('Edit','تعديل')+'</button> <button data-action="delete-place" data-id="'+p.id+'">'+t('Delete','حذف')+'</button></span></div>').join('')+'</div>');
 }
@@ -371,7 +386,7 @@ async function uploadPhoto(form,fileId='wte-upload-file'){
   message(t('Photo uploaded privately. Save the entry to attach it.','الصورة اترفعت بشكل خاص. احفظ المكان علشان تربطها بيه.'));
 }
 root.addEventListener('submit',async ev=>{
-  const form=ev.target;if(!['wte-login','wte-settings-form','wte-term-form','wte-place-form','wte-section-form','wte-photo-form'].includes(form.id))return;
+  const form=ev.target;if(!['wte-login','wte-settings-form','wte-brand-form','wte-term-form','wte-place-form','wte-section-form','wte-photo-form'].includes(form.id))return;
   ev.preventDefault();const b=form.querySelector('button[type=submit]');if(b)b.disabled=true;
   try{
     if(form.id==='wte-login'){
@@ -379,6 +394,24 @@ root.addEventListener('submit',async ev=>{
       if(error)throw error;await refresh();return;
     }
     if(!staff())throw Error(t('Editor access required.','مطلوب صلاحية محرر.'));
+    if(form.id==='wte-brand-form'){
+      if(!admin())throw Error(t('Admin access required.','مطلوب صلاحية مدير.'));
+      const raw=payload(form,['guide_intro_en','guide_intro_ar','brand_hero_url','community_instagram_url','community_handle']);
+      const photo=raw.brand_hero_url?validUrl(raw.brand_hero_url):null;
+      if(raw.brand_hero_url&&!photo)throw Error(t('Use a secure HTTPS photo URL.','استخدم رابط HTTPS صحيح للصورة.'));
+      const rights=form.elements.brand_hero_rights_confirmed.checked;
+      if(photo&&!rights)throw Error(t('Confirm photo rights before using an alternative hero.','أكّد حقوق الصورة قبل استخدامها كغلاف.'));
+      const community=validUrl(raw.community_instagram_url);
+      if(!community||!['instagram.com','www.instagram.com'].includes(new URL(community).hostname))
+        throw Error(t('Use a valid Instagram HTTPS URL.','استخدم رابط حساب إنستجرام بصيغة HTTPS.'));
+      if(!/^@[a-zA-Z0-9._]{1,35}$/.test(raw.community_handle))throw Error(t('Use a valid @username.','اكتب اسم حساب صحيح يبدأ بعلامة @.'));
+      const data={guide_intro_en:raw.guide_intro_en,guide_intro_ar:raw.guide_intro_ar,
+        brand_hero_url:photo,brand_hero_rights_confirmed:Boolean(photo&&rights),
+        community_instagram_url:community,community_handle:raw.community_handle,
+        updated_at:new Date().toISOString()};
+      const {error}=await state.client.from('be_wte_settings').update(data).eq('id',1);if(error)throw error;
+      await refresh();message(t('Brand identity saved privately.','تم حفظ الهوية بشكل خاص.'));return;
+    }
     if(form.id==='wte-settings-form'){
       if(!admin())throw Error(t('Admin access required.','مطلوب صلاحية مدير.'));
       const data={site_enabled:form.elements.site_enabled.checked,partner_approved:form.elements.partner_approved.checked,pdf_url:validUrl(form.elements.pdf_url.value)||null,updated_at:new Date().toISOString()};
