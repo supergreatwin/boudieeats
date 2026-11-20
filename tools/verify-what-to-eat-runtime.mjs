@@ -28,10 +28,13 @@ runInContext("state.search=''",ctx,{timeout:3000});
 sandbox.window.location={search:'?preview=1'};
 runInContext('render()',ctx,{timeout:3000});
 assert.equal(runInContext('previewMode()',ctx),true,'Secure preview mode was not recognized.');
-for(const marker of ['wte-preview-toolbar','wte-brand-hero','wte-filters','wte-results','wte-sections','Sample Private','Back to content studio']){
+for(const marker of ['wte-preview-toolbar','wte-brand-hero','wte-filters','wte-results','wte-sections','Back to content studio']){
  assert(root.innerHTML.includes(marker),'Private branded preview missing '+marker);
 }
-assert(!root.innerHTML.includes('wte-card-actions'),'Visitor preview should not expose edit/delete buttons.');
+// The simple document stub does not parse root.innerHTML into child nodes:
+// updateCards() writes into separately mocked #wte-results.
+assert(el('wte-results').innerHTML.includes('Sample Private'),'Private preview failed to render the draft restaurant.');
+assert(!el('wte-results').innerHTML.includes('wte-card-actions'),'Visitor preview must not expose edit/delete buttons.');
 sandbox.window.location={search:''};
 runInContext('render()',ctx,{timeout:3000});
 assert(root.innerHTML.includes('wte-brand-form'),'Leaving preview did not return to Editorial Desk');
