@@ -3,7 +3,8 @@ on:
   pull_request:
     paths:
       - "tools/**"
-      - "supabase/what-to-eat.sql"
+      - "supabase/what-to-eat*.sql"
+      - "assets/what-to-eat-*"
       - ".github/workflows/verify-what-to-eat.yml"
   workflow_dispatch:
 
