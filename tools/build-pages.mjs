@@ -149,6 +149,9 @@ if (site.hostname.endsWith('.github.io')) {
       if (!entry.isFile() || !entry.name.endsWith('.html') || entry.name.startsWith('google')) continue;
       const route = path.slice(dist.length).replaceAll('\\', '/').replace(/^\//, '')
         .replace(/index\.html$/, '').replace(/\.html$/, '');
+      // Retain noindexed, RLS-gated private editor and preview URLs as a
+      // working fallback when the Cloudflare production build is stale.
+      if (/^(?:ar\/)?(?:editorial-desk\/)?what-to-eat\/$/.test(route)) continue;
       const target = new URL(route, 'https://boudieeats.com/').href;
       const html = readFileSync(path, 'utf8');
       if (!/<head[^>]*>/i.test(html)) continue;

@@ -1,0 +1,19 @@
+name: Check live What to Eat access
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Publish BoudieEats"]
+    types: [completed]
+jobs:
+  private-editor-health:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+      - name: Check both private editorial URLs without authentication
+        run: node tools/check-what-to-eat-live.mjs

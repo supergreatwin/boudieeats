@@ -25,6 +25,7 @@ jobs:
           node --check tools/what-to-eat-pages.mjs
           node --check tools/build-pages.mjs
           node --check tools/verify-what-to-eat.mjs
+          node --check tools/verify-what-to-eat-runtime.mjs
       - name: Build private preview
         run: node tools/build-pages.mjs
         env:
@@ -34,5 +35,7 @@ jobs:
       - name: Verify generated sections
         run: |
           node tools/verify-what-to-eat.mjs
+          node tools/verify-what-to-eat-runtime.mjs
+          node tools/verify-what-to-eat-public-api.mjs
           node tools/verify-accounts.mjs
           node tools/verify-publishing.mjs

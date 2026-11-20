@@ -5,7 +5,7 @@ function page({arabic,editor,base,url,key}){
   const lang=arabic?'ar-EG':'en',prefix=arabic?'ar/':'',direction=arabic?'rtl':'ltr';
   const rootPath=base+prefix;
   const title=arabic?'ناكل إيه؟':'What to Eat';
-  const brand=arabic?'<span>بودي إيتس<span style="color:#ebc57b">.</span></span>':'<img src="'+base+'media/boudieeats-wordmark.svg" alt="boudieeats.">';
+  const brand=arabic?'<span>بودي إيتس<span style="color:#ebc57b">.</span></span>':'<img src="'+base+'media/boudieeats-wordmark-cream-gold-v2.svg" alt="boudieeats.">';
   const altPath=base+(arabic?'':'ar/')+(editor?'editorial-desk/what-to-eat/':'what-to-eat/');
   const config=JSON.stringify({url,publishableKey:key,basePath:base}).replace(/</g,'\\u003c');
   return '<!doctype html><html lang="'+lang+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
@@ -16,7 +16,7 @@ function page({arabic,editor,base,url,key}){
     '<link rel="alternate" hreflang="ar-EG" href="https://boudieeats.com/ar/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="stylesheet" href="'+base+'be-what-to-eat.css"></head>'+
     '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+rootPath+'">'+brand+'</a>'+
-    '<nav class="be-language"><a href="'+rootPath+'">'+(arabic?'الرئيسية':'Home')+'</a><a href="'+rootPath+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a>'+
+    '<nav class="be-language"><a href="'+rootPath+'">'+(arabic?'الرئيسية':'Home')+'</a>'+(editor?'<a href="'+rootPath+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a>':'')+
     '<a href="'+altPath+'" hreflang="'+(arabic?'en':'ar-EG')+'">'+(arabic?'EN':'عربي')+'</a></nav></header>'+
     '<main class="wte-shell" id="wte-root" aria-live="polite"><p>'+(arabic?'جارٍ التحميل…':'Loading private guide…')+'</p></main>'+
     '<footer class="wte-site-footer"><span>© Boudie Eats</span><span>'+(arabic?'دليل الطعام قيد الإعداد.':'This collaboration has not launched.')+'</span></footer>'+

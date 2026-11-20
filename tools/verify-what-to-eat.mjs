@@ -17,7 +17,7 @@ for(const prefix of ['', 'ar/']){
   if(!desk.includes(prefix+'editorial-desk/what-to-eat/'))errors.push('Editor nav missing '+prefix);
 }
 const script=readFileSync(join(dist,'be-what-to-eat.js'),'utf8');
-for(const marker of ['be_wte_settings','be_wte_terms','be_wte_places','be_wte_place_notes','signInWithPassword','createSignedUrl','partner_approved','site_enabled','image_rights_confirmed','city_id','cuisine_id']){
+for(const marker of ['be_wte_settings','be_wte_terms','be_wte_places','be_wte_place_notes','be_wte_sections','be_wte_photos','signInWithPassword','createSignedUrl','partner_approved','site_enabled','image_rights_confirmed','city_id','cuisine_id']){
   if(!script.includes(marker))errors.push('Guide client missing '+marker);
 }
 for(const marker of ['service_role','sb_secret_']){
@@ -29,5 +29,10 @@ for(const marker of ['enable row level security','wte live places public','wte p
 }
 const site=readFileSync(join(dist,'sitemap.xml'),'utf8');
 if(site.includes('boudieeats.com/what-to-eat/'))errors.push('Private guide incorrectly included in sitemap');
+const phaseTwo=readFileSync(new URL('../supabase/what-to-eat-phase-two.sql',import.meta.url),'utf8');
+for(const marker of ['be_wte_sections','be_wte_photos','wte images live read','site_enabled and s.partner_approved'])if(!phaseTwo.includes(marker))errors.push('Phase two schema missing '+marker);
+const builder=readFileSync(new URL('./build-pages.mjs',import.meta.url),'utf8');
+if(!builder.includes('working fallback when the Cloudflare'))errors.push('Private fallback is not retained');
+for(const marker of ['function sectionEditor()','function photoEditor()','function readiness()','async function saveSection(','async function savePhoto('])if(!script.includes(marker))errors.push('Editorial feature missing '+marker);
 if(errors.length){console.error(errors.join('\n'));process.exit(1);}
 console.log('PASS: bilingual guide and editorial editor routes are hidden, noindexed and backed by RLS-gated metadata.');
