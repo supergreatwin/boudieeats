@@ -33,5 +33,6 @@ const phaseTwo=readFileSync(new URL('../supabase/what-to-eat-phase-two.sql',impo
 for(const marker of ['be_wte_sections','be_wte_photos','wte images live read','site_enabled and s.partner_approved'])if(!phaseTwo.includes(marker))errors.push('Phase two schema missing '+marker);
 const builder=readFileSync(new URL('./build-pages.mjs',import.meta.url),'utf8');
 if(!builder.includes('working fallback when the Cloudflare'))errors.push('Private fallback is not retained');
+for(const marker of ['function sectionEditor()','function photoEditor()','function readiness()','async function saveSection(','async function savePhoto('])if(!script.includes(marker))errors.push('Editorial feature missing '+marker);
 if(errors.length){console.error(errors.join('\n'));process.exit(1);}
 console.log('PASS: bilingual guide and editorial editor routes are hidden, noindexed and backed by RLS-gated metadata.');
