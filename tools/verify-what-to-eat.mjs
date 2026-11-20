@@ -11,6 +11,8 @@ for(const prefix of ['', 'ar/']){
       if(!html.includes(marker))errors.push(prefix+mode+' missing '+marker);
     }
     if(!html.includes('what to eat?')||!html.includes('wte-logotype'))errors.push(prefix+mode+' wrong What to Eat wordmark');
+    for(const brandMarker of ['be-what-to-eat-favicon.svg','<nav class="be-language"','what to eat?</span>'])if(!html.includes(brandMarker))errors.push(prefix+mode+' missing independent brand marker '+brandMarker);
+    if(html.includes('<title>what to eat? | Boudie Eats</title>'))errors.push(prefix+mode+' uses parent brand title');
     if(html.includes('sb_secret_')||html.includes('service_role'))errors.push(prefix+mode+' exposes private key');
     if(mode==='what-to-eat'&&html.includes('data-wte-mode="editor"'))errors.push('Public guide must not be an editor page');
   }
@@ -19,11 +21,17 @@ for(const prefix of ['', 'ar/']){
 }
 const imagePath=join(dist,'be-what-to-eat-brand.jpg');
 if(!existsSync(imagePath))errors.push('Original What to Eat photo artwork missing');
+if(!existsSync(join(dist,'be-what-to-eat-favicon.svg')))errors.push('What to Eat favicon missing');
+const css=readFileSync(join(dist,'be-what-to-eat.css'),'utf8');
+for(const token of ['--orange:#f36e2d','wte-brand-hero','wte-community','grayscale(1)','wte-footer-wordmark'])if(!css.includes(token))errors.push('Brand stylesheet missing '+token);
+if(css.includes('burgundy')||css.includes('Fraunces')||css.includes('Lalezar'))errors.push('Inherited Boudie Eats styling remains');
+if(/wte-brand-hero img\{[^}]*grayscale\(1\)/.test(css))errors.push('Brand hero incorrectly desaturates the orange original artwork');
 const script=readFileSync(join(dist,'be-what-to-eat.js'),'utf8');
 if(!script.includes('brandHero()')||!script.includes('s.slug===\'community\''))errors.push('What to Eat brand or community preview missing');
 for(const marker of ['be_wte_settings','be_wte_terms','be_wte_places','be_wte_place_notes','be_wte_sections','be_wte_photos','signInWithPassword','createSignedUrl','partner_approved','site_enabled','image_rights_confirmed','city_id','cuisine_id']){
   if(!script.includes(marker))errors.push('Guide client missing '+marker);
 }
+for(const marker of ['wte-brand-form','community_instagram_url','brand_hero_url','brand_hero_rights_confirmed','function brandHero(compact=false)','wte-community-link'])if(!script.includes(marker))errors.push('Full brand client missing '+marker);
 for(const marker of ['service_role','sb_secret_']){
   if(script.includes(marker))errors.push('Guide client contains private key marker '+marker);
 }
@@ -31,6 +39,8 @@ const sql=readFileSync(new URL('../supabase/what-to-eat.sql',import.meta.url),'u
 for(const marker of ['enable row level security','wte live places public','wte places staff insert','be_wte_place_notes','partner_approved','site_enabled','be-wte-media']){
   if(!sql.includes(marker))errors.push('Schema missing '+marker);
 }
+const brandSQL=readFileSync(new URL('../supabase/what-to-eat-brand-settings.sql',import.meta.url),'utf8');
+for(const marker of ['guide_intro_en','community_instagram_url','brand_hero_rights_confirmed'])if(!brandSQL.includes(marker))errors.push('Brand settings migration missing '+marker);
 const site=readFileSync(join(dist,'sitemap.xml'),'utf8');
 if(site.includes('boudieeats.com/what-to-eat/'))errors.push('Private guide incorrectly included in sitemap');
 const phaseTwo=readFileSync(new URL('../supabase/what-to-eat-phase-two.sql',import.meta.url),'utf8');
