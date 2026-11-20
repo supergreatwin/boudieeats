@@ -4,6 +4,9 @@ const cfg=window.BE_WTE_CONFIG||{};
 const ar=document.documentElement.lang.startsWith('ar');
 const t=(en,arabic)=>ar?arabic:en;
 const editor=document.body.dataset.wteMode==='editor';
+// Use a signed-in Editorial Desk URL for full visitor-style previews.
+// This never turns on public launch, and Supabase RLS still gates all data.
+const previewMode=()=>editor&&/(?:^|[?&])preview=1(?:&|$)/.test(window.location?.search||'');
 const root=document.getElementById('wte-root');
 const state={client:null,user:null,role:null,settings:null,terms:[],places:[],notes:[],sections:[],photos:[],editing:null,editingTerm:null,editingSection:null,editingPhoto:null,search:'',city:'',cuisine:'',price:''};
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -30,7 +33,7 @@ function selectField(name,label,options,value,required=false){
 function check(name,label,checked=false){return '<label class="wte-check"><input type="checkbox" name="'+name+'" '+(checked?'checked':'')+'><span>'+esc(label)+'</span></label>';}
 function panel(title,body){return '<section class="wte-panel"><h2>'+title+'</h2>'+body+'</section>';}
 function login(){
-  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Private collaboration','تعاون خاص')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1><p>'+t('This guide has not been released. Approved editors can sign in to review it.','الدليل لسه ما اتنشرش. فريق التحرير المعتمد يقدر يدخل ويراجعه.')+'</p></div>'+
+  root.innerHTML=brandHero(true)+'<div class="wte-intro"><p class="wte-eyebrow">'+t('Private collaboration','تعاون خاص')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1><p>'+t('This guide has not been released. Approved editors can sign in to review it.','الدليل لسه ما اتنشرش. فريق التحرير المعتمد يقدر يدخل ويراجعه.')+'</p></div>'+
   panel(t('Editorial sign-in','دخول فريق التحرير'),'<form id="wte-login" class="wte-form">'+field('email',t('Email','البريد الإلكتروني'),'','email',true)+field('password',t('Password','كلمة المرور'),'','password',true)+'<button class="wte-primary" type="submit">'+t('Sign in','دخول')+'</button></form>')+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>';
 }
@@ -72,7 +75,7 @@ function cards(override=null){
     const summary=localized(p,'summary')?'<p>'+esc(localized(p,'summary'))+'</p>':'';
     const must=localized(p,'must_try')?'<p><strong>'+t('Order this: ','جرب: ')+'</strong>'+esc(localized(p,'must_try'))+'</p>':'';
     const links=[['website_url',t('Website','الموقع')],['instagram_url','Instagram'],['booking_url',t('Booking','الحجز')]].map(([key,label])=>validUrl(p[key])?'<a href="'+esc(validUrl(p[key]))+'" target="_blank" rel="noopener noreferrer">'+label+'</a>':'').join('');
-    const controls=editor&&staff()?'<div class="wte-card-actions"><button data-action="edit-place" data-id="'+esc(p.id)+'">'+t('Edit','تعديل')+'</button><button data-action="delete-place" data-id="'+esc(p.id)+'">'+t('Delete','حذف')+'</button></div>':'';
+    const controls=editor&&!previewMode()&&staff()?'<div class="wte-card-actions"><button data-action="edit-place" data-id="'+esc(p.id)+'">'+t('Edit','تعديل')+'</button><button data-action="delete-place" data-id="'+esc(p.id)+'">'+t('Delete','حذف')+'</button></div>':'';
     const badge=staff()?'<span class="wte-state">'+esc(p.status)+(p.partner_reviewed?' · reviewed':'')+'</span>':'';
     const img=p.image_url?'<div class="wte-photo"><img data-image="'+esc(p.id)+'" alt="'+esc(localized(p,'image_alt')||placeName(p))+'" loading="lazy"><small>'+esc(p.image_credit||'')+'</small></div>':'<div class="wte-no-photo">'+t('Photograph pending','الصورة لسه هتتضاف')+'</div>';
     const gallery=state.photos.filter(ph=>ph.place_id===p.id&&(staff()||ph.image_rights_confirmed));
@@ -117,7 +120,8 @@ function brandHero(compact=false){
 function browse(){
   const isPreview=staff()&&!live();
   const intro=localized(state.settings||{},'guide_intro')||t('Find places by cuisine and city, with carefully written recommendations.','اختار أكلتك ومدينتك، وشوف ترشيحات مكتوبة بعناية.');
-  root.innerHTML=brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / the guide','what to eat? / الدليل')+'</p>'+
+  const previewToolbar=previewMode()?'<div class="wte-preview-toolbar" role="status"><span>'+t('PRIVATE PREVIEW — visible only to approved editors','معاينة خاصة — لفريق التحرير المعتمد فقط')+'</span><a href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/what-to-eat/')+'">'+t('Back to content studio','العودة لمكتب التحرير')+'</a></div>':'';
+  root.innerHTML=previewToolbar+brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / the guide','what to eat? / الدليل')+'</p>'+
     '<h1>'+t('the guide<span class="wte-orange-dot">.</span>','دليل الأكل<span class="wte-orange-dot">.</span>')+'</h1>'+
     '<p>'+esc(intro)+'</p>'+
     (isPreview?'<div class="wte-private">'+t('PRIVATE PREVIEW / not published','معاينة خاصة / لم يتم النشر')+'</div>':'')+
@@ -266,14 +270,14 @@ function renderEditor(){
   if(!staff()){denied();return;}
   root.innerHTML=brandHero(true)+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / private editorial','what to eat? / التحرير الخاص')+'</p><h1>'+t('the studio<span class="wte-orange-dot">.</span>','مكتب التحرير<span class="wte-orange-dot">.</span>')+'</h1><p>'+t('Edit the guide, stories, community and recommendations before launch.','عدّل الدليل والمحتوى والمجتمع والترشيحات قبل الإطلاق.')+'</p>'+
   '<div class="wte-private">'+(live()?t('PUBLIC LAUNCH ENABLED','النشر العام مفتوح'):t('HIDDEN & LIVE IN PRIVATE MODE','القسم شغال وخاص لحد الموافقة'))+'</div></div>'+
-  '<div class="wte-buttons"><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'what-to-eat/')+'">'+t('Open visitor preview','معاينة صفحة الزائر')+'</a><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
+  '<div class="wte-buttons"><a class="wte-button wte-primary" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/what-to-eat/?preview=1')+'">'+t('View full private preview','افتح المعاينة الخاصة الكاملة')+'</a><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>'+
   brandEditor()+readiness()+launchEditor()+'<div class="wte-editor-columns">'+termEditor()+placeEditor()+'</div>'+sectionEditor()+photoEditor()+
   panel(t('Current entries','الأماكن المضافة'),'<p class="wte-hint">'+state.places.length+' '+t('entries saved','مكان محفوظ')+'</p><div class="wte-list">'+
   state.places.map(p=>'<div><span><strong>'+esc(placeName(p))+'</strong><small>'+esc(p.status)+' · '+esc(p.slug)+'</small></span><span><button data-action="edit-place" data-id="'+p.id+'">'+t('Edit','تعديل')+'</button> <button data-action="delete-place" data-id="'+p.id+'">'+t('Delete','حذف')+'</button></span></div>').join('')+'</div>');
 }
 function render(){
-  if(editor){if(staff())renderEditor();else if(state.user)denied();else login();return;}
+  if(editor){if(staff()){if(previewMode())browse();else renderEditor();}else if(state.user)denied();else login();return;}
   if(!live()&&!staff()){notFound();return;}
   browse();
 }
@@ -427,11 +431,11 @@ root.addEventListener('submit',async ev=>{
   finally{if(b&&b.isConnected)b.disabled=false;}
 });
 root.addEventListener('change',e=>{
-  const el=e.target;if(!el.name||!['city','cuisine','price'].includes(el.name)||editor)return;
+  const el=e.target;if(!el.name||!['city','cuisine','price'].includes(el.name)||(editor&&!previewMode()))return;
   state[el.name]=el.value;updateCards();
 });
 root.addEventListener('input',e=>{
-  if(!editor&&e.target.dataset.filter==='search'){state.search=e.target.value;updateCards();}
+  if((!editor||previewMode())&&e.target.dataset.filter==='search'){state.search=e.target.value;updateCards();}
 });
 root.addEventListener('click',async e=>{
   const b=e.target.closest('button[data-action]');if(!b||!staff())return;
