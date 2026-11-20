@@ -4,6 +4,8 @@ const cfg=window.BE_WTE_CONFIG||{};
 const ar=document.documentElement.lang.startsWith('ar');
 const t=(en,arabic)=>ar?arabic:en;
 const editor=document.body.dataset.wteMode==='editor';
+let installPrompt=null;
+window.addEventListener?.('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;});
 // Use a signed-in Editorial Desk URL for full visitor-style previews.
 // This never turns on public launch, and Supabase RLS still gates all data.
 const previewMode=()=>editor&&/(?:^|[?&])preview=1(?:&|$)/.test(window.location?.search||'');
@@ -270,7 +272,7 @@ function renderEditor(){
   if(!staff()){denied();return;}
   root.innerHTML=brandHero(true)+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / private editorial','what to eat? / التحرير الخاص')+'</p><h1>'+t('the studio<span class="wte-orange-dot">.</span>','مكتب التحرير<span class="wte-orange-dot">.</span>')+'</h1><p>'+t('Edit the guide, stories, community and recommendations before launch.','عدّل الدليل والمحتوى والمجتمع والترشيحات قبل الإطلاق.')+'</p>'+
   '<div class="wte-private">'+(live()?t('PUBLIC LAUNCH ENABLED','النشر العام مفتوح'):t('HIDDEN & LIVE IN PRIVATE MODE','القسم شغال وخاص لحد الموافقة'))+'</div></div>'+
-  '<div class="wte-buttons"><a class="wte-button wte-primary" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/what-to-eat/?preview=1')+'">'+t('View full private preview','افتح المعاينة الخاصة الكاملة')+'</a><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
+  '<div class="wte-buttons"><a class="wte-button wte-primary" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/what-to-eat/?preview=1')+'">'+t('View full private preview','افتح المعاينة الخاصة الكاملة')+'</a><button type="button" data-action="install-app" class="wte-button">'+t('Install private web app','ثبّت التطبيق الخاص')+'</button><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>'+
   brandEditor()+readiness()+launchEditor()+'<div class="wte-editor-columns">'+termEditor()+placeEditor()+'</div>'+sectionEditor()+photoEditor()+
   panel(t('Current entries','الأماكن المضافة'),'<p class="wte-hint">'+state.places.length+' '+t('entries saved','مكان محفوظ')+'</p><div class="wte-list">'+
@@ -441,6 +443,11 @@ root.addEventListener('click',async e=>{
   const b=e.target.closest('button[data-action]');if(!b||!staff())return;
   const action=b.dataset.action,id=b.dataset.id;
   try{
+    if(action==='install-app'){
+      if(installPrompt){const event=installPrompt;installPrompt=null;await event.prompt();return;}
+      const guidance=t('To install this free web app, use your browser menu: Install app or Add to Home Screen (Safari: Share → Add to Home Screen).','لتثبيت التطبيق المجاني افتح قائمة المتصفح واختر تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية (في سفاري: مشاركة ثم إضافة إلى الشاشة الرئيسية).');
+      message(guidance);alert(guidance);return;
+    }
     if(action==='edit-place'){state.editing=state.places.find(x=>x.id===id);renderEditor();getForm('wte-place-form')?.scrollIntoView({block:'start',behavior:'smooth'});return;}
     if(action==='edit-term'){state.editingTerm=state.terms.find(x=>x.id===id);renderEditor();getForm('wte-term-form')?.scrollIntoView({block:'start',behavior:'smooth'});return;}
     if(action==='reset-place'){state.editing=null;renderEditor();return;}
