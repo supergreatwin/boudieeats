@@ -20,10 +20,11 @@ state.notes=[];state.editing=state.places[0];
 `;
 runInContext(fixture,ctx,{timeout:3000});
 runInContext('renderEditor()',ctx,{timeout:3000});
-for(const marker of ['wte-place-form','wte-section-form','wte-photo-form','wte-term-form','wte-settings-form','Launch readiness','Sample Private']){
+for(const marker of ['wte-place-form','wte-section-form','wte-photo-form','wte-term-form','wte-settings-form','wte-brand-form','Launch readiness','Sample Private']){
  assert(root.innerHTML.includes(marker),'Editor missing '+marker);
 }
 const html=runInContext('sectionHTML()',ctx,{timeout:3000});
+assert(root.innerHTML.includes('brand_hero_url'),'Admin branding controls missing');
 for(const marker of ['Intro draft','FAQ draft','Breakfast collection','Sample Private']){
  assert(html.includes(marker),'Private preview section missing '+marker);
 }

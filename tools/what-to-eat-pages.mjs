@@ -4,22 +4,28 @@ import {join} from 'node:path';
 function page({arabic,editor,base,url,key}){
   const lang=arabic?'ar-EG':'en',prefix=arabic?'ar/':'',direction=arabic?'rtl':'ltr';
   const rootPath=base+prefix;
+  const guidePath=rootPath+'what-to-eat/';
+  const editorPath=rootPath+'editorial-desk/what-to-eat/';
   const title=arabic?'what to eat? | ناكل إيه؟':'what to eat?';
   const brand='<span class="wte-logotype" lang="en">what to eat?</span>';
   const altPath=base+(arabic?'':'ar/')+(editor?'editorial-desk/what-to-eat/':'what-to-eat/');
   const config=JSON.stringify({url,publishableKey:key,basePath:base}).replace(/</g,'\\u003c');
+  const nav=editor?
+    '<a href="'+guidePath+'">'+(arabic?'معاينة الدليل':'Preview guide')+'</a><a href="'+editorPath+'">'+(arabic?'إدارة المحتوى':'Content studio')+'</a>':
+    '<a href="#wte-guide">'+(arabic?'استكشف':'Explore')+'</a><a href="#wte-sections">'+(arabic?'عن الدليل':'About the guide')+'</a>';
   return '<!doctype html><html lang="'+lang+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
     '<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#f36c2c">'+
-    '<title>'+title+' | Boudie Eats</title><meta name="description" content="Private collaboration guide, currently under review.">'+
+    '<title>'+title+'</title><meta name="description" content="what to eat? | An independent food guide in preparation.">'+
+    '<link rel="icon" href="'+base+'be-what-to-eat-favicon.svg" type="image/svg+xml">'+
     '<link rel="canonical" href="https://boudieeats.com/'+prefix+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="alternate" hreflang="en" href="https://boudieeats.com/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="alternate" hreflang="ar-EG" href="https://boudieeats.com/ar/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="stylesheet" href="'+base+'be-what-to-eat.css"></head>'+
-    '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+rootPath+'">'+brand+'</a>'+
-    '<nav class="be-language"><a href="'+rootPath+'">'+(arabic?'الرئيسية':'Home')+'</a>'+(editor?'<a href="'+rootPath+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a>':'')+
+    '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+guidePath+'" aria-label="what to eat?">'+brand+'</a>'+
+    '<nav class="be-language" aria-label="'+(arabic?'روابط القسم':'Section navigation')+'">'+nav+
     '<a href="'+altPath+'" hreflang="'+(arabic?'en':'ar-EG')+'">'+(arabic?'EN':'عربي')+'</a></nav></header>'+
     '<main class="wte-shell" id="wte-root" aria-live="polite"><p>'+(arabic?'جارٍ التحميل…':'Loading private guide…')+'</p></main>'+
-    '<footer class="wte-site-footer"><span>what to eat? × Boudie Eats</span><span>'+(arabic?'دليل الطعام قيد الإعداد.':'This collaboration has not launched.')+'</span></footer>'+
+    '<footer class="wte-site-footer"><span class="wte-footer-wordmark" lang="en">what to eat?</span><span>'+(arabic?'بالشراكة مع بودي إيتس':'In collaboration with Boudie Eats')+'</span></footer>'+
     '<script>window.BE_WTE_CONFIG='+config+';</script><script type="module" src="'+base+'be-what-to-eat.js"></script></body></html>';
 }
 export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabasePublishableKey=''}){
@@ -27,6 +33,7 @@ export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabas
   copyFileSync(new URL('./what-to-eat-client.mjs',import.meta.url),join(directory,'be-what-to-eat.js'));
   copyFileSync(new URL('./what-to-eat.css',import.meta.url),join(directory,'be-what-to-eat.css'));
   copyFileSync(new URL('../assets/what-to-eat-original-reference.jpg',import.meta.url),join(directory,'be-what-to-eat-brand.jpg'));
+  copyFileSync(new URL('../assets/what-to-eat-favicon.svg',import.meta.url),join(directory,'be-what-to-eat-favicon.svg'));
   for(const arabic of [false,true]){
     const prefix=arabic?'ar/':'';
     for(const editor of [false,true]){
