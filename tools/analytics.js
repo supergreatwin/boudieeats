@@ -1,6 +1,6 @@
 (() => {
   const id = document.currentScript.dataset.measurementId;
-  if (location.origin !== 'https://boudieeats.pages.dev' || !/^G-[A-Z0-9]{10}$/.test(id)) return;
+  if (location.origin !== 'https://boudieeats.com' || !/^G-[A-Z0-9]{10}$/.test(id)) return;
 
   const key = 'analytics-consent-v1';
   const arabic = document.documentElement.lang.startsWith('ar');
