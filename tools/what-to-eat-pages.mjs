@@ -4,12 +4,12 @@ import {join} from 'node:path';
 function page({arabic,editor,base,url,key}){
   const lang=arabic?'ar-EG':'en',prefix=arabic?'ar/':'',direction=arabic?'rtl':'ltr';
   const rootPath=base+prefix;
-  const title=arabic?'ناكل إيه؟':'What to Eat';
-  const brand=arabic?'<span>بودي إيتس<span style="color:#ebc57b">.</span></span>':'<img src="'+base+'media/boudieeats-wordmark-cream-gold-v2.svg" alt="boudieeats.">';
+  const title=arabic?'what to eat? | ناكل إيه؟':'what to eat?';
+  const brand='<span class="wte-logotype" lang="en">what to eat?</span>';
   const altPath=base+(arabic?'':'ar/')+(editor?'editorial-desk/what-to-eat/':'what-to-eat/');
   const config=JSON.stringify({url,publishableKey:key,basePath:base}).replace(/</g,'\\u003c');
   return '<!doctype html><html lang="'+lang+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
-    '<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#51283e">'+
+    '<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#f36c2c">'+
     '<title>'+title+' | Boudie Eats</title><meta name="description" content="Private collaboration guide, currently under review.">'+
     '<link rel="canonical" href="https://boudieeats.com/'+prefix+(editor?'editorial-desk/':'')+'what-to-eat/">'+
     '<link rel="alternate" hreflang="en" href="https://boudieeats.com/'+(editor?'editorial-desk/':'')+'what-to-eat/">'+
@@ -19,13 +19,14 @@ function page({arabic,editor,base,url,key}){
     '<nav class="be-language"><a href="'+rootPath+'">'+(arabic?'الرئيسية':'Home')+'</a>'+(editor?'<a href="'+rootPath+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a>':'')+
     '<a href="'+altPath+'" hreflang="'+(arabic?'en':'ar-EG')+'">'+(arabic?'EN':'عربي')+'</a></nav></header>'+
     '<main class="wte-shell" id="wte-root" aria-live="polite"><p>'+(arabic?'جارٍ التحميل…':'Loading private guide…')+'</p></main>'+
-    '<footer class="wte-site-footer"><span>© Boudie Eats</span><span>'+(arabic?'دليل الطعام قيد الإعداد.':'This collaboration has not launched.')+'</span></footer>'+
+    '<footer class="wte-site-footer"><span>what to eat? × Boudie Eats</span><span>'+(arabic?'دليل الطعام قيد الإعداد.':'This collaboration has not launched.')+'</span></footer>'+
     '<script>window.BE_WTE_CONFIG='+config+';</script><script type="module" src="'+base+'be-what-to-eat.js"></script></body></html>';
 }
 export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabasePublishableKey=''}){
   const base=basePath.endsWith('/')?basePath:basePath+'/';
   copyFileSync(new URL('./what-to-eat-client.mjs',import.meta.url),join(directory,'be-what-to-eat.js'));
   copyFileSync(new URL('./what-to-eat.css',import.meta.url),join(directory,'be-what-to-eat.css'));
+  copyFileSync(new URL('../assets/what-to-eat-original-reference.jpg',import.meta.url),join(directory,'be-what-to-eat-brand.jpg'));
   for(const arabic of [false,true]){
     const prefix=arabic?'ar/':'';
     for(const editor of [false,true]){

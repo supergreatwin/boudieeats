@@ -29,7 +29,7 @@ function selectField(name,label,options,value,required=false){
 function check(name,label,checked=false){return '<label class="wte-check"><input type="checkbox" name="'+name+'" '+(checked?'checked':'')+'><span>'+esc(label)+'</span></label>';}
 function panel(title,body){return '<section class="wte-panel"><h2>'+title+'</h2>'+body+'</section>';}
 function login(){
-  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Private collaboration','تعاون خاص')+'</p><h1>'+t('What to Eat','ناكل إيه؟')+'</h1><p>'+t('This guide has not been released. Approved editors can sign in to review it.','الدليل لسه ما اتنشرش. فريق التحرير المعتمد يقدر يدخل ويراجعه.')+'</p></div>'+
+  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Private collaboration','تعاون خاص')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1><p>'+t('This guide has not been released. Approved editors can sign in to review it.','الدليل لسه ما اتنشرش. فريق التحرير المعتمد يقدر يدخل ويراجعه.')+'</p></div>'+
   panel(t('Editorial sign-in','دخول فريق التحرير'),'<form id="wte-login" class="wte-form">'+field('email',t('Email','البريد الإلكتروني'),'','email',true)+field('password',t('Password','كلمة المرور'),'','password',true)+'<button class="wte-primary" type="submit">'+t('Sign in','دخول')+'</button></form>')+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>';
 }
@@ -38,7 +38,7 @@ function notFound(){
   root.innerHTML='<div class="wte-intro"><h1>'+t('Page not found','الصفحة غير موجودة')+'</h1><p>'+t('The page you requested is unavailable.','الصفحة المطلوبة غير متاحة.')+'</p><a href="'+esc(cfg.basePath+(ar?'ar/':''))+'">'+t('Return home','العودة للرئيسية')+'</a></div>';
 }
 function denied(){
-  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Not published','لم يُنشر بعد')+'</p><h1>'+t('What to Eat','ناكل إيه؟')+'</h1><p>'+t('This section is reserved for the collaboration team until approval.','القسم ده مخصص لفريق التعاون لحد الموافقة النهائية.')+'</p><a href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Editorial desk','مكتب التحرير')+'</a></div><p id="wte-status" class="wte-status"></p>';
+  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Not published','لم يُنشر بعد')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1><p>'+t('This section is reserved for the collaboration team until approval.','القسم ده مخصص لفريق التعاون لحد الموافقة النهائية.')+'</p><a href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Editorial desk','مكتب التحرير')+'</a></div><p id="wte-status" class="wte-status"></p>';
 }
 function filterBar(){
   const cities=state.terms.filter(x=>x.kind==='city'&&(x.active||staff())).sort((a,b)=>a.position-b.position);
@@ -89,6 +89,7 @@ function sectionHTML(){
   return ordered.map(s=>{
     const title=esc(localized(s,'title')),description=body(localized(s,'body'));
     const status=staff()?'<span class="wte-state">'+esc(s.status)+(s.partner_reviewed?' · reviewed':'')+'</span>':'';
+    if(s.slug==='community')return '<section class="wte-content-section wte-community"><p class="wte-community-kicker">'+t('Community','المجتمع')+'</p><h2>'+title+'</h2>'+status+description+'</section>';
     if(s.kind==='faq')return '<details class="wte-faq"><summary>'+title+status+'</summary>'+description+'</details>';
     if(s.kind==='collection'){
       const picked=visiblePlaces().filter(p=>(p.tags||[]).some(tag=>tag.toLowerCase()===s.filter_tag.trim().toLowerCase()));
@@ -99,9 +100,10 @@ function sectionHTML(){
   }).join('');
 }
 
+function brandHero(){return '<div class="wte-brand-hero" role="img" aria-label="Original what to eat? monochrome dining photograph with orange wordmark"><img src="'+esc(cfg.basePath+'be-what-to-eat-brand.jpg')+'" alt="what to eat? original orange logo across a black and white dining photograph" loading="eager"></div>';}
 function browse(){
   const isPreview=staff()&&!live();
-  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Boudie Eats · curated food guide','بودي إيتس · دليل الأكل')+'</p><h1>'+t('What to Eat','ناكل إيه؟')+'</h1>'+
+  root.innerHTML=brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? · the food guide','what to eat? · دليل الأكل')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1>'+
     '<p>'+t('Find places by cuisine and city, with carefully written recommendations.','اختار أكلتك ومدينتك، وشوف ترشيحات مكتوبة بعناية.')+'</p>'+
     (isPreview?'<div class="wte-private">'+t('PRIVATE PREVIEW — Not visible to visitors. Launch approval is still off.','معاينة خاصة — مش ظاهرة للزوار. الموافقة على النشر لسه مقفولة.')+'</div>':'')+
     '</div>'+filterBar()+'<p class="wte-count" id="wte-count"></p><div class="wte-results" id="wte-results"></div>'+
@@ -232,7 +234,7 @@ function launchEditor(){
 }
 function renderEditor(){
   if(!staff()){denied();return;}
-  root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Editorial desk / Private workspace','مكتب التحرير / مساحة خاصة')+'</p><h1>'+t('What to Eat · Editor','ناكل إيه؟ · التحرير')+'</h1><p>'+t('A complete editable directory, ready to be reviewed without making it public.','دليل قابل للتحرير بالكامل، جاهز للمراجعة من غير نشر للجمهور.')+'</p>'+
+  root.innerHTML=brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('Editorial desk / Private workspace','مكتب التحرير / مساحة خاصة')+'</p><h1 class="wte-orange-title" lang="en">what to eat? <span class="wte-editor-sub">/ editorial</span></h1><p>'+t('A complete editable directory, ready to be reviewed without making it public.','دليل قابل للتحرير بالكامل، جاهز للمراجعة من غير نشر للجمهور.')+'</p>'+
   '<div class="wte-private">'+(live()?t('PUBLIC LAUNCH ENABLED','النشر العام مفتوح'):t('HIDDEN & LIVE IN PRIVATE MODE','القسم شغال وخاص لحد الموافقة'))+'</div></div>'+
   '<div class="wte-buttons"><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'what-to-eat/')+'">'+t('Open visitor preview','معاينة صفحة الزائر')+'</a><a class="wte-button" href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Back to Editorial Desk','العودة لمكتب التحرير')+'</a></div>'+
   '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>'+

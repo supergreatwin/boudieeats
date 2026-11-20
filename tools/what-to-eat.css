@@ -49,3 +49,42 @@ html[lang^=ar] body{font:18px/1.75 'Lalezar',sans-serif}html[lang^=ar] :is(.wte-
 html[lang^=ar] :is(.wte-content-section h2,.wte-pdf h2,.wte-faq summary,.wte-readiness strong){font-family:'Aref Ruqaa',serif;letter-spacing:0;line-height:1.6}
 @media(max-width:780px){.wte-readiness{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.wte-gallery-grid{grid-template-columns:1fr}.wte-readiness{grid-template-columns:1fr 1fr}.wte-content-section h2{font-size:2rem}}
+
+
+/* what to eat? — original campaign identity, orange × black × monochrome.
+   Keep this sub-brand distinct from the Boudie Eats site palette. */
+:root{--cream:#f7f7f4;--ink:#1d1d1d;--burgundy:#ed6a2a;--wine:#ce5220;--gold:#ed6a2a;--line:#dedbd8;--muted:#666}
+body{background:var(--cream);color:var(--ink)}
+.wte-site-header{background:#131313;border-bottom:5px solid var(--orange,#ed6a2a);color:#fff}
+.wte-wordmark{background:#ed6a2a;padding:6px 17px 9px;transform:skew(-.4deg);min-height:0}
+.wte-logotype{color:#fff!important;font-family:Arial,Helvetica,sans-serif!important;font-style:italic!important;font-weight:900!important;letter-spacing:-.055em;font-size:clamp(21px,2.5vw,33px)!important;line-height:1.1!important;white-space:nowrap}
+.wte-site-header nav a{color:#fff}
+.wte-site-header nav a:hover,.wte-site-header nav a:focus-visible{color:#ffaf81;text-decoration:underline}
+.wte-brand-hero{width:100%;margin:0 0 clamp(24px,4vw,44px);background:#1d1d1d;overflow:hidden;aspect-ratio:960/541;max-height:570px}
+.wte-brand-hero img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.wte-orange-title{font-family:Arial,Helvetica,sans-serif!important;font-weight:900!important;font-style:italic!important;letter-spacing:-.055em!important;line-height:1.05!important;text-transform:lowercase!important;color:#181818}
+.wte-editor-sub{display:inline-block;font-size:.38em;font-weight:650;font-style:normal;letter-spacing:-.02em;color:#ed6a2a;vertical-align:middle}
+.wte-eyebrow{color:#dc6025}
+.wte-private{border-left-color:#ed6a2a;background:#fff2e9;color:#a34213}
+.wte-filters{border-color:#b8b8b8}
+.wte-field :focus-visible,.wte-form :focus-visible{outline-color:#ed6a2a}
+.wte-check input{accent-color:#ed6a2a}
+.wte-content-section h2,.wte-pdf h2{color:#111}
+.wte-panel h2,.wte-card h3{color:#151515}
+.wte-card{box-shadow:none}
+.wte-card:hover{border-color:#b8b8b8}
+.wte-kicker,.wte-state{color:#ce5220}
+.wte-buttons .wte-primary,.wte-primary{background:#ed6a2a;color:#fff;border-color:#ed6a2a}
+.wte-buttons .wte-primary:hover,.wte-primary:hover{background:#c44c17;border-color:#c44c17}
+.wte-buttons button:not(.wte-primary),.wte-button,.wte-upload button{border-color:#222;background:#fff;color:#151515}
+.wte-site-footer{background:#171717;color:#dedede;border-top:3px solid #ed6a2a}
+.wte-site-footer span:first-child{font-family:Arial,Helvetica,sans-serif;font-weight:900;font-style:italic;color:#fff}
+.wte-community{background:#1b1b1b;color:#f8f7f4;padding:clamp(28px,5vw,64px);border-bottom:0}
+.wte-community h2{font-family:Arial,Helvetica,sans-serif!important;font-weight:900!important;font-style:italic!important;color:#fff!important;letter-spacing:-.045em}
+.wte-community p{color:#e2e2e2!important}
+.wte-community-kicker{color:#ff995f!important;text-transform:uppercase;letter-spacing:.12em;font-weight:800;font-size:12px}
+.wte-community .wte-state{color:#ffa16c}
+html[lang^=ar] .wte-logotype,html[lang^=ar] .wte-orange-title{font-family:Arial,Helvetica,sans-serif!important}
+html[lang^=ar] .wte-community h2{font-family:'Aref Ruqaa',serif!important;font-style:normal!important;letter-spacing:0}
+html[lang^=ar] .wte-private{border-right-color:#ed6a2a}
+@media(max-width:620px){.wte-wordmark{padding:6px 12px}.wte-logotype{font-size:23px!important}.wte-brand-hero{aspect-ratio:4/3}.wte-brand-hero img{object-fit:cover;object-position:center}}
