@@ -92,7 +92,8 @@
     dialog.showModal();
   });
   if (choice === 'granted') start();
-  else if (choice !== 'denied') dialog.show();
+  if (new URLSearchParams(location.search).get('preview') === 'analytics') dialog.showModal();
+  else if (choice !== 'granted' && choice !== 'denied') dialog.show();
 
   document.addEventListener('click', event => {
     if (choice !== 'granted' || !started) return;
@@ -104,6 +105,18 @@
     } else if (['http:', 'https:'].includes(target.protocol) && target.origin !== location.origin) {
       window.gtag('event', 'click', { outbound: true, link_domain: target.hostname });
     }
+  });
+
+  // Tally's documented form submission event is emitted only on completed embedded submissions.
+  // Never send respondents' form answers or email addresses to Google Analytics.
+  window.addEventListener('Tally.FormSubmitted', () => {
+    if (choice !== 'granted' || !started) return;
+    const newsletter = document.getElementById('be-letter-dialog');
+    if (!newsletter?.open) return;
+    window.gtag('event', 'newsletter_waitlist_signup', {
+      form_location: 'homepage_popup',
+      site_language: arabic ? 'ar' : 'en',
+    });
   });
 
   document.addEventListener('submit', event => {
