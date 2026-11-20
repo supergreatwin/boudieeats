@@ -36,5 +36,6 @@ jobs:
         run: |
           node tools/verify-what-to-eat.mjs
           node tools/verify-what-to-eat-runtime.mjs
+          node tools/verify-what-to-eat-public-api.mjs
           node tools/verify-accounts.mjs
           node tools/verify-publishing.mjs
