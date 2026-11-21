@@ -12,7 +12,7 @@ export function addMemberSession({directory,basePath='/',supabaseUrl='',supabase
  let updated=0,homeCount=0;
  for(const entry of readdirSync(directory,{recursive:true})) {
   if(!entry.endsWith('.html')||/^google[a-z0-9]+\.html$/i.test(entry)||
-      /^(?:ar\/)?(?:account|editorial-desk|discover)\//.test(entry))continue;
+      /^(?:ar\/)?(?:account|editorial-desk)\//.test(entry))continue;
   const file=join(directory,entry);
   let html=readFileSync(file,'utf8');
   // The authored reader pages already expose a progressive-enhancement account link.
