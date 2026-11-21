@@ -31,6 +31,7 @@ export function addAccountPages({directory,basePath='/',supabaseUrl='',supabaseP
     (!!supabaseUrl!==!!supabasePublishableKey))throw new Error('A dedicated BoudieEats Supabase URL and publishable key must be configured together');
  const config={url:supabaseUrl,key:supabasePublishableKey};
  copyFileSync(new URL('./account-client.mjs',import.meta.url),join(directory,'be-account.js'));
+ copyFileSync(new URL('./boudie-editorial-manager.mjs',import.meta.url),join(directory,'be-editorial-manager.js'));
  for(const arabic of [false,true])for(const desk of [false,true]){
   const slug=(arabic?'ar/':'')+(desk?'editorial-desk':'account');
   const folder=join(directory,slug);mkdirSync(folder,{recursive:true});
