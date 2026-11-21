@@ -27,8 +27,11 @@ function standard(title,copy,num,body){
 }
 const empty=(title,copy)=>'<div class="be-exp-empty"><strong>'+esc(title)+'</strong><p>'+esc(copy)+'</p></div>';
 function mama(){
- return standard(lang('Boudie’s Mama Picks','اختيارات ماما عند بودي'),lang('Food you would happily put on the family table. The badge is editorial, not a paid endorsement.','أكل تحبه على سفرة البيت. الترشيح قرار تحريري مش إعلان مدفوع.'),'01',
- '<div class="be-exp-box"><h2>'+lang('How a pick earns its place','إزاي بنختار')+'</h2><p>'+lang('Original tasting notes, consistency, value, disclosure of any commercial relationship, and final editorial approval. No restaurant currently carries this label.','تجربة أصلية، جودة ثابتة، قيمة مقابل سعر، إعلان واضح عن أي علاقة تجارية، وموافقة تحريرية. مفيش مكان واخد العلامة دي دلوقتي.')+'</p></div>'+empty(lang('First picks are under review','الترشيحات الأولى قيد المراجعة'),lang('Nothing is awarded or implied before verification.','مش هنمنح أي علامة قبل التحقق.')));
+ return standard(lang('Boudie’s Mama Picks','اختيارات ماما عند بودي'),
+ lang('Family-favourite food picks verified by Boudie Eats, never paid or self-awarded recommendations.','اختيارات أكل محبوبة في البيت وراجعها بودي إيتس، مش شارات مدفوعة أو منحتها أماكن لنفسها.'),'01',
+ '<div class="be-exp-box be-exp-box--burgundy"><h2>'+lang('How picks are selected','إزاي بنختار')+'</h2><p>'+
+ lang('Firsthand tasting, consistency, value, disclosure of commercial relationships and final editorial approval.','تجربة فعلية، جودة ثابتة، قيمة مقابل سعر، إعلان واضح عن أي علاقة تجارية، وموافقة تحريرية نهائية.')+
+ '</p></div><div id="be-mama-results" class="be-exp-ideas" aria-live="polite"></div>');
 }
 function finder(){
  return standard(lang('What are you craving?','نفسك في إيه؟'),
