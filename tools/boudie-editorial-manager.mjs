@@ -103,7 +103,7 @@ export async function mountExperienceEditor({client,target,locale,role}){
   editEl.innerHTML='<h3>'+h(entry?t('Edit record','تعديل السجل'):t('New record','سجل جديد'))+'</h3>'+
    '<p>'+h(t('English and Arabic fields are saved together. You control when the content becomes public.','النسختين الإنجليزية والعربية بيتحفظوا مع بعض. وإنت بتختار إمتى تنشر.'))+'</p>'+
    (!entry&&!addAllowed?'<p>'+t('Select an existing record to edit.','اختر سجل موجود لتعديله.')+'</p>':
-   '<form id="be-content-form" class="be-grid" novalidate>'+fieldsFor(key).map(x=>field(x,entry)).join('')+
+   '<form id="be-content-form" class="be-grid">'+fieldsFor(key).map(x=>field(x,entry)).join('')+
    '<div class="be-commands be-wide"><button class="be-save" type="submit"'+(readonly?' disabled':'')+'>'+t('Save changes','احفظ التعديلات')+'</button>'+
    (entry&&!schema.fixed?'<button type="button" id="be-content-delete">'+t('Delete record','احذف السجل')+'</button>':'')+
    (entry?'<button type="button" id="be-content-preview">'+t('Preview content','معاينة المحتوى')+'</button>':'')+'</div></form>');
@@ -137,7 +137,7 @@ export async function mountExperienceEditor({client,target,locale,role}){
    else row[name]=el.value.trim()||(['place_id','city_id','cuisine_id'].includes(name)||URLS.has(name)?null:'');
   }
   // Publish gates must be deliberate. A status update alone cannot bypass approval.
-  if(row.status==='published'||row.status==='approved'){
+  if(row.status==='published'||(row.status==='approved'&&schema.table!=='be_wte_ideas')){
    if(!row.editorial_approved)throw Error(t('Approve this record before publishing.','لازم توافق على السجل قبل النشر.'));
    if(row.image_url&&!row.image_rights_confirmed)throw Error(t('Confirm photo rights before publishing.','لازم تؤكد حقوق نشر الصورة قبل النشر.'));
    if(row.kind==='mama'&&schema.table==='be_wte_recognitions'&&!row.approved_at)
@@ -178,6 +178,7 @@ export async function mountExperienceEditor({client,target,locale,role}){
   state.working=true;
   const submit=e.target.querySelector('[type=submit]');if(submit)submit.disabled=true;
   try{
+   if(!e.target.reportValidity())return;
    const schema=SCHEMAS[state.category],row=parse(e.target);
    if(schema.write==='admin'&&role!=='admin')throw Error(t('Administrator only.','للمدير فقط.'));
    const query=state.selected?
@@ -185,7 +186,7 @@ export async function mountExperienceEditor({client,target,locale,role}){
       client.from(schema.table).insert(row);
    const {error}=await query.select(schema.key).single();
    if(error)throw error;
-   message(t('Saved successfully.','تم حفظ البيانات بنجاح.'));await reload();
+   await reload();message(t('Saved successfully.','تم حفظ البيانات بنجاح.'));
   }catch(error){message(error.message||t('Save failed.','تعذّر الحفظ.'),true);}
   finally{state.working=false;if(submit)submit.disabled=false;}
  });
