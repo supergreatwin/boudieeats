@@ -113,3 +113,128 @@ const form=document.getElementById('be-lab-form');if(form){
  out.innerHTML='<p class="be-exp-small">'+lang('YOUR PLAYFUL RESULT','نتيجتك للتسلية')+'</p><h2>'+esc(type)+'</h2><p>'+esc(food)+'</p><small>'+lang('No answers were saved or sent to a server.','إجاباتك مش اتسجلت ومش اتبعتت لأي سيرفر.')+'</small>';out.scrollIntoView({behavior:'smooth',block:'nearest'});
  });
 }
+
+
+// Only public Supabase publishable credentials are embedded. Supabase RLS
+// independently verifies editorial approval for every returned content row.
+function safeUrl(raw){
+ try{const u=new URL(String(raw||''));return u.protocol==='https:'?u.href:'';}catch{return '';}
+}
+const localName=(row,field)=>lang(row?.[field+'_en']||'',row?.[field+'_ar']||row?.[field+'_en']||'');
+const loadingEmpty=(title,body)=>empty(title,body);
+async function publicRecords(table,columns,filters=''){
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(cfg.url||'')||!/^sb_publishable_/.test(cfg.publishableKey||''))throw Error('Invalid public content connection');
+ const url=cfg.url.replace(/\/$/,'')+'/rest/v1/'+table+'?select='+encodeURIComponent(columns)+(filters?'&'+filters:'')+'&limit=50';
+ const res=await fetch(url,{headers:{'apikey':cfg.publishableKey,'Accept':'application/json'}});
+ if(!res.ok)throw Error('Content service unavailable');
+ const rows=await res.json();if(!Array.isArray(rows))throw Error('Unexpected content response');
+ return rows;
+}
+function makePlaceCard(p){
+ const name=localName(p,'name'),summary=localName(p,'summary'),district=localName(p,'district');
+ const city=store.terms.find(t=>t.id===p.city_id),cuisine=store.terms.find(t=>t.id===p.cuisine_id);
+ return '<article class="be-exp-idea">'+
+ (safeUrl(p.image_url)&&p.image_rights_confirmed?'<img loading="lazy" width="480" height="360" alt="'+esc(localName(p,'image_alt')||name)+'" src="'+esc(p.image_url)+'">':'')+
+ '<strong>'+esc(name)+'</strong><small>'+esc([district,city?localName(city,'label'):'',cuisine?localName(cuisine,'label'):''].filter(Boolean).join(' · '))+'</small>'+
+ '<p>'+esc(summary)+'</p></article>';
+}
+function renderCity(){
+ const out=document.getElementById('be-city-results');if(!out)return;
+ const options=(kind)=>store.terms.filter(t=>t.kind===kind);
+ const fill=(id,kind)=>{
+  const el=document.getElementById(id);if(!el||el.dataset.filled)return;
+  const label=(kind==='city'?lang('City','المدينة'):lang('Cuisine','المطبخ'));
+  el.innerHTML='<option value="all">'+esc(lang('All ','كل ')+label)+'</option>'+
+   options(kind).map(t=>'<option value="'+esc(t.id)+'">'+esc(localName(t,'label'))+'</option>').join('');
+  el.dataset.filled='true';
+ };
+ fill('be-city','city');fill('be-cuisine','cuisine');
+ const refresh=()=>{
+  const city=document.getElementById('be-city').value,cuisine=document.getElementById('be-cuisine').value,price=document.getElementById('be-price').value;
+  const matches=store.places.filter(p=>(city==='all'||p.city_id===city)&&(cuisine==='all'||p.cuisine_id===cuisine)&&(price==='all'||p.price_band===price));
+  out.innerHTML=matches.length?matches.map(makePlaceCard).join(''):
+   loadingEmpty(store.failed?lang('Unable to load listings','مش قادرين نحمّل الأماكن'):lang('No approved places match','مفيش أماكن متراجعة مطابقة'),
+   lang('Original Boudie Eats reviews remain available while the directory is curated.','تجارب بودي إيتس الأصلية موجودة لحد ما يكتمل إعداد الدليل.'));
+ };
+ ['be-city','be-cuisine','be-price'].forEach(id=>document.getElementById(id)?.addEventListener('change',refresh));refresh();
+}
+function renderMama(){
+ const out=document.getElementById('be-mama-results');if(!out)return;
+ const picks=store.places.filter(p=>Array.isArray(p.tags)&&p.tags.includes('mama-approved'));
+ out.innerHTML=picks.length?picks.map(makePlaceCard).join(''):
+  loadingEmpty(lang('Our first family picks are being reviewed','بنراجع اختيارات ماما الأولى'),
+   lang('No place receives the badge before an actual editorial decision.','مفيش مكان بياخد العلامة قبل قرار تحريري واضح.'));
+}
+function renderGallery(){
+ const out=document.getElementById('be-gallery-results');if(!out)return;
+ const allowed=store.photos.filter(p=>p.image_rights_confirmed&&safeUrl(p.image_url));
+ out.innerHTML=allowed.length?allowed.map(p=>
+  '<figure class="be-exp-gallery-item"><img loading="lazy" width="480" height="360" src="'+esc(p.image_url)+'" alt="'+esc(localName(p,'image_alt')||localName(p,'caption'))+'">'+
+  '<figcaption>'+esc(localName(p,'caption'))+' <small>'+esc(p.image_credit||'')+'</small></figcaption></figure>').join(''):
+  loadingEmpty(lang('Original photo gallery is being curated','بنجهز ألبوم الصور الأصلية'),
+    lang('Only permission-cleared originals will appear here.','هتظهر هنا الصور الأصلية المصرح بنشرها بس.'));
+}
+function renderSpotlight(){
+ const out=document.getElementById('be-spotlight-results');if(!out)return;
+ const records=store.sections.filter(p=>p.slug==='spotlight'||p.kind==='spotlight');
+ out.innerHTML=records.length?records.map(p=>
+  '<article class="be-exp-box"><h2>'+esc(localName(p,'title'))+'</h2><p>'+esc(localName(p,'body'))+'</p></article>').join(''):
+  loadingEmpty(lang('No creator spotlight published yet','لسه مفيش حكايات سبوتلايت منشورة'),
+   lang('We only publish stories with contributor consent and editorial approval.','بننشر الحكايات بعد موافقة أصحابها والمراجعة التحريرية.'));
+}
+async function renderPassport(){
+ const out=document.getElementById('be-passport-results');if(!out)return;
+ if(!store.foods.length){
+  out.innerHTML=loadingEmpty(lang('Start with approved dishes','ابدأ بأكلات متراجعة'),
+    lang('Your private passport will include dishes as the verified catalogue grows.','جواز سفرك هيضم الأكلات المتراجعة لما دليل الأكل يكبر.'));
+  return;
+ }
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(cfg.url||''))return;
+ try{
+  const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.119.0?bundle');
+  const client=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,flowType:'pkce'}});
+  const {data:identity}=await client.auth.getUser();
+  const user=identity?.user;
+  if(!user){
+   out.innerHTML='<h2>'+lang('Your personal food passport','جواز سفرك الخاص')+'</h2><p>'+lang('Sign in to save recipes privately and return to them on any device.','سجّل دخولك عشان تحفظ الوصفات وترجع لها من أي جهاز.')+'</p>'+
+   link(lang('Sign in / Sign up','دخول / حساب جديد'),base+(ar?'ar/':'')+'account/');return;
+  }
+  const {data:passport,error:readError}=await client.from('be_wte_passports').select('owner_id,saved_food_ids,tried_food_ids,explored_cuisines,last_archetype').eq('owner_id',user.id).maybeSingle();
+  if(readError)throw readError;
+  let saved=Array.isArray(passport?.saved_food_ids)?passport.saved_food_ids:[];
+  const tried=Array.isArray(passport?.tried_food_ids)?passport.tried_food_ids:[];
+  const cuisines=Array.isArray(passport?.explored_cuisines)?passport.explored_cuisines:[];
+  const render=()=>{out.innerHTML='<p class="be-exp-small">'+lang('YOUR PRIVATE FOOD PASSPORT','جواز سفرك الخاص')+'</p><h2>'+
+   lang('Saved dishes: ','أكلات محفوظة: ')+saved.length+'</h2><div class="be-exp-ideas">'+
+   store.foods.map(f=>'<article class="be-exp-idea"><strong>'+esc(localName(f,'name'))+'</strong>'+
+   '<button type="button" data-passport-id="'+esc(f.id)+'">'+(saved.includes(f.id)?lang('Remove saved dish','شيل من المحفوظات'):lang('Save dish','احفظ الأكلة'))+'</button></article>').join('')+
+   '</div><p id="be-passport-message" role="status" aria-live="polite">'+lang('Changes are protected by your account permissions.','التغييرات محمية بصلاحيات حسابك.')+'</p>';};
+  render();
+  out.addEventListener('click',async(event)=>{
+   const btn=event.target.closest('button[data-passport-id]');if(!btn)return;
+   const foodId=btn.dataset.passportId;
+   if(!store.foods.some(f=>f.id===foodId))return;
+   btn.disabled=true;
+   const changed=saved.includes(foodId)?saved.filter(id=>id!==foodId):[...saved,foodId];
+   const {error}=await client.from('be_wte_passports').upsert({owner_id:user.id,saved_food_ids:changed,tried_food_ids:tried,explored_cuisines:cuisines},{onConflict:'owner_id'});
+   if(error){btn.disabled=false;const m=document.getElementById('be-passport-message');if(m)m.textContent=lang('Could not save this change.','مش قادرين نحفظ التغيير.');return;}
+   saved=changed;render();
+  });
+ }catch{
+  out.innerHTML=loadingEmpty(lang('Passport temporarily unavailable','جواز السفر غير متاح حاليًا'),
+   lang('Your account data has not been changed. Try again later.','بيانات حسابك متغيرتش. جرب تاني بعدين.'));
+ }
+}
+async function loadApprovedContent(){
+ const tasks=[
+ ['foods',publicRecords('be_wte_foods','id,slug,name_en,name_ar,description_en,description_ar,mode,cuisine_en,cuisine_ar,sweet,comfort,weirdness,adventurous,recipe_url','status=eq.published&editorial_approved=eq.true')],
+ ['places',publicRecords('be_wte_places','id,slug,name_en,name_ar,city_id,cuisine_id,district_en,district_ar,summary_en,summary_ar,image_url,image_alt_en,image_alt_ar,image_rights_confirmed,price_band,tags','status=eq.published&editorial_approved=eq.true')],
+ ['terms',publicRecords('be_wte_terms','id,kind,slug,label_en,label_ar','active=eq.true')],
+ ['photos',publicRecords('be_wte_photos','image_url,image_rights_confirmed,image_alt_en,image_alt_ar,caption_en,caption_ar,image_credit','image_rights_confirmed=eq.true')],
+ ['sections',publicRecords('be_wte_sections','slug,kind,title_en,title_ar,body_en,body_ar','status=eq.published&editorial_approved=eq.true&active=eq.true')]
+ ];
+ const outcomes=await Promise.allSettled(tasks.map(([,promise])=>promise));
+ outcomes.forEach((result,index)=>{if(result.status==='fulfilled')store[tasks[index][0]]=result.value;else store.failed=true;});
+ store.loaded=true;updateDishes();renderCity();renderMama();renderGallery();renderSpotlight();renderPassport();
+}
+loadApprovedContent();
