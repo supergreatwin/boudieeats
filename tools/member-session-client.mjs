@@ -22,7 +22,7 @@ function makeDialog(){
  return dialog;
 }
 function note(message,error=false){
- if(!notice){
+ if(!notice?.isConnected){
   notice=document.createElement('div');notice.className='be-member-notice';notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');
   const text=document.createElement('span'),close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label',tr('Dismiss','إغلاق'));close.addEventListener('click',()=>notice.remove());
   notice.append(text,close);document.body.appendChild(notice);
@@ -122,7 +122,7 @@ async function submit(event){
   }else if(action==='signup'){
    const requested=String(data.get('username')||'').trim().toLowerCase();
    if(!safeUsername(requested)||password.length<12)throw Error(tr('Use a valid username and a password of at least 12 characters.','اختار اسم مستخدم صالح وكلمة سر من ١٢ حرف على الأقل.'));
-   const {data:signup,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+route('')+'?auth=confirmed',data:{requested_username:requested}}});
+   const {data:signup,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+route(''),data:{requested_username:requested}}});
    if(error)throw error;
    if(signup?.session&&signup?.user?.email_confirmed_at){await synchronize();if(user){dialog.close();note(tr('Account created!','الحساب اتعمل!'));return;}}
    dialog.close();
@@ -152,7 +152,7 @@ async function init(){
   const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.119.0?bundle');
   supabase=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
   supabase.auth.onAuthStateChange(ev=>{
-   if(['SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED','USER_UPDATED','INITIAL_SESSION'].includes(ev))
+   if(['SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED','USER_UPDATED','INITIAL_SESSION'].includes(ev)&&!busy)
     setTimeout(()=>synchronize(),0);
   });
   await synchronize();
