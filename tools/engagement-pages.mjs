@@ -11,7 +11,7 @@ export function addEngagementPages({ directory, basePath = '/' }) {
   const menu = '<nav class="be-reader-links" aria-label="Reader participation">' +
     '<a href="' + link('reader-responses/') + '">Send feedback</a>' +
     '<a href="' + link('newsletter-signup/') + '">Newsletter</a>' +
-    '<a href="' + link('account/') + '">Editorial desk</a></nav>';
+    '<a href="' + link('account/') + '">Sign in / Sign up</a></nav>';
   const menuCss = '<style>.be-reader-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;padding:20px;font:600 15px/1.5 "DM Sans",sans-serif}.be-reader-links a{color:inherit;text-decoration:underline;text-underline-offset:4px}</style>';
 
   for (const entry of readdirSync(directory, { recursive: true })) {
@@ -46,7 +46,7 @@ export function addEngagementPages({ directory, basePath = '/' }) {
       '<link rel="canonical" href="' + origin + slug + '/">' + (noindex?'<meta name="robots" content="noindex,nofollow">':'') + styles + '</head>';
     const html = head + '<body><header><a href="' + link('') + '"><strong>BoudieEats.</strong></a><nav><a href="' + link('recipes/') + '">Recipes</a> · <a href="' + link('reviews/') + '">Reviews</a> · <a href="' + link('') + '">Home</a></nav></header>' +
       '<main><div class="eyebrow">An Egyptian food journal</div><h1>' + title + '</h1><p class="muted">' + description + '</p>' + content + '</main>' +
-      '<footer><a href="' + link('reader-responses/') + '">Feedback</a> · <a href="' + link('newsletter-signup/') + '">Newsletter</a> · <a href="' + link('account/') + '">Editorial desk</a></footer></body></html>';
+      '<footer><a href="' + link('reader-responses/') + '">Feedback</a> · <a href="' + link('newsletter-signup/') + '">Newsletter</a> · <a href="' + link('account/') + '">Sign in / Sign up</a></footer></body></html>';
     writeFileSync(join(folder,'index.html'),html);
   }
 
