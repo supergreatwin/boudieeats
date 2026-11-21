@@ -27,9 +27,13 @@ export function launchBoudieDiscovery({directory}){
     if(html.includes('class="desktop-nav"')&&!html.includes('class="be-discover-nav"')){
       html=html.replace(/(<nav\b[^>]*class="[^"]*\bdesktop-nav\b[^"]*"[^>]*>)/i,'$1'+anchor);
     }
-    if((entry==='index.html'||entry==='ar/index.html')&&html.includes('class="be-landing-directories"')){
+    if(entry==='index.html'||entry==='ar/index.html'){
       const teaser='<p class="be-discover-teaser"><span>'+(isArabic?'سبع طرق جديدة لاكتشاف الأكل':'Seven new ways to explore food')+'</span><a href="'+accountEntry+'">'+label+' <span aria-hidden="true">↗</span></a></p>';
-      html=html.replace(/(<nav class="be-landing-directories"[\s\S]*?<\/nav>)/i,'$1'+teaser);
+      // Recipe-led native home has a short welcome panel; keep Discover
+      // hidden for guests and show it only after member login as before.
+      const anchor=/<section class="be-home-intro"[\s\S]*?<\/section>/i;
+      if(!anchor.test(html))throw new Error('Original Boudie Eats homepage intro missing: '+entry);
+      html=html.replace(anchor,match=>match+teaser);
       homeCount++;
     }
     if(html.includes('</footer>')&&!html.includes('class="be-discover-footer"')){
