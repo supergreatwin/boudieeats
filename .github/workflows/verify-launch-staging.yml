@@ -1,0 +1,43 @@
+name: Verify Boudie Eats launch staging
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: tools/astro/package-lock.json
+      - name: Validate prototype code
+        run: |
+          node --check tools/account-client.mjs
+          node --check tools/account-pages.mjs
+          node --check tools/boudie-experiences-client.mjs
+          node --check tools/boudie-experiences-pages.mjs
+          node --check tools/verify-boudie-experiences.mjs
+      - name: Build private bilingual staging output
+        env:
+          SITE_URL: https://boudieeats.com/
+          SITE_BASE_PATH: /
+          CF_PAGES: "1"
+          CF_PAGES_BRANCH: boudie-staging
+          BE_SUPABASE_URL: ${{ vars.BE_SUPABASE_URL }}
+          BE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.BE_SUPABASE_PUBLISHABLE_KEY }}
+        run: node tools/build-pages.mjs
+      - name: Verify release gates
+        run: |
+          node tools/verify-english.mjs
+          node tools/verify-bilingual.mjs
+          node tools/verify-accounts.mjs
+          node tools/verify-publishing.mjs
+          node tools/verify-boudie-experiences.mjs
