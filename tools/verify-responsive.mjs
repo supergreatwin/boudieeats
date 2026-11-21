@@ -3,7 +3,7 @@ import {join} from 'node:path';
 const dist=new URL('../boudieeats/dist/',import.meta.url).pathname;
 const errors=[];
 const styles=readFileSync(new URL('./responsive-finish.css',import.meta.url),'utf8');
-for(const marker of ['@media(max-width:1024px)','@media(max-width:760px)','@media(max-width:480px)','@media(prefers-reduced-motion:reduce)','--be-burgundy:#72253f','.cover-grid','.be-letter-dialog','.be-home-intro']){
+for(const marker of ['@media(max-width:1024px)','@media(max-width:760px)','@media(max-width:480px)','@media(prefers-reduced-motion:reduce)','--be-burgundy:#72253f','.cover-grid','.be-letter-dialog','.be-landing-cover']){
  if(!styles.includes(marker))errors.push('Responsive style missing '+marker);
 }
 for(const locale of ['','ar/']){
