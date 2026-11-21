@@ -19,7 +19,7 @@ for(const prefix of ['','ar/']){
 }
 const script=read('be-account.js');
 requireCheck(script.includes("client.rpc('be_staff')"),'No server-authoritative staff check');
-requireCheck(script.includes("if(deskMode &&"),'No staff-only action guard'); // source branch has exact string
+requireCheck(script.includes("if(deskMode&&!isStaff())"),'No staff-only action guard'); // source branch has exact string
 requireCheck(script.includes('be-request-password-reset'),'Reset handler not using protected edge endpoint');
 requireCheck(!script.includes('client.auth.resetPasswordForEmail('),'Direct auth reset bypass remains in browser code');
 const headers=read('_headers');
