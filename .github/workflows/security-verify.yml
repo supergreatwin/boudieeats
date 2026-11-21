@@ -30,7 +30,7 @@ jobs:
           SITE_URL: https://boudieeats.com/
           SITE_BASE_PATH: /
           CF_PAGES: "1"
-          CF_PAGES_BRANCH: security-staging
+          CF_PAGES_BRANCH: main
           BE_SUPABASE_URL: ${{ vars.BE_SUPABASE_URL }}
           BE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.BE_SUPABASE_PUBLISHABLE_KEY }}
         run: node tools/build-pages.mjs
