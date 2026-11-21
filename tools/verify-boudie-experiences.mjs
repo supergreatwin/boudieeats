@@ -24,6 +24,7 @@ else {
   if(!c.includes(key))errors.push('Missing live-data check '+key);
  }
  if(/what[-\s]to[-\s]eat|whattocommunity/i.test(c))errors.push('Former brand in client code');
+ if(!c.includes("document.documentElement.lang.toLowerCase().startsWith('ar')"))errors.push('Arabic Egypt locale is not detected by client');
  if(/demo stamp|Koshary.*Ful medames/i.test(c))errors.push('Demo or fake result shipped as verified content');
 }
 const staff=join(dist,'be-editorial-manager.js');
