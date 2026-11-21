@@ -74,12 +74,14 @@ function lab(){
  '<form id="be-lab-form">'+q('mood',lang('What sounds good today?','نفسك في إيه النهارده؟'),[['comfort',lang('A familiar favourite','أكلة مضمونة')],['new',lang('Something new','حاجة جديدة')]])+q('flavour',lang('Pick a flavour.','اختار طعم.') ,[['savory',lang('Savoury','حادق')],['sweet',lang('Sweet','حلو')]])+q('adventure',lang('How adventurous are you?','قد إيه بتحب التجارب؟'),[['low',lang('Keep it classic','خليك في الكلاسيك')],['high',lang('Surprise me','فاجئني')]])+q('mix',lang('Sweet + savoury in one bite?','حلو وحادق مع بعض؟'),[['no',lang('Not today','مش النهارده')],['yes',lang('I am curious','ممكن أجرب')]])+'<button class="be-exp-action" type="submit">'+lang('Reveal my food type','اكتشف نوعي')+'</button></form><div id="be-lab-result" class="be-exp-result" role="status" aria-live="polite"></div><div class="be-exp-box"><h2>'+lang('Explore later in the lab','تجارب جاية في المعمل')+'</h2><p>'+lang('Fusion Explorer · Weirdness Meter · Culinary Chaos · Community voting. These require moderated, rights-cleared content before public activation.','فيوجن إكسبلورر · مقياس الغرابة · فوضى الأكل · تصويت المجتمع. محتاجة محتوى متراجع قبل الإطلاق.')+'</p></div>');
 }
 const render={home,mama: mama,'mama-picks':mama,'dish-finder':finder,'city-guide':city,gallery,spotlight,passport,'food-lab':lab};
-root.innerHTML=(render[slug]||home)();
+// Render is deferred until an authenticated reader is verified.
 // All published records are retrieved through Supabase RLS; unpublished
 // venue, food, contributor, or photo records cannot appear in this UI.
 const cfg=window.BE_DISCOVER_CONFIG||{};
+let discoverAuthClient=null;
 const store={foods:[],places:[],terms:[],photos:[],sections:[],recognitions:[],badges:[],loaded:false,failed:false};
 let updateDishes=()=>{};
+function bindDiscoverControls(){
 const dishQuery=document.getElementById('be-dish-q');
 if(dishQuery){
  const refresh=()=>{
@@ -113,7 +115,7 @@ const form=document.getElementById('be-lab-form');if(form){
  out.innerHTML='<p class="be-exp-small">'+lang('YOUR PLAYFUL RESULT','نتيجتك للتسلية')+'</p><h2>'+esc(type)+'</h2><p>'+esc(food)+'</p><small>'+lang('No answers were saved or sent to a server.','إجاباتك مش اتسجلت ومش اتبعتت لأي سيرفر.')+'</small>';out.scrollIntoView({behavior:'smooth',block:'nearest'});
  });
 }
-
+}
 
 // Only public Supabase publishable credentials are embedded. Supabase RLS
 // independently verifies editorial approval for every returned content row.
@@ -125,7 +127,11 @@ const loadingEmpty=(title,body)=>empty(title,body);
 async function publicRecords(table,columns,filters=''){
  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(cfg.url||'')||!/^sb_publishable_/.test(cfg.publishableKey||''))throw Error('Invalid public content connection');
  const url=cfg.url.replace(/\/$/,'')+'/rest/v1/'+table+'?select='+encodeURIComponent(columns)+(filters?'&'+filters:'')+'&limit=50';
- const res=await fetch(url,{headers:{'apikey':cfg.publishableKey,'Accept':'application/json'}});
+ if(!discoverAuthClient)throw Error('Sign in required');
+ const {data:sessionResult,error:sessionError}=await discoverAuthClient.auth.getSession();
+ const accessToken=sessionResult?.session?.access_token;
+ if(sessionError||!accessToken)throw Error('Sign in required');
+ const res=await fetch(url,{headers:{'apikey':cfg.publishableKey,'Authorization':'Bearer '+accessToken,'Accept':'application/json'},cache:'no-store'});
  if(!res.ok)throw Error('Content service unavailable');
  const rows=await res.json();if(!Array.isArray(rows))throw Error('Unexpected content response');
  return rows;
@@ -239,4 +245,34 @@ async function loadApprovedContent(){
  outcomes.forEach((result,index)=>{if(result.status==='fulfilled')store[tasks[index][0]]=result.value;else store.failed=true;});
  store.loaded=true;updateDishes();renderCity();renderMama();renderGallery();renderSpotlight();renderPassport();
 }
-loadApprovedContent();
+function showDiscoverSignIn(){
+ const redirect=encodeURIComponent(location.pathname);
+ const account=base+(ar?'ar/':'')+'account/';
+ root.innerHTML='<section class="be-exp-section be-exp-auth-gate" role="region" aria-labelledby="be-discover-signin-title">'+
+ '<p class="be-exp-small">'+lang('BOUDIE EATS · MEMBERS','بودي إيتس · للأعضاء')+'</p>'+
+ '<h1 id="be-discover-signin-title">'+lang('Sign in to explore.','سجّل دخولك علشان تستكشف.')+'</h1>'+
+ '<p>'+lang('The seven Boudie Eats experiences are available to readers with a confirmed account. Recipes, reviews and stories remain free to browse.','تجارب بودي إيتس السبعة متاحة للقراء أصحاب الحسابات المؤكدة. الوصفات والتجارب والحكايات العادية بتفضل مجانية ومفتوحة.')+'</p>'+
+ '<div class="be-exp-auth-actions">'+
+ link(lang('Sign in','تسجيل الدخول'),account+'?next='+redirect)+
+ link(lang('Create a free account','إنشاء حساب مجاني'),account+'?mode=signup&next='+redirect,true)+
+ '</div></section>';
+}
+async function bootDiscover(){
+ if(!String(cfg.url||'').startsWith('https://')||!/^sb_publishable_/.test(cfg.publishableKey||'')){
+  root.textContent=lang('Accounts are temporarily unavailable. Please try again later.','الحسابات غير متاحة مؤقتًا. جرّب تاني بعدين.');
+  return;
+ }
+ try{
+  const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.119.0?bundle');
+  discoverAuthClient=createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
+  const {data,error}=await discoverAuthClient.auth.getUser();
+  if(error||!data?.user?.email_confirmed_at){showDiscoverSignIn();return;}
+  const {data:sessionData}=await discoverAuthClient.auth.getSession();
+  if(!sessionData?.session?.access_token){showDiscoverSignIn();return;}
+  discoverAuthClient.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){discoverAuthClient=null;showDiscoverSignIn();}});
+  root.innerHTML=(render[slug]||home)();
+  bindDiscoverControls();
+  await loadApprovedContent();
+ }catch{showDiscoverSignIn();}
+}
+bootDiscover();
