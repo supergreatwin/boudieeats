@@ -31,12 +31,9 @@ jobs:
           node --check tools/account-client.mjs
           node --check tools/account-pages.mjs
           node --check tools/published-pages.mjs
-          node --check tools/what-to-eat-client.mjs
-          node --check tools/what-to-eat-experiences.mjs
-          node --check tools/what-to-eat-pages.mjs
-          node --check tools/what-to-eat-newsletter.mjs
-          node --check tools/verify-what-to-eat.mjs
-          node --check tools/verify-what-to-eat-runtime.mjs
+          node --check tools/boudie-experiences-client.mjs
+          node --check tools/boudie-experiences-pages.mjs
+          node --check tools/verify-boudie-experiences.mjs
       - name: Build and verify the site
         run: node tools/build-pages.mjs
         env:
@@ -50,9 +47,7 @@ jobs:
           node tools/verify-bilingual.mjs
           node tools/verify-accounts.mjs
           node tools/verify-publishing.mjs
-          node tools/verify-what-to-eat.mjs
-          node tools/verify-what-to-eat-runtime.mjs
-          node tools/verify-food-lab.mjs
+          node tools/verify-boudie-experiences.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist
