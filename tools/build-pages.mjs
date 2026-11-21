@@ -11,7 +11,7 @@ import { addAccountPages } from './account-pages.mjs';
 import { bePublicConfig } from './be-public-config.mjs';
 import { polishVisitorPages } from './site-polish.mjs';
 import { addPublishedPages } from './published-pages.mjs';
-import { addWhatToEatPages } from './what-to-eat-pages.mjs';
+import { addBoudieExperiences } from './boudie-experiences-pages.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const project = join(root, 'boudieeats');
@@ -113,14 +113,8 @@ addPublishedPages({
 finishLanguageLinks({ directory: dist, basePath: originalBase });
 // Apply responsive brand-safe corrections to both complete language editions.
 polishVisitorPages({ directory: dist, basePath: originalBase });
-// Private-by-default What to Eat guide and full Editorial Desk manager.
-// The route is not linked publicly; RLS prevents public data access.
-addWhatToEatPages({
-  directory: dist,
-  basePath: originalBase,
-  supabaseUrl: process.env.BE_SUPABASE_URL || bePublicConfig.url,
-  supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey,
-});
+// Independent Boudie Eats seven-experience prototype, not yet public navigation.
+addBoudieExperiences({ directory: dist, basePath: originalBase });
 // Ship the original supplied logo artwork as a shared English/Arabic asset.
 mkdirSync(join(dist, 'media'), { recursive: true });
 copyFileSync(join(root, 'assets', 'boudieeats-wordmark.svg'), join(dist, 'media', 'boudieeats-wordmark.svg'));
@@ -151,7 +145,7 @@ if (site.hostname.endsWith('.github.io')) {
         .replace(/index\.html$/, '').replace(/\.html$/, '');
       // Retain noindexed, RLS-gated private editor and preview URLs as a
       // working fallback when the Cloudflare production build is stale.
-      if (/^(?:ar\/)?(?:editorial-desk\/)?what-to-eat\/$/.test(route)) continue;
+      if (/^(?:ar\/)?discover(?:\/|$)/.test(route)) continue;
       const target = new URL(route, 'https://boudieeats.com/').href;
       const html = readFileSync(path, 'utf8');
       if (!/<head[^>]*>/i.test(html)) continue;
