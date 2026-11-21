@@ -24,7 +24,8 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  '<a href="'+base+prefix+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
  '<a href="'+base+prefix+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
  '<a href="'+base+prefix+'account/">'+(arabic?'دخول / حساب جديد':'Sign in / Sign up')+'</a>'+
- '<a hreflang="'+(arabic?'en':'ar-EG')+'" href="'+langHref+'">'+(arabic?'EN':'AR')+'</a>';
+ ''; 
+ const switcher='<nav class="be-language" aria-label="Language"><a hreflang="'+(arabic?'en':'ar-EG')+'" href="'+langHref+'">'+(arabic?'EN':'AR')+'</a></nav>';
  const logo=arabic?'<span class="be-exp-logo-text">بودي إيتس.</span>':'<img src="'+base+'media/boudieeats-wordmark-cream-gold-v2.svg" width="195" height="32" alt="boudieeats.">';
  const nav='<nav class="be-exp-subnav" aria-label="'+(arabic?'أقسام التجربة':'Experience sections')+'">'+
  '<a href="'+path+'" '+(view==='home'?'aria-current="page"':'')+'>'+(arabic?'الكل':'All seven')+'</a>'+
@@ -36,7 +37,7 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  '<meta name="theme-color" content="#72253f"><link rel="canonical" href="https://boudieeats.com/'+prefix+'discover/'+(view==='home'?'':view+'/')+'">'+
  '<link rel="alternate" hreflang="en" href="'+enHref+'"><link rel="alternate" hreflang="ar-EG" href="'+arHref+'">'+
  '<link rel="stylesheet" href="'+base+'be-experiences.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
- '<header class="be-exp-top"><div class="be-exp-top-in"><a href="'+base+prefix+'" class="be-exp-logo">'+logo+'</a><nav>'+primaryNav+'</nav></div></header>'+
+ '<header class="be-exp-top"><div class="be-exp-top-in"><a href="'+base+prefix+'" class="be-exp-logo">'+logo+'</a><nav>'+primaryNav+'</nav>'+switcher+'</div></header>'+
  '<div class="be-exp-page">'+nav+'<main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
  '<footer class="be-exp-footer"><div><span>© Boudie Eats</span><span>'+(arabic?'الأكل حكايات.':'Food is a story.')+'</span></div></footer>'+
  '<script>window.BE_DISCOVER_CONFIG='+JSON.stringify({url:supabaseUrl,publishableKey:supabasePublishableKey}).replace(/</g,'\\u003c')+';</script>'+ 
