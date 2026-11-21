@@ -92,3 +92,13 @@ body{max-width:100%;min-width:0;overflow-wrap:break-word}
 :where(.be-language){gap:4px!important}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Public discovery launch: an understated editorial link, not another card feed. */
+.be-discover-teaser{margin:0!important;border-bottom:1px solid var(--be-line);padding:clamp(17px,2vw,25px) 2px!important;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.be-discover-teaser>span{font:400 clamp(.94rem,1vw,1.05rem)/1.5 "DM Sans",sans-serif;color:var(--be-ink);opacity:.83}
+.be-discover-teaser>a,.be-discover-footer{color:var(--be-burgundy)!important;font-weight:700!important;text-decoration:underline!important;text-underline-offset:4px!important}
+.be-discover-teaser>a{display:inline-flex;align-items:center;gap:12px;min-height:44px;font-size:clamp(.91rem,1.08vw,1.06rem)}
+.be-discover-footer{display:inline-flex!important;align-items:center;min-height:44px;margin-inline:12px}
+.be-discover-nav{white-space:normal;overflow-wrap:break-word}
+html[lang^="ar"] .be-discover-teaser>span,html[lang^="ar"] .be-discover-teaser>a,html[lang^="ar"] .be-discover-footer{font-family:"Lalezar",sans-serif;letter-spacing:0}
+@media(max-width:480px){.be-discover-teaser{align-items:start!important;gap:3px!important;flex-direction:column}.be-discover-teaser>a{min-height:44px}}
