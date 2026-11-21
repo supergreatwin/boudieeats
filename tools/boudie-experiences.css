@@ -22,3 +22,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 @media(max-width:760px){.be-exp-top-in{padding:13px 16px;gap:10px;flex-wrap:wrap}.be-exp-page{padding:22px 16px 60px}.be-exp-top nav{gap:8px 12px}.be-exp-subnav{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin}.be-exp-subnav a{flex:none}.be-exp-filters{grid-template-columns:minmax(0,1fr)!important}}
 @media(max-width:450px){.be-exp-top-in nav a{font-size:12px}.be-exp-logo img{width:165px}.be-exp-grid{grid-template-columns:1fr!important}.be-exp-hero{grid-template-columns:1fr!important}.be-exp-action{display:block;text-align:center}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation-duration:.01ms!important}}
+
+/* Reader-only Discover: static shell has no privileged content; sign-in gate is the initial screen. */
+.be-exp-auth-gate{width:min(760px,100%);margin:clamp(30px,7vw,110px) auto;padding:clamp(24px,5vw,56px);background:#fffaf2;border:1px solid #ecdfe0}
+.be-exp-auth-gate h1{font-size:clamp(2.3rem,5vw,4.5rem);line-height:1.12;max-width:14ch}
+.be-exp-auth-gate>p:not(.be-exp-small){max-width:55ch;line-height:1.7}
+.be-exp-auth-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:clamp(24px,3vw,36px)}
+.be-exp-auth-actions a{min-height:46px;display:inline-flex;align-items:center;justify-content:center}
+@media(max-width:480px){.be-exp-auth-gate{padding:26px 18px;margin:20px auto}.be-exp-auth-actions{flex-direction:column}.be-exp-auth-actions a{width:100%}}

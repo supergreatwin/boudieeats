@@ -9,6 +9,8 @@ const root=document.getElementById('be-account-app');
 const status=document.getElementById('be-account-status');
 const base=config.basePath||'/';
 const here=location.origin+base+(ar?'ar/':'')+(document.body.dataset.mode==='desk'?'editorial-desk/':'account/');
+// Allow only first-party Discover routes as a post-login destination.
+const safeDiscoverNext=()=>{const next=new URLSearchParams(location.search).get('next')||'';return /^\/(?:ar\/)?discover\/(?:[a-z-]+\/)?$/.test(next)?next:null;};
 let lastResetAttemptAt=0;
 let client=null, user=null, profile=null, staffAuthorized=false, tab=document.body.dataset.mode==='desk'?'articles':'profile', authMode='login', recovery=false, refreshing=false;
 
@@ -58,6 +60,7 @@ function nav(){
  if(profile?.role==='reader')items.push(['apply',tr('Apply to contribute','قدّم طلب مساهمة')]);
  return '<nav class="be-tabs" aria-label="'+tr('Reader account sections','أقسام حساب القارئ')+'">'+
   items.map(([key,label])=>button(label,'tab:'+key,tab===key?'be-active':'')).join('')+
+  '<a class="be-primary" href="'+base+(ar?'ar/':'')+'discover/">'+tr('Explore Boudie Eats','استكشف بودي إيتس')+'</a>'+ 
   (isStaff()?'<a class="be-primary" href="'+base+(ar?'ar/':'')+'editorial-desk/">'+tr('Open staff Editorial Desk','افتح مكتب التحرير للموظفين')+'</a>':'')+
   '</nav>';
 }
@@ -505,7 +508,7 @@ async function loadProfile(){
 }
 async function refresh(){
  if(refreshing)return;refreshing=true;
- try{await loadProfile();render();}
+ try{await loadProfile();const next=safeDiscoverNext();if(next&&user?.email_confirmed_at&&profile){location.replace(next);return;}render();}
  catch(error){say(error.message||tr('Unable to load the account.','تعذّر تحميل الحساب.'),true);}
  finally{refreshing=false;}
 }
@@ -748,6 +751,7 @@ async function init(){
    const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.119.0?bundle');
    client=createClient(config.url,config.publishableKey,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true,flowType:'pkce'}});
    if(location.search.includes('mode=reset')){authMode='recovery';}
+   else if(new URLSearchParams(location.search).get('mode')==='signup'){authMode='signup';}
    client.auth.onAuthStateChange((event)=>{
     if(event==='PASSWORD_RECOVERY'){recovery=true;authMode='recovery';render();}
     if(event==='SIGNED_OUT'){user=profile=null;staffAuthorized=false;render();}

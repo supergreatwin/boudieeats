@@ -8,7 +8,7 @@ for(const lang of ['','ar/']){
   const target=join(dist,lang,'discover',route,'index.html');
   if(!existsSync(target)){errors.push('Missing '+lang+'discover/'+route);continue}
   const h=readFileSync(target,'utf8');
-  for(const key of ['id="be-exp-app"','be-experiences.js','be-experiences.css','BE_DISCOVER_CONFIG','index,follow,max-image-preview:large','hreflang="en"','hreflang="ar-EG"','class="be-language"','be-responsive-release']){
+  for(const key of ['id="be-exp-app"','be-experiences.js','be-experiences.css','BE_DISCOVER_CONFIG','noindex,nofollow,noarchive','hreflang="en"','hreflang="ar-EG"','class="be-language"','be-responsive-release']){
    if(!h.includes(key))errors.push('Missing '+key+' in '+lang+route);
   }
   if(/whattocommunity|what[-\s]to[-\s]eat/i.test(h))errors.push('Former third-party brand in '+lang+route);
@@ -42,6 +42,11 @@ else {
  if(!accountScript.includes('loadExperienceEditor()')||!accountScript.includes("if(tab==='experiences'&&isStaff())"))errors.push('Experience editor is not behind staff-only desk tab');
  if(!accountScript.includes("client.rpc('be_staff')"))errors.push('Supabase staff role check is missing');
 }
+const memberClient=readFileSync(join(dist,'be-experiences.js'),'utf8');
+for(const required of ['showDiscoverSignIn','getUser()','email_confirmed_at',"Authorization':'Bearer",'bindDiscoverControls()']){
+ if(!memberClient.includes(required))errors.push('Discover membership guard missing '+required);
+}
+if(!readFileSync(join(dist,'be-account.js'),'utf8').includes('safeDiscoverNext'))errors.push('Safe after-login redirect missing');
 const css=join(dist,'be-experiences.css');
 if(!existsSync(css))errors.push('Missing experience styling');
 else{
@@ -50,18 +55,16 @@ else{
  if(/#f0642b|--tangerine/.test(c))errors.push('Cancelled orange accent leaked');
 }
 const sitemap=join(dist,'sitemap.xml');
-if(!existsSync(sitemap))errors.push('Public sitemap missing');
+if(!existsSync(sitemap))errors.push('Sitemap missing');
 else {
  const xml=readFileSync(sitemap,'utf8');
- for(const lang of ['','ar/'])for(const route of routes){
-  if(!xml.includes('<loc>https://boudieeats.com/'+lang+'discover/'+route+'</loc>'))errors.push('Public experience route missing from sitemap: '+lang+route);
- }
+ if(xml.includes('/discover/'))errors.push('Authenticated Discover routes leaked into sitemap');
 }
 for(const lang of ['','ar/']){
  const home=join(dist,lang,'index.html');
  const html=existsSync(home)?readFileSync(home,'utf8'):'';
- if(!html.includes('class="be-discover-teaser"')||!html.includes('href="/'+lang+'discover/"'))
-  errors.push('Discover navigation missing from '+lang+'homepage');
+ if(!html.includes('class="be-discover-teaser"')||!html.includes('href="/'+lang+'account/?next=%2F'+(lang?'ar%2F':'')+'discover%2F"'))
+  errors.push('Discover must link through Sign in / Sign up on '+lang+'homepage');
 }
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
-console.log('PASS: public bilingual launch, 16 indexable routes, homepage and sitemap, protected staff content and RLS passport.');
+console.log('PASS: bilingual authenticated Discover, 16 noindex routes, login-first navigation, JWT-only data, editor/admin isolation, RLS passport.');
