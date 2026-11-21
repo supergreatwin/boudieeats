@@ -30,7 +30,7 @@ function page({arabic,base,view}){
  '<title>'+e(title)+' | Boudie Eats</title>'+
  '<meta name="robots" content="noindex,nofollow,noarchive">'+
  '<meta name="description" content="'+e(arabic?'سبع تجارب أصلية للأكل من بودي إيتس':'Seven independent food discovery experiences by Boudie Eats')+'">'+
- '<meta name="theme-color" content="#315b4b"><link rel="canonical" href="https://boudieeats.com/'+prefix+'discover/'+(view==='home'?'':view+'/')+'">'+
+ '<meta name="theme-color" content="#72253f"><link rel="canonical" href="https://boudieeats.com/'+prefix+'discover/'+(view==='home'?'':view+'/')+'">'+
  '<link rel="stylesheet" href="'+base+'be-experiences.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
  '<header class="be-exp-top"><div class="be-exp-top-in"><a href="'+base+prefix+'" class="be-exp-logo">'+logo+'</a><nav>'+primaryNav+'</nav></div></header>'+
  '<div class="be-exp-page">'+nav+'<main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
