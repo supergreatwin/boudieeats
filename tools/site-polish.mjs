@@ -56,6 +56,8 @@ const css = [
   '.be-home-intro p{margin:0;font-size:clamp(15px,1.45vw,18px);line-height:1.65}',
   '.be-home-intro .be-home-links{display:flex;gap:18px;flex-wrap:wrap;font-size:15px;font-weight:700}',
   '.be-home-intro .be-home-links a{color:inherit;text-decoration:underline;text-underline-offset:5px}',
+  '.be-home-letter-button{display:inline-flex;align-items:center;margin-top:14px;padding:9px 0;border:0;background:transparent;color:#51283e;font-weight:750;font-size:14px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}',
+  'html[lang^="ar"] .be-home-letter-button{font-family:"Lalezar",sans-serif;font-size:18px}',
   'html[lang^="ar"] .be-home-intro h2{font-family:"Aref Ruqaa",serif}',
   '@media(max-width:800px){.be-home-intro{width:calc(100% - 32px);margin:12px auto 20px;padding:12px 0 18px}.masthead .header-inner .utilities{gap:9px}.be-language{gap:8px!important}}',
   "/* Two-up editorial listings with a featured lead; keep original colour palette. */",
@@ -408,7 +410,7 @@ function homeIntroduction(isArabic,base){
   const items=links.map(([slug,label])=>'<a href="'+path+slug+'">'+label+'</a>').join('');
   return '<section class="be-home-intro" aria-label="'+(isArabic?'أهلاً بيك':'Welcome')+'">'+
     '<div class="be-home-copy"><span class="be-home-eyebrow">'+(isArabic?'الرئيسية':'HOME')+'</span>'+
-    '<h2>'+title+'</h2><p>'+desc+'</p></div><nav class="be-home-links" aria-label="'+(isArabic?'استكشف اليومية':'Explore the journal')+'">'+items+'</nav></section>';
+    '<h2>'+title+'</h2><p>'+desc+'</p><button class="be-home-letter-button" type="button" data-be-letter-open>'+(isArabic?'جواب من بودي':'The Boudie Letter')+'</button></div><nav class="be-home-links" aria-label="'+(isArabic?'استكشف اليومية':'Explore the journal')+'">'+items+'</nav></section>';
 }
 
 
@@ -488,9 +490,16 @@ function editorialHomepage(html,{isArabic,base}){
     'else if(preview!=="analytics"&&!shown&&(!last||Date.now()-last>86400000)){setTimeout(function(){if(document.visibilityState==="visible"){if(!d.open&&allowAuto())show();return;}function whenVisible(){if(document.visibilityState==="visible"){document.removeEventListener("visibilitychange",whenVisible);if(!d.open&&allowAuto())show();}}document.addEventListener("visibilitychange",whenVisible);},3500)}',
     '})();</script>'
   ].join('');
-  const main=html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i);
-  if(!main)throw new Error('Boudie Eats homepage main landmark missing');
-  return html.replace(main[0],main[0].replace(/(<main\b[^>]*>)[\s\S]*?(<\/main>)/i,'$1'+introduction+'$2'));
+  // Restore the original Astro recipe-led magazine homepage, not the later
+  // stripped-down be-landing cover. Keep the automatic bilingual newsletter
+  // dialog and its working event handlers without replacing <main>.
+  if(!html.includes('<main')||!html.includes('<div class="manifesto">'))
+    throw new Error('Original recipe-led homepage landmarks missing');
+  const dialogAt=introduction.indexOf('<dialog class="be-letter-dialog"');
+  if(dialogAt<0)throw new Error('Original newsletter popup was not generated');
+  const newsletterPopup=introduction.slice(dialogAt);
+  html=html.replace('<div class="manifesto">',homeIntroduction(isArabic,base)+'<div class="manifesto">');
+  return html.replace('</main>','</main>'+newsletterPopup);
 }
 
 function removeBookmarkUi(html){
