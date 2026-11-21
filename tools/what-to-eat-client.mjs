@@ -1,3 +1,4 @@
+import {mountExperienceGuide,mountExperienceStudio} from './be-what-to-eat-experiences.js';
 // what to eat? independent branded guide hosted by Boudie Eats.
 // Public Supabase key only; database RLS is authoritative.
 const cfg=window.BE_WTE_CONFIG||{};
@@ -10,11 +11,12 @@ window.addEventListener?.('beforeinstallprompt',event=>{event.preventDefault();i
 // This never turns on public launch, and Supabase RLS still gates all data.
 const previewMode=()=>editor&&/(?:^|[?&])preview=1(?:&|$)/.test(window.location?.search||'');
 const root=document.getElementById('wte-root');
-const state={client:null,user:null,role:null,settings:null,terms:[],places:[],notes:[],sections:[],photos:[],editing:null,editingTerm:null,editingSection:null,editingPhoto:null,search:'',city:'',cuisine:'',price:''};
+const state={client:null,user:null,role:null,settings:null,terms:[],places:[],notes:[],sections:[],photos:[],editing:null,editingTerm:null,editingSection:null,editingPhoto:null,search:'',city:'',cuisine:'',price:'',reviewer:false,features:[],foods:[],recognitions:[],badges:[],lab:null,ideas:[],passport:null};
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const validUrl=v=>{if(!v)return '';try{const x=new URL(v);return x.protocol==='https:'?x.href:'';}catch{return '';}};
 const staff=()=>['editor','admin'].includes(state.role);
 const admin=()=>state.role==='admin';
+const canPreview=()=>staff()||state.reviewer;
 const live=()=>Boolean(state.settings?.site_enabled&&state.settings?.partner_approved);
 const termName=x=>ar?x.label_ar:x.label_en;
 const placeName=x=>ar?x.name_ar:x.name_en;
@@ -47,8 +49,8 @@ function denied(){
   root.innerHTML='<div class="wte-intro"><p class="wte-eyebrow">'+t('Not published','لم يُنشر بعد')+'</p><h1 class="wte-orange-title" lang="en">what to eat?</h1><p>'+t('This section is reserved for the collaboration team until approval.','القسم ده مخصص لفريق التعاون لحد الموافقة النهائية.')+'</p><a href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/')+'">'+t('Editorial desk','مكتب التحرير')+'</a></div><p id="wte-status" class="wte-status"></p>';
 }
 function filterBar(){
-  const cities=state.terms.filter(x=>x.kind==='city'&&(x.active||staff())).sort((a,b)=>a.position-b.position);
-  const cuisines=state.terms.filter(x=>x.kind==='cuisine'&&(x.active||staff())).sort((a,b)=>a.position-b.position);
+  const cities=state.terms.filter(x=>x.kind==='city'&&(x.active||canPreview())).sort((a,b)=>a.position-b.position);
+  const cuisines=state.terms.filter(x=>x.kind==='cuisine'&&(x.active||canPreview())).sort((a,b)=>a.position-b.position);
   return '<div class="wte-filters" aria-label="'+t('Food guide filters','فلاتر دليل الأكل')+'">'+
   '<label class="wte-field"><span>'+t('Search','بحث')+'</span><input data-filter="search" placeholder="'+t('Restaurant, dish or district','مطعم أو أكلة أو منطقة')+'" value="'+esc(state.search)+'"></label>'+
   selectField('city',t('City','المدينة'),[['',t('All cities','كل المدن')],...cities.map(x=>[x.id,termName(x)])],state.city)+
@@ -58,7 +60,7 @@ function filterBar(){
 }
 function visiblePlaces(){
   return state.places.filter(p=>{
-    if(!staff()&&p.status!=='published')return false;
+    if(!canPreview()&&p.status!=='published')return false;
     if(state.city&&p.city_id!==state.city)return false;
     if(state.cuisine&&p.cuisine_id!==state.cuisine)return false;
     if(state.price&&p.price_band!==state.price)return false;
@@ -78,9 +80,9 @@ function cards(override=null){
     const must=localized(p,'must_try')?'<p><strong>'+t('Order this: ','جرب: ')+'</strong>'+esc(localized(p,'must_try'))+'</p>':'';
     const links=[['website_url',t('Website','الموقع')],['instagram_url','Instagram'],['booking_url',t('Booking','الحجز')]].map(([key,label])=>validUrl(p[key])?'<a href="'+esc(validUrl(p[key]))+'" target="_blank" rel="noopener noreferrer">'+label+'</a>':'').join('');
     const controls=editor&&!previewMode()&&staff()?'<div class="wte-card-actions"><button data-action="edit-place" data-id="'+esc(p.id)+'">'+t('Edit','تعديل')+'</button><button data-action="delete-place" data-id="'+esc(p.id)+'">'+t('Delete','حذف')+'</button></div>':'';
-    const badge=staff()?'<span class="wte-state">'+esc(p.status)+(p.partner_reviewed?' · reviewed':'')+'</span>':'';
+    const badge=canPreview()?'<span class="wte-state">'+esc(p.status)+(p.partner_reviewed?' · reviewed':'')+'</span>':'';
     const img=p.image_url?'<div class="wte-photo"><img data-image="'+esc(p.id)+'" alt="'+esc(localized(p,'image_alt')||placeName(p))+'" loading="lazy"><small>'+esc(p.image_credit||'')+'</small></div>':'<div class="wte-no-photo">'+t('Photograph pending','الصورة لسه هتتضاف')+'</div>';
-    const gallery=state.photos.filter(ph=>ph.place_id===p.id&&(staff()||ph.image_rights_confirmed));
+    const gallery=state.photos.filter(ph=>ph.place_id===p.id&&(canPreview()||ph.image_rights_confirmed));
     const galleryHtml=gallery.length?'<details class="wte-gallery"><summary>'+t('See more photographs','صور إضافية')+' ('+gallery.length+')</summary><div class="wte-gallery-grid">'+gallery.map(ph=>'<figure><img data-image="'+esc(ph.id)+'" alt="'+esc(localized(ph,'image_alt')||placeName(p))+'" loading="lazy"><figcaption>'+esc(localized(ph,'caption'))+(ph.image_credit?' · '+esc(ph.image_credit):'')+'</figcaption></figure>').join('')+'</div></details>':'';
     return '<article class="wte-card">'+img+header+meta+badge+summary+must+
       (localized(p,'address')?'<p class="wte-card-meta">'+esc(localized(p,'address'))+'</p>':'')+
@@ -89,12 +91,12 @@ function cards(override=null){
 }
 
 function sectionHTML(){
-  const ordered=state.sections.filter(s=>staff()||(s.active&&s.partner_reviewed&&s.status==='published')).sort((a,b)=>a.position-b.position);
+  const ordered=state.sections.filter(s=>canPreview()||(s.active&&s.partner_reviewed&&s.status==='published')).sort((a,b)=>a.position-b.position);
   if(!ordered.length)return '';
   const body=x=>esc(x||'').split(/\n\s*\n/).map(part=>'<p>'+part.replace(/\n/g,' ')+'</p>').join('');
   return ordered.map(s=>{
     const title=esc(localized(s,'title')),description=body(localized(s,'body'));
-    const status=staff()?'<span class="wte-state">'+esc(s.status)+(s.partner_reviewed?' · reviewed':'')+'</span>':'';
+    const status=canPreview()?'<span class="wte-state">'+esc(s.status)+(s.partner_reviewed?' · reviewed':'')+'</span>':'';
     if(s.slug==='community'){
       const profile=validUrl(state.settings?.community_instagram_url);
       const handle=esc(state.settings?.community_handle||'@whattocommunity');
@@ -120,7 +122,7 @@ function brandHero(compact=false){
   return '<div class="wte-brand-hero" data-compact="'+String(compact)+'"><img src="'+esc(src)+'" alt="'+t('The original what to eat? orange wordmark over black and white food photography','هوية what to eat? البرتقالية على صورة طعام بالأبيض والأسود')+'" loading="eager" fetchpriority="high"></div>';
 }
 function browse(){
-  const isPreview=staff()&&!live();
+  const isPreview=canPreview()&&!live();
   const intro=localized(state.settings||{},'guide_intro')||t('Find places by cuisine and city, with carefully written recommendations.','اختار أكلتك ومدينتك، وشوف ترشيحات مكتوبة بعناية.');
   const previewToolbar=previewMode()?'<div class="wte-preview-toolbar" role="status"><span>'+t('PRIVATE PREVIEW — visible only to approved editors','معاينة خاصة — لفريق التحرير المعتمد فقط')+'</span><a href="'+esc(cfg.basePath+(ar?'ar/':'')+'editorial-desk/what-to-eat/')+'">'+t('Back to content studio','العودة لمكتب التحرير')+'</a></div>':'';
   root.innerHTML=previewToolbar+brandHero()+'<div class="wte-intro"><p class="wte-eyebrow">'+t('what to eat? / the guide','what to eat? / الدليل')+'</p>'+
@@ -131,6 +133,7 @@ function browse(){
     '<div id="wte-sections" class="wte-sections"></div>'+(validUrl(state.settings?.pdf_url)?'<div class="wte-pdf"><h2>'+t('the guide, to go.','الدليل معاك.')+'</h2><a href="'+esc(validUrl(state.settings.pdf_url))+'" target="_blank" rel="noopener noreferrer" class="wte-button">'+t('Open PDF guide','افتح دليل PDF')+' ↗</a></div>':'')+
     '<p id="wte-status" class="wte-status" role="status" aria-live="polite"></p>';
   updateCards();
+  mountExperienceGuide({root,state,ar,staff:staff(),reviewer:state.reviewer,live:live(),admin:admin(),refresh});
 }
 function updateCards(){
   const el=document.getElementById('wte-results');if(!el)return;
@@ -177,6 +180,7 @@ function placeEditor(){
     field('name_en',t('Name in English','الاسم بالإنجليزي'),p.name_en||'','text',true)+field('name_ar',t('Name in Arabic','الاسم بالعربي'),p.name_ar||'','text',true)+
     field('district_en',t('District (English)','المنطقة بالإنجليزي'),p.district_en)+field('district_ar',t('District (Arabic)','المنطقة بالعربي'),p.district_ar)+
     field('address_en',t('Address (English)','العنوان بالإنجليزي'),p.address_en)+field('address_ar',t('Address (Arabic)','العنوان بالعربي'),p.address_ar)+
+    field('latitude',t('Verified latitude','خط العرض الموثق'),p.latitude??'','number')+field('longitude',t('Verified longitude','خط الطول الموثق'),p.longitude??'','number')+
     '</div><div class="wte-form-grid">'+area('summary_en',t('Review / description (English)','الوصف بالإنجليزي'),p.summary_en)+area('summary_ar',t('Review / description (Arabic)','الوصف بالعربي'),p.summary_ar)+
     area('must_try_en',t('Must try (English)','أهم طلب بالإنجليزي'),p.must_try_en)+area('must_try_ar',t('Must try (Arabic)','أهم طلب بالعربي'),p.must_try_ar)+
     '</div><div class="wte-form-grid">'+
@@ -277,33 +281,45 @@ function renderEditor(){
   brandEditor()+readiness()+launchEditor()+'<div class="wte-editor-columns">'+termEditor()+placeEditor()+'</div>'+sectionEditor()+photoEditor()+
   panel(t('Current entries','الأماكن المضافة'),'<p class="wte-hint">'+state.places.length+' '+t('entries saved','مكان محفوظ')+'</p><div class="wte-list">'+
   state.places.map(p=>'<div><span><strong>'+esc(placeName(p))+'</strong><small>'+esc(p.status)+' · '+esc(p.slug)+'</small></span><span><button data-action="edit-place" data-id="'+p.id+'">'+t('Edit','تعديل')+'</button> <button data-action="delete-place" data-id="'+p.id+'">'+t('Delete','حذف')+'</button></span></div>').join('')+'</div>');
+  mountExperienceStudio({root,state,ar,staff:staff(),reviewer:state.reviewer,admin:admin(),refresh});
 }
 function render(){
-  if(editor){if(staff()){if(previewMode())browse();else renderEditor();}else if(state.user)denied();else login();return;}
-  if(!live()&&!staff()){notFound();return;}
+  if(editor){if(staff()){if(previewMode())browse();else renderEditor();}else if(state.reviewer&&previewMode())browse();else if(state.user)denied();else login();return;}
+  if(!live()&&!canPreview()){notFound();return;}
   browse();
 }
 async function refresh(){
   const {data:who}=await state.client.auth.getUser();
   state.user=who?.user||null;
-  state.role=null;
+  state.role=null;state.reviewer=false;
   if(state.user){
     const {data}=await state.client.from('be_profiles').select('role').eq('id',state.user.id).maybeSingle();
     state.role=data?.role||null;
+    const reviewerRow=await state.client.from('be_wte_reviewers').select('active').eq('user_id',state.user.id).maybeSingle();
+    state.reviewer=Boolean(reviewerRow.data?.active);
   }
   const settings=await state.client.from('be_wte_settings').select('*').eq('id',1).maybeSingle();
   if(settings.error)throw settings.error;
   state.settings=settings.data;
-  if(!staff()&&!live()){state.terms=[];state.places=[];state.notes=[];state.sections=[];state.photos=[];render();return;}
-  const [terms,places,sections,photos]=await Promise.all([
+  if(!canPreview()&&!live()){state.terms=[];state.places=[];state.notes=[];state.sections=[];state.photos=[];state.features=[];state.foods=[];state.ideas=[];render();return;}
+  const [terms,places,sections,photos,features,foods,recognitions,badges,lab,ideas,passport]=await Promise.all([
     state.client.from('be_wte_terms').select('*').order('position',{ascending:true}),
     state.client.from('be_wte_places').select('*').order('position',{ascending:true}),
     state.client.from('be_wte_sections').select('*').order('position',{ascending:true}),
-    state.client.from('be_wte_photos').select('*').order('position',{ascending:true})
+    state.client.from('be_wte_photos').select('*').order('position',{ascending:true}),
+    state.client.from('be_wte_features').select('*').order('position',{ascending:true}),
+    state.client.from('be_wte_foods').select('*').order('name_en',{ascending:true}),
+    state.client.from('be_wte_recognitions').select('*'),
+    state.client.from('be_wte_badges').select('*'),
+    state.client.from('be_wte_lab_settings').select('*').eq('id',1).maybeSingle(),
+    state.client.from('be_wte_ideas').select('*').order('created_at',{ascending:false}).limit(100),
+    state.user?state.client.from('be_wte_passports').select('*').eq('owner_id',state.user.id).maybeSingle():Promise.resolve({data:null,error:null})
   ]);
-  for(const r of [terms,places,sections,photos])if(r.error)throw r.error;
+  for(const r of [terms,places,sections,photos,features,foods,recognitions,badges,lab,ideas,passport])if(r.error)throw r.error;
   state.terms=terms.data||[];state.places=places.data||[];
   state.sections=sections.data||[];state.photos=photos.data||[];
+  state.features=features.data||[];state.foods=foods.data||[];state.recognitions=recognitions.data||[];
+  state.badges=badges.data||[];state.lab=lab.data;state.ideas=ideas.data||[];state.passport=passport.data;
   if(editor&&staff()){
     const notes=await state.client.from('be_wte_place_notes').select('*');
     if(notes.error)throw notes.error;state.notes=notes.data||[];
@@ -328,12 +344,14 @@ async function saveTerm(form){
   state.editingTerm=null;await refresh();message(t('Category saved.','تم حفظ التصنيف.'));
 }
 async function savePlace(form){
-  const names=['slug','name_en','name_ar','city_id','cuisine_id','district_en','district_ar','summary_en','summary_ar','must_try_en','must_try_ar','address_en','address_ar','price_band','image_url','image_alt_en','image_alt_ar','image_credit','website_url','instagram_url','booking_url','status'];
+  const names=['slug','name_en','name_ar','city_id','cuisine_id','district_en','district_ar','summary_en','summary_ar','must_try_en','must_try_ar','address_en','address_ar','latitude','longitude','price_band','image_url','image_alt_en','image_alt_ar','image_credit','website_url','instagram_url','booking_url','status'];
   const data=payload(form,names);data.slug=data.slug.toLowerCase();
   if(!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(data.slug))throw Error(t('The URL code must be lowercase, letters, numbers and hyphens.','الكود لازم حروف صغيرة وأرقام وشرطات.'));
   for(const x of ['website_url','instagram_url','booking_url']){if(data[x]&&!validUrl(data[x]))throw Error(t('Use a secure https:// URL for '+x,'استخدم رابط https صحيح: '+x));if(!data[x])data[x]=null;}
   if(data.image_url&&!data.image_url.startsWith('storage:')&&!validUrl(data.image_url))throw Error(t('Image must be an https URL or uploaded file path.','الصورة لازم رابط https أو ملف مرفوع.'));
   if(!data.image_url)data.image_url=null;
+  for(const coord of ['latitude','longitude']){const v=data[coord];data[coord]=v===''?null:Number(v);if(data[coord]!==null&&(!Number.isFinite(data[coord])||Math.abs(data[coord])>(coord==='latitude'?90:180)))throw Error('Invalid coordinates');}
+  if((data.latitude===null)!==(data.longitude===null))throw Error('Both coordinates are required together.');
   data.tags=String(new FormData(form).get('tags')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,20);
   data.position=Number(new FormData(form).get('position'))||0;
   for(const x of ['featured','partner_reviewed','image_rights_confirmed'])data[x]=form.elements[x].checked;
