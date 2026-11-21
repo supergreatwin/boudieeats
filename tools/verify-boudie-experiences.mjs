@@ -8,7 +8,7 @@ for(const lang of ['','ar/']){
   const target=join(dist,lang,'discover',route,'index.html');
   if(!existsSync(target)){errors.push('Missing '+lang+'discover/'+route);continue}
   const h=readFileSync(target,'utf8');
-  for(const key of ['id="be-exp-app"','be-experiences.js','be-experiences.css','BE_DISCOVER_CONFIG','noindex,nofollow,noarchive','hreflang="en"','hreflang="ar-EG"','class="be-language"','be-responsive-release']){
+  for(const key of ['id="be-exp-app"','be-experiences.js','be-experiences.css','BE_DISCOVER_CONFIG','index,follow,max-image-preview:large','hreflang="en"','hreflang="ar-EG"','class="be-language"','be-responsive-release']){
    if(!h.includes(key))errors.push('Missing '+key+' in '+lang+route);
   }
   if(/whattocommunity|what[-\s]to[-\s]eat/i.test(h))errors.push('Former third-party brand in '+lang+route);
@@ -49,6 +49,21 @@ else{
  if(/#f0642b|--tangerine/.test(c))errors.push('Cancelled orange accent leaked');
 }
 const sitemap=join(dist,'sitemap.xml');
-if(existsSync(sitemap)&&readFileSync(sitemap,'utf8').includes('/discover/'))errors.push('Unreleased routes leaked into indexable sitemap');
+if(!existsSync(sitemap))errors.push('Public discovery sitemap missing');
+else {
+ const xml=readFileSync(sitemap,'utf8');
+ for(const lang of ['','ar/'])for(const route of routes){
+  if(!xml.includes('<loc>https://boudieeats.com/'+lang+'discover/'+route+'</loc>'))errors.push('Discovery route not in public sitemap: '+lang+route);
+ }
+}
+for(const lang of ['','ar/']){
+ const home=join(dist,lang,'index.html');
+ if(!existsSync(home))errors.push('Public home missing: '+lang);
+ else {
+  const html=readFileSync(home,'utf8');
+  if(!html.includes('class="be-discover-teaser"')||!html.includes('href="/'+lang+'discover/"'))errors.push('Public launch invitation absent from homepage: '+lang);
+  if(/<a[^>]+href="[^"]*editorial-desk\//i.test(html))errors.push('Staff link exposed in public homepage: '+lang);
+ }
+}
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
-console.log('PASS: 16 bilingual noindex routes, responsive styles, live approved Supabase data, private RLS passport and no retired brand.');
+console.log('PASS: 16 bilingual publicly indexable routes, homepage navigation, sitemap, live approved Supabase data, private RLS passport and no retired brand.');
