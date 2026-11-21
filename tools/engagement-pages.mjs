@@ -11,7 +11,7 @@ export function addEngagementPages({ directory, basePath = '/' }) {
   const menu = '<nav class="be-reader-links" aria-label="Reader participation">' +
     '<a href="' + link('reader-responses/') + '">Send feedback</a>' +
     '<a href="' + link('newsletter-signup/') + '">Newsletter</a>' +
-    '<a href="' + link('editorial-desk/') + '">Editorial desk</a></nav>';
+    '<a href="' + link('account/') + '">Editorial desk</a></nav>';
   const menuCss = '<style>.be-reader-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;padding:20px;font:600 15px/1.5 "DM Sans",sans-serif}.be-reader-links a{color:inherit;text-decoration:underline;text-underline-offset:4px}</style>';
 
   for (const entry of readdirSync(directory, { recursive: true })) {
@@ -46,7 +46,7 @@ export function addEngagementPages({ directory, basePath = '/' }) {
       '<link rel="canonical" href="' + origin + slug + '/">' + (noindex?'<meta name="robots" content="noindex,nofollow">':'') + styles + '</head>';
     const html = head + '<body><header><a href="' + link('') + '"><strong>BoudieEats.</strong></a><nav><a href="' + link('recipes/') + '">Recipes</a> · <a href="' + link('reviews/') + '">Reviews</a> · <a href="' + link('') + '">Home</a></nav></header>' +
       '<main><div class="eyebrow">An Egyptian food journal</div><h1>' + title + '</h1><p class="muted">' + description + '</p>' + content + '</main>' +
-      '<footer><a href="' + link('reader-responses/') + '">Feedback</a> · <a href="' + link('newsletter-signup/') + '">Newsletter</a> · <a href="' + link('editorial-desk/') + '">Editorial desk</a></footer></body></html>';
+      '<footer><a href="' + link('reader-responses/') + '">Feedback</a> · <a href="' + link('newsletter-signup/') + '">Newsletter</a> · <a href="' + link('account/') + '">Editorial desk</a></footer></body></html>';
     writeFileSync(join(folder,'index.html'),html);
   }
 
@@ -58,20 +58,12 @@ export function addEngagementPages({ directory, basePath = '/' }) {
   page({
     slug:'newsletter-signup', title:'The Boudie Letter',
     description:'Original recipes, restaurant reviews, and food stories from Egypt — delivered when the newsletter launches.',
-    content:'<div class="panel"><h2>Join the launch list</h2><p>We are collecting launch interest, not issuing active email subscriptions yet. A dedicated BoudieEats Beehiiv publication is required before newsletter deliveries can start. Your email will not be added to any other publication.</p>' +
+    content:'<div class="panel"><h2>Join the launch list</h2><p>This is the free Boudie Eats newsletter and launch signup. Subscribing to emails is optional, separate from other submissions, and requires your explicit choice and email confirmation. Read our Privacy Notice before signing up.</p>' +
       embed('vXDORl','BoudieEats newsletter launch list') + '</div>'
   });
-  page({
-    slug:'editorial-desk',title:'Editorial desk',
-    description:'Manage BoudieEats ideas, drafts, reviews, and publishing. Editor permissions and authentication are handled by GitHub.',
-    noindex:true,
-    content:'<div class="panel"><h2>Editor sign-in</h2><p>Editorial access uses <strong>GitHub usernames and repository permissions</strong>. The authenticated repository owner is <strong>@supergreatwin</strong>. A username displayed here is not proof of authorization; GitHub enforces access when you open the links below.</p><a class="button" href="https://github.com/login">Sign in to GitHub</a></div>' +
-      '<div class="grid"><section class="panel"><h2>Pitch board</h2><a href="https://github.com/supergreatwin/boudieeats/issues/new/choose">Create an assignment</a><a href="https://github.com/supergreatwin/boudieeats/issues">Browse assignments</a></section>' +
-      '<section class="panel"><h2>Review & publish</h2><a href="https://github.com/supergreatwin/boudieeats/pulls">Review pull requests</a><a href="https://github.com/supergreatwin/boudieeats/actions/workflows/pages.yml">Check deploy status</a></section>' +
-      '<section class="panel"><h2>Reader inbox</h2><a href="https://tally.so/forms">Open Tally dashboard (login required)</a><a href="' + feedback + '">View feedback form</a></section>' +
-      '<section class="panel"><h2>Site analytics</h2><a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener noreferrer">Open Google Analytics (authorized editors)</a><p>Visitor reports are private and require the connected Google account. Consent is required for tracking.</p></section><section class="panel"><h2>Newsletter</h2><a href="' + waitlist + '">Launch interest form</a><a href="https://github.com/supergreatwin/boudieeats/tree/main/editorial/newsletter">Newsletter drafts</a><p>Beehiiv sending is not connected to BoudieEats yet.</p></section></div>' +
-      '<p class="muted">Workflow: idea → draft → editorial review → approved pull request → deployment. No passwords, API keys, or private reader submissions are stored on this public page.</p>'
-  });
+
+  // Editorial routes are rendered ONLY by account-pages.mjs with Supabase Auth.
+  // Do not publish a GitHub-based public alternate desk or any staff-only links.
 
   const sitemapFile=join(directory,'sitemap.xml');
   const sitemap=readFileSync(sitemapFile,'utf8');
