@@ -37,7 +37,7 @@ const pages={
     ['Your account','Keep your login credentials confidential. Reader and contributor accounts cannot enter the staff Editorial Desk. Only verified editors and administrators are authorized to edit or publish official content. We may moderate abusive conduct and restrict access to protect the service.'],
     ['Food safety and allergens','Recipes and food suggestions are informational, not individualized medical or dietary advice. Ingredients, allergens and restaurant practices may vary. Verify them directly before eating, especially when allergies or dietary restrictions matter.'],
     ['Original material and submissions','Do not copy, republish or commercially use original Boudie Eats photography or editorial work without permission. Submit only content, photos and stories you have permission to share. Submitting an idea does not guarantee publication; the Editorial Desk reviews material before publication.'],
-    ['Free access','The site currently publishes free editorial content. There is no required paid subscription to read it or join the free email newsletter.'),
+    ['Free access','The site currently publishes free editorial content. There is no required paid subscription to read it or join the free email newsletter.'],
     ['Contact and updates','Use the <a href="/reader-responses/">reader contact form</a> for questions or reports. We may revise this notice as features change. Last updated: 21 November 2026.']
    ]
   }
