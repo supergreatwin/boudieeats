@@ -1,0 +1,43 @@
+name: Security and compliance prelaunch checks
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: tools/astro/package-lock.json
+      - name: Syntax validation
+        run: |
+          node --check tools/account-client.mjs
+          node --check tools/account-pages.mjs
+          node --check tools/engagement-pages.mjs
+          node --check tools/compliance-pages.mjs
+          node --check tools/verify-security-compliance.mjs
+      - name: Build staged site without deployment
+        env:
+          SITE_URL: https://boudieeats.com/
+          SITE_BASE_PATH: /
+          CF_PAGES: "1"
+          CF_PAGES_BRANCH: security-staging
+          BE_SUPABASE_URL: ${{ vars.BE_SUPABASE_URL }}
+          BE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.BE_SUPABASE_PUBLISHABLE_KEY }}
+        run: node tools/build-pages.mjs
+      - name: Check editorial permissions, routes, and legal notices
+        run: |
+          node tools/verify-security-compliance.mjs
+          node tools/verify-no-retired-brand.mjs
+          node tools/verify-bilingual.mjs
+          node tools/verify-accounts.mjs
+          node tools/verify-publishing.mjs
