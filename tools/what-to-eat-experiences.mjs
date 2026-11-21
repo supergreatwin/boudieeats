@@ -14,6 +14,7 @@ const loc=(x,name)=>x?.[name+(context?.ar?'_ar':'_en')]||x?.[name+'_en']||'';
 const label=x=>loc(x,'name')||loc(x,'title')||x?.slug||'';
 const rule=(key,fallback)=>{const val=Number(context?.state?.lab?.rules?.[key]);return Number.isFinite(val)&&val>=0&&val<=20?val:fallback;};
 const isPrivate=()=>context?.staff||context?.reviewer;
+const visibleModules=()=>modules.filter(m=>isPrivate()||Boolean((context?.state?.features||[]).find(f=>f.slug===m[0]&&f.status==='published'&&f.partner_reviewed)));
 const allowedFoods=()=> (context?.state?.foods||[]).filter(f=>isPrivate()?['draft','preview','published'].includes(f.status):f.status==='published'&&f.partner_reviewed);
 const verifyUrl=x=>{try{const u=new URL(x);return u.protocol==='https:'?u.href:'';}catch{return '';}};
 const options=(rows,chosen)=>rows.map(([id,text])=>'<option value="'+h(id)+'" '+(String(id)===String(chosen)?'selected':'')+'>'+h(text)+'</option>').join('');
@@ -91,7 +92,9 @@ export function rankFoods(foods,answers,weights={}){
  (a.mood==='curious'&&Number(f.adventurous)>=4?4:0)+
  (a.hunger==='large'&&Number(f.comfort)>=4?3:0)+
  (a.flavour&&(f.flavours||[]).includes(a.flavour)?8:0)+
- (a.texture&&(f.textures||[]).includes(a.texture)?7:0))}))
+ (a.texture&&(f.textures||[]).includes(a.texture)?7:0)+
+ (a.social==='group'&&(f.dietary_tags||[]).includes('shareable')?3:0)+
+ (a.social==='alone'&&(f.dietary_tags||[]).includes('single-serving')?3:0))}))
  .sort((x,y)=>y._score-x._score||x.slug.localeCompare(y.slug));
 }
 const state=()=>context.state;
@@ -109,7 +112,7 @@ function intro(){
  return '<section class="wte-x-home"><div class="wte-x-over">'+txt('PRIVATE COLLABORATION EXPERIMENTS','تجارب التعاون الخاصة')+'</div>'+
  '<h2 lang="en">WHAT TO<br>EAT<span>?</span></h2><p>'+txt('Seven connected experiences, from family favourites and restaurant discovery to playful food experiments.','سبع تجارب مترابطة من الأكل المفضل وترشيحات المطاعم لتجارب الأكل المبتكرة.')+'</p>'+
  '<button class="wte-x-primary" data-x-go="food-lab">'+txt('Take the Food Personality Test ↗','اختبر شخصية أكلك ↗')+'</button></section>'+
- '<div class="wte-x-grid">'+modules.map((m,i)=>'<button class="wte-x-module" data-x-go="'+m[0]+'"><small>0'+(i+1)+' / '+(feature(m[0])?.status||'draft').toUpperCase()+'</small><strong>'+h(txt(m[1],m[2]))+'</strong><span>↗</span></button>').join('')+'</div>';
+ '<div class="wte-x-grid">'+visibleModules().map((m,i)=>'<button class="wte-x-module" data-x-go="'+m[0]+'"><small>0'+(i+1)+' / '+(feature(m[0])?.status||'draft').toUpperCase()+'</small><strong>'+h(txt(m[1],m[2]))+'</strong><span>↗</span></button>').join('')+'</div>';
 }
 function foodCard(f){
  return '<article class="wte-x-food"><small>'+h(f.mode.toUpperCase())+' / '+h(loc(f,'cuisine')||'')+' / W'+h(f.weirdness)+'</small><strong>'+h(label(f))+'</strong><p>'+h(loc(f,'description')||'')+'</p>'+
@@ -133,7 +136,10 @@ function foodDetails(f){
  '</div></div><div class="wte-x-actions"><button class="wte-x-primary" data-x-save="'+h(f.id)+'">♡ '+txt('Save to Passport','احفظ في الباسبور')+'</button><button class="wte-x-secondary" data-x-tried="'+h(f.id)+'">'+txt('I tried it','جرّبتها')+'</button><button class="wte-x-secondary" data-x-share="'+h(f.id)+'">'+txt('Share ↗','شارك ↗')+'</button></div></section>';
 }
 function quizQuestion(name,en,arabic,opts,defaultValue){
- return '<label class="wte-x-field"><span>'+txt(en,arabic)+'</span><select name="'+name+'">'+options(opts,defaultValue)+'</select></label>';
+ const cfg=(context?.state?.lab?.questions||[]).find(q=>q?.id===name);
+ const title=cfg?txt(cfg.label_en||en,cfg.label_ar||arabic):txt(en,arabic);
+ const override=Array.isArray(cfg?.options)?cfg.options.filter(x=>opts.some(y=>String(y[0])===String(x.value))).map(x=>[x.value,txt(x.label_en||String(x.value),x.label_ar||String(x.value))]):[];
+ return '<label class="wte-x-field"><span>'+h(title)+'</span><select name="'+name+'">'+options(override.length===opts.length?override:opts,defaultValue)+'</select></label>';
 }
 function renderLab(){
  const foods=allowedFoods().filter(f=>mode==='all'||f.mode===mode);
@@ -222,7 +228,7 @@ function renderCommunity(){
 function home(){return intro()+'<div class="wte-x-homeend">'+renderPassport()+'</div>';}
 function current(){
  let html='<nav class="wte-x-tabs" aria-label="'+txt('What to Eat experiences','أقسام وات تو إيت')+'"><button data-x-go="home" class="'+(view==='home'?'active':'')+'">'+txt('HOME','الرئيسية')+'</button>'+
- modules.map(m=>'<button data-x-go="'+m[0]+'" class="'+(view===m[0]?'active':'')+'">'+h(txt(m[1],m[2]))+'</button>').join('')+'</nav>';
+ visibleModules().map(m=>'<button data-x-go="'+m[0]+'" class="'+(view===m[0]?'active':'')+'">'+h(txt(m[1],m[2]))+'</button>').join('')+'</nav>';
  if(view==='home')html+=home();
  else if(view==='food-lab')html+=renderLab()+renderCommunity()+renderPassport();
  else if(view==='what-map')html+=renderMap(true);
@@ -311,7 +317,7 @@ function controls(ev){
  const button=ev.target.closest('button');
  if(!button||!source?.contains(button))return;
  const d=button.dataset;
- if(d.xGo){view=d.xGo;query='';city='';selected=null;feedback='';paint();source.scrollIntoView({block:'start',behavior:'smooth'});return;}
+ if(d.xGo){if(d.xGo!=='home'&&!visibleModules().some(m=>m[0]===d.xGo))return;view=d.xGo;query='';city='';selected=null;feedback='';paint();source.scrollIntoView({block:'start',behavior:'smooth'});return;}
  if(d.xMode){mode=d.xMode;selected=null;previous=[];paint();return;}
  if(d.xFood){selected=findFood(d.xFood)||null;view='food-lab';paint();return;}
  if(d.xBack){selected=null;paint();return;}
@@ -331,13 +337,22 @@ async function formSubmit(e){
  if(e.target.id==='wte-x-quiz'){
   e.preventDefault();const fd=new FormData(e.target);
   answer=Object.fromEntries(fd.entries());answer.mode=mode;answer.weirdness=meter;
-  previous=[];suggest();paint();return;
+  previous=[];suggest();
+  if(state().user&&profile){
+   const p=state().passport||{};
+   const data={owner_id:state().user.id,saved_food_ids:p.saved_food_ids||[],tried_food_ids:p.tried_food_ids||[],explored_cuisines:p.explored_cuisines||[],last_archetype:profile[0],updated_at:new Date().toISOString()};
+   const result=await state().client.from('be_wte_passports').upsert(data,{onConflict:'owner_id'});
+   if(!result.error)state().passport=data;
+  }
+  paint();return;
  }
  if(e.target.id==='wte-x-idea'){e.preventDefault();if(busy)return;busy=true;try{await submitIdea(e.target);}catch(err){setStatus(err.message||err);}finally{busy=false;}}
 }
 export function mountExperienceGuide(ctx){
  context=ctx;const root=ctx.root;
  if(!root.querySelector('#wte-guide'))return;
+ const featureParam=new URLSearchParams(window.location.search).get('feature');
+ if(featureParam&&visibleModules().some(m=>m[0]===featureParam))view=featureParam;
  const host=document.createElement('section');host.id='wte-experiences';host.className='wte-x';
  root.insertBefore(host,root.querySelector('#wte-guide'));
  source=host;
