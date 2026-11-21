@@ -31,32 +31,40 @@ function mama(){
  '<div class="be-exp-box"><h2>'+lang('How a pick earns its place','إزاي بنختار')+'</h2><p>'+lang('Original tasting notes, consistency, value, disclosure of any commercial relationship, and final editorial approval. No restaurant currently carries this label.','تجربة أصلية، جودة ثابتة، قيمة مقابل سعر، إعلان واضح عن أي علاقة تجارية، وموافقة تحريرية. مفيش مكان واخد العلامة دي دلوقتي.')+'</p></div>'+empty(lang('First picks are under review','الترشيحات الأولى قيد المراجعة'),lang('Nothing is awarded or implied before verification.','مش هنمنح أي علامة قبل التحقق.')));
 }
 function finder(){
- const dishes=[
- {en:'Koshary',ar:'كشري',type:'egyptian',mood:'comfort',note:'Dish idea · no venue listed'},
- {en:'Ful medames',ar:'فول مدمس',type:'egyptian',mood:'comfort',note:'Dish idea · no venue listed'},
- {en:'Vermicelli with milk',ar:'شعرية باللبن',type:'dessert',mood:'sweet',note:'Explore the Boudie Eats recipes'},
- {en:'Taameya',ar:'طعمية',type:'egyptian',mood:'savory',note:'Dish idea · no venue listed'},
- {en:'Basbousa',ar:'بسبوسة',type:'dessert',mood:'sweet',note:'Dish idea · no venue listed'}
- ];
- return standard(lang('What are you craving?','نفسك في إيه؟'),lang('Try this working dish-search demo. These are food ideas, not fabricated restaurants or verified listings.','جرب البحث ده. دي أفكار أكلات مش مطاعم وهمية أو ترشيحات موثقة.'),'02',
- '<div class="be-exp-box"><div class="be-exp-filters"><label>'+lang('Dish or ingredient','أكلة أو مكون')+'<input id="be-dish-q" placeholder="'+lang('Try koshary, sweet...','جرب كشري أو حلويات...')+'"></label><label>'+lang('Cuisine','نوع المطبخ')+'<select id="be-dish-type"><option value="all">'+lang('All cuisines','كل المطابخ')+'</option><option value="egyptian">'+lang('Egyptian','مصري')+'</option><option value="dessert">'+lang('Desserts','حلويات')+'</option></select></label><label>'+lang('Mood','المود')+'<select id="be-dish-mood"><option value="all">'+lang('Any','أي مود')+'</option><option value="comfort">'+lang('Comfort','راحة')+'</option><option value="sweet">'+lang('Sweet','حلو')+'</option><option value="savory">'+lang('Savoury','حادق')+'</option></select></label></div></div><div class="be-exp-ideas" id="be-dish-results"></div>'+link(lang('See original recipes','شوف الوصفات الأصلية'),base+(ar?'ar/':'')+'recipes/',true));
+ return standard(lang('What are you craving?','نفسك في إيه؟'),
+  lang('Search Boudie Eats dishes that have passed editorial review. Nothing is presented as tested until it is approved.','دور على أكلات بودي إيتس اللي اتراجعت تحريرياً. مش هنقدم تجربة على إنها متجربة قبل المراجعة.'),'02',
+  '<div class="be-exp-box"><div class="be-exp-filters">'+
+  '<label>'+lang('Dish or ingredient','أكلة أو مكون')+'<input id="be-dish-q" placeholder="'+lang('Search dishes…','دور على أكلة…')+'"></label>'+
+  '<label>'+lang('Cuisine','نوع المطبخ')+'<select id="be-dish-type"><option value="all">'+lang('All cuisines','كل المطابخ')+'</option><option value="egyptian">'+lang('Egyptian','مصري')+'</option><option value="dessert">'+lang('Desserts','حلويات')+'</option></select></label>'+
+  '<label>'+lang('Mood','المود')+'<select id="be-dish-mood"><option value="all">'+lang('Any','أي مود')+'</option><option value="comfort">'+lang('Comfort','راحة')+'</option><option value="sweet">'+lang('Sweet','حلو')+'</option><option value="savory">'+lang('Savoury','حادق')+'</option></select></label>'+
+  '</div></div><div class="be-exp-ideas" id="be-dish-results" role="status" aria-live="polite"></div>'+
+  link(lang('Explore all recipes','شوف الوصفات'),base+(ar?'ar/':'')+'recipes/',true));
 }
 function city(){
- return standard(lang('Find your next food stop.','اختار مكان أكلتك الجاية.'),lang('A restaurant directory filtered by city, district, cuisine and budget. Only reviewed, rights-cleared entries will become public.','دليل مطاعم بفلتر المدينة والمنطقة والمطبخ والسعر. مش هننشر إلا الأماكن المتراجعة واللي ليها حقوق نشر واضحة.'),'03',
- '<div class="be-exp-box"><div class="be-exp-filters"><label>'+lang('City','المدينة')+'<select id="be-city"><option>'+lang('All cities','كل المدن')+'</option><option>'+lang('Cairo','القاهرة')+'</option><option>'+lang('Alexandria','الإسكندرية')+'</option><option>'+lang('Ismailia','الإسماعيلية')+'</option></select></label><label>'+lang('Cuisine','المطبخ')+'<select id="be-cuisine"><option>'+lang('All cuisines','كل المطابخ')+'</option><option>'+lang('Egyptian','مصري')+'</option><option>'+lang('International','عالمي')+'</option><option>'+lang('Coffee & cafés','قهوة وكافيهات')+'</option></select></label><label>'+lang('Budget','الميزانية')+'<select id="be-price"><option>'+lang('Any budget','كل الأسعار')+'</option><option>'+lang('Budget','اقتصادي')+'</option><option>'+lang('Moderate','متوسط')+'</option><option>'+lang('Premium','مرتفع')+'</option></select></label></div></div>'+empty(lang('0 verified listings in the new guide','مفيش أماكن متراجعة في الدليل الجديد لسه'),lang('Filters are ready for editorial data. Existing Boudie Eats reviews remain available separately.','الفلاتر جاهزة لإضافة البيانات من التحرير. المراجعات الحالية موجودة في قسم التجارب.'))+link(lang('Read existing reviews','اقرأ التجارب الحالية'),base+(ar?'ar/':'')+'reviews/',true));
+ return standard(lang('Find your next food stop.','اختار مكان أكلتك الجاية.'),
+ lang('Verified first-hand reviews, organized by city and cuisine. A place appears only after editorial approval.','تجارب حقيقية متراجعة حسب المدينة والمطبخ. المكان مش بيظهر قبل موافقة التحرير.'),'03',
+ '<div class="be-exp-box"><div class="be-exp-filters"><label>'+lang('City','المدينة')+'<select id="be-city"><option value="all">'+lang('All cities','كل المدن')+'</option></select></label>'+
+ '<label>'+lang('Cuisine','المطبخ')+'<select id="be-cuisine"><option value="all">'+lang('All cuisines','كل المطابخ')+'</option></select></label>'+
+ '<label>'+lang('Budget','الميزانية')+'<select id="be-price"><option value="all">'+lang('Any budget','كل الأسعار')+'</option><option value="budget">'+lang('Budget','اقتصادي')+'</option><option value="mid">'+lang('Moderate','متوسط')+'</option><option value="premium">'+lang('Premium','مرتفع')+'</option></select></label>'+
+ '</div></div><div id="be-city-results" class="be-exp-ideas" role="status" aria-live="polite"></div>'+
+ link(lang('Read original reviews','اقرأ التجارب الأصلية'),base+(ar?'ar/':'')+'reviews/',true));
 }
 function gallery(){
- return standard(lang('Food looks better when it is real.','الأكل الحقيقي أحلى في الصور.'),lang('Original photography, made by the people who lived the meal. No generated images, stock galleries or unlicensed uploads.','صور أصلية من الناس اللي عاشوا التجربة. لا صور مولدة ولا ستوك ولا صور من غير إذن.'),'04',
- '<div class="be-exp-gallery"><div class="be-exp-frame">'+lang('Original photo slot 01','مكان صورة أصلية ١')+'</div><div class="be-exp-frame">'+lang('Original photo slot 02','مكان صورة أصلية ٢')+'</div><div class="be-exp-frame">'+lang('Community photo · pending consent','صورة من المجتمع · بعد الموافقة')+'</div></div><p>'+lang('The finished gallery will include photo credits, alt text and permission tracking.','الألبوم النهائي هيظهر اسم المصور والوصف النصي وحالة الإذن.')+'</p>');
+ return standard(lang('Food looks better when it is real.','الأكل الحقيقي أحلى في الصور.'),
+ lang('Original Boudie Eats and contributor photography, shown only after permission and editorial review.','صور أصلية من بودي إيتس والمشاركين، بتظهر بعد الإذن والمراجعة.'),'04',
+ '<div class="be-exp-gallery" id="be-gallery-results" aria-live="polite"></div>');
 }
 function spotlight(){
- return standard(lang('The people behind the plate.','الناس اللي ورا الطبق.'),lang('Stories of home cooks, food makers and creators, published with their explicit participation.','حكايات ناس بتطبخ وبتصنع أكل وبتحكي عنه، بمشاركتهم وموافقتهم.'),'05',
- empty(lang('Spotlight submissions are being prepared','بنجهّز مشاركات سبوتلايت'),lang('Contributor pitches can start through the existing Boudie Eats account workflow; publication still requires editorial approval.','تقدر تبعت فكرة من حساب بودي إيتس، والنشر بعد موافقة التحرير فقط.'))+link(lang('My account / contribute','حسابي والمشاركة'),base+(ar?'ar/':'')+'account/'));
+ return standard(lang('The people behind the plate.','الناس اللي ورا الطبق.'),
+ lang('A place for independently reviewed stories of food makers and home cooks.','مساحة لحكايات الطهاة وأصحاب الأكل بعد المراجعة المستقلة.'),'05',
+ '<div id="be-spotlight-results" aria-live="polite"></div>'+link(lang('Pitch a story','ابعت حكاية'),base+(ar?'ar/':'')+'account/',true));
 }
 function passport(){
- return standard(lang('A passport for your appetite.','جواز سفر لذوقك في الأكل.'),lang('Collect visits, saved recipes and themed achievements. The demo stamp below is temporary and is not stored in your account.','اجمع تجاربك ووصفاتك المحفوظة وشاراتك. الختم التجريبي مش بيتحفظ في حسابك.'),'06',
- '<div class="be-exp-passport"><p class="be-exp-small">'+lang('SAMPLE PASSPORT · DEMO','جواز سفر تجريبي')+'</p><h2>'+lang('Your food journey starts here.','رحلتك مع الأكل بتبدأ هنا.')+'</h2><p id="be-stamp-count">'+lang('0 demo stamps','٠ أختام تجريبية')+'</p><button id="be-stamp">'+lang('Try a demo stamp','جرب ختم تجريبي')+'</button><p><small>'+lang('Actual badges will require signed-in accounts and verified actions.','الشارات الحقيقية هتحتاج حساب وتوثيق النشاط.')+'</small></p></div>');
+ return standard(lang('A passport for your appetite.','جواز سفر لذوقك في الأكل.'),
+ lang('Sign in to save approved dishes in your private Boudie Eats passport. Every change is stored under your own account.','سجّل دخولك عشان تحفظ الأكلات المتراجعة في جواز سفر بودي إيتس، وكل حساب بيشوف بياناته بس.'),'06',
+ '<div class="be-exp-passport" id="be-passport-results" aria-live="polite"><p>'+lang('Checking your account…','بنفحص حسابك…')+'</p></div>');
 }
+
 function lab(){
  const q=(name,title,opts)=>'<fieldset class="be-exp-question"><legend>'+esc(title)+'</legend><div class="be-exp-options">'+opts.map((o,i)=>'<label><input type="radio" name="'+name+'" value="'+esc(o[0])+'" '+(i===0?'checked':'')+'>'+esc(o[1])+'</label>').join('')+'</div></fieldset>';
  return standard(lang('Boudie Food Personality Lab','معمل شخصية الأكل من بودي'),lang('A playful quiz about how you eat, not a validated psychological assessment. Try the working recommendation engine below.','اختبار خفيف عن ذوقك في الأكل، مش تقييم نفسي علمي. جرب محرك الترشيحات ده.'),'07',
@@ -64,28 +72,31 @@ function lab(){
 }
 const render={home,mama: mama,'mama-picks':mama,'dish-finder':finder,'city-guide':city,gallery,spotlight,passport,'food-lab':lab};
 root.innerHTML=(render[slug]||home)();
+// All published records are retrieved through Supabase RLS; unpublished
+// venue, food, contributor, or photo records cannot appear in this UI.
+const cfg=window.BE_DISCOVER_CONFIG||{};
+const store={foods:[],places:[],terms:[],photos:[],sections:[],badges:[],loaded:false,failed:false};
+let updateDishes=()=>{};
 const dishQuery=document.getElementById('be-dish-q');
 if(dishQuery){
- const dishes=[
- {en:'Koshary',ar:'كشري',type:'egyptian',mood:'comfort'},
- {en:'Ful medames',ar:'فول مدمس',type:'egyptian',mood:'comfort'},
- {en:'Vermicelli with milk',ar:'شعرية باللبن',type:'dessert',mood:'sweet'},
- {en:'Taameya',ar:'طعمية',type:'egyptian',mood:'savory'},
- {en:'Basbousa',ar:'بسبوسة',type:'dessert',mood:'sweet'}
- ];
  const refresh=()=>{
   const q=dishQuery.value.trim().toLocaleLowerCase();
   const type=document.getElementById('be-dish-type').value,mood=document.getElementById('be-dish-mood').value;
-  const list=dishes.filter(d=>(!q||(d.en+' '+d.ar).toLocaleLowerCase().includes(q))&&(type==='all'||d.type===type)&&(mood==='all'||d.mood===mood));
-  document.getElementById('be-dish-results').innerHTML=list.length?list.map(d=>'<div class="be-exp-idea"><strong>'+esc(lang(d.en,d.ar))+'</strong><small>'+lang('Food idea · not a verified venue','فكرة أكلة · مش مطعم موثّق')+'</small></div>').join(''):empty(lang('No matches','مفيش نتائج'),lang('Try another craving or filter.','جرب كلمة أو فلتر تاني.'));
+  const dishes=store.foods.map(d=>({
+   id:d.id,en:d.name_en,ar:d.name_ar,desc:lang(d.description_en,d.description_ar),
+   type:Number(d.sweet)>=4?'dessert':/egyptian/i.test(d.cuisine_en)?'egyptian':'other',
+   mood:Number(d.sweet)>=4?'sweet':Number(d.comfort)>=4?'comfort':'savory',
+   href:d.recipe_url
+  }));
+  const list=dishes.filter(d=>(!q||(d.en+' '+d.ar+' '+d.desc).toLocaleLowerCase().includes(q))&&(type==='all'||d.type===type)&&(mood==='all'||d.mood===mood));
+  document.getElementById('be-dish-results').innerHTML=list.length?list.map(d=>
+   '<article class="be-exp-idea"><strong>'+esc(lang(d.en,d.ar))+'</strong><p>'+esc(d.desc)+'</p>'+
+   (safeUrl(d.href)?link(lang('Read verified recipe','اقرأ الوصفة الأصلية'),d.href,true):'')+'</article>'
+  ).join(''):empty(store.loaded?lang('No approved dishes match','مفيش أكلات متراجعة مطابقة'):lang('Loading approved dishes…','جاري تحميل الأكلات المتراجعة…'),
+   store.loaded?lang('Try a different search or browse our original recipes.','جرب بحث تاني أو شوف وصفاتنا الأصلية.'):lang('Only approved records appear here.','المحتوى المتراجع بس هو اللي بيظهر.'));
  };
- ['be-dish-q','be-dish-type','be-dish-mood'].forEach(id=>document.getElementById(id).addEventListener('input',refresh));refresh();
-}
-const stamp=document.getElementById('be-stamp');if(stamp){
- let count=0;stamp.addEventListener('click',()=>{
- count=Math.min(count+1,9);
- document.getElementById('be-stamp-count').textContent=lang(count+' demo stamp'+(count===1?'':'s'),count+' ختم تجريبي');
- });
+ ['be-dish-q','be-dish-type','be-dish-mood'].forEach(id=>document.getElementById(id).addEventListener('input',refresh));
+ updateDishes=refresh;refresh();
 }
 const form=document.getElementById('be-lab-form');if(form){
  form.addEventListener('submit',(e)=>{
