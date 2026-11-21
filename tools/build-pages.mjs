@@ -15,6 +15,7 @@ import { addCompliancePages } from './compliance-pages.mjs';
 import { finishResponsiveLayout } from './responsive-finish.mjs';
 import { addBoudieExperiences } from './boudie-experiences-pages.mjs';
 import { launchBoudieDiscovery } from './launch-discovery.mjs';
+import { addMemberSession } from './member-session-pages.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -126,6 +127,10 @@ addBoudieExperiences({ directory: dist, basePath: originalBase,
 addCompliancePages({ directory: dist });
 // Owner-approved public release of seven bilingual food experiences.
 launchBoudieDiscovery({ directory: dist });
+// Main-site account modal: signed-in username and members-only Discover links.
+addMemberSession({ directory: dist, basePath: originalBase,
+  supabaseUrl: process.env.BE_SUPABASE_URL || bePublicConfig.url,
+  supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey });
 // Last-mile responsive polish: phones, tablets, desktops and reduced-motion users.
 finishResponsiveLayout({ directory: dist });
 // Cancelled collaboration routes and assets are deliberately not generated.
