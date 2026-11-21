@@ -130,7 +130,7 @@ function foodDetails(f){
  (f.image_url&&f.image_rights_confirmed&&verifyUrl(f.image_url)?'<img class="wte-x-detail-photo" src="'+h(verifyUrl(f.image_url))+'" alt="'+h(label(f))+'">':'<div class="wte-x-photo-empty">'+txt('Original photograph pending','الصورة الأصلية لم تُرفق')+'</div>')+
  (recipe?'<p><a href="'+h(recipe)+'" target="_blank" rel="noopener">'+txt('Boudie Eats recipe ↗','وصفة بودي إيتس ↗')+'</a></p>':'<p>'+txt('Verified recipe not yet linked.','لسه مفيش وصفة موثقة مرتبطة.')+'</p>')+
  (related?'<p><button class="wte-x-secondary" data-x-go="where-map">'+txt('Verified place','المكان الموثق')+': '+h(label(related))+'</button></p>':'<p>'+txt('No verified restaurant match. Explore the Where to Eat directory.','لا يوجد مطعم موثق مطابق. جرّب دليل ناكل فين.')+'</p>')+
- '</div></div><div class="wte-x-actions"><button class="wte-x-primary" data-x-save="'+h(f.id)+'">♡ '+txt('Save to Passport','احفظ في الباسبور')</button><button class="wte-x-secondary" data-x-tried="'+h(f.id)+'">'+txt('I tried it','جرّبتها')</button><button class="wte-x-secondary" data-x-share="'+h(f.id)+'">'+txt('Share ↗','شارك ↗')+'</button></div></section>';
+ '</div></div><div class="wte-x-actions"><button class="wte-x-primary" data-x-save="'+h(f.id)+'">♡ '+txt('Save to Passport','احفظ في الباسبور')+'</button><button class="wte-x-secondary" data-x-tried="'+h(f.id)+'">'+txt('I tried it','جرّبتها')+'</button><button class="wte-x-secondary" data-x-share="'+h(f.id)+'">'+txt('Share ↗','شارك ↗')+'</button></div></section>';
 }
 function quizQuestion(name,en,arabic,opts,defaultValue){
  return '<label class="wte-x-field"><span>'+txt(en,arabic)+'</span><select name="'+name+'">'+options(opts,defaultValue)+'</select></label>';
