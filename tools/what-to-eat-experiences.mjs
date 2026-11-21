@@ -265,6 +265,8 @@ function suggest(another=false){
  if(!next){selected=null;feedback=txt('No eligible recommendations. Food with unverified ingredients is excluded when you enter allergies, disliked ingredients or dietary restrictions.','مفيش ترشيحات مناسبة. الأكلات بمكونات غير موثقة مستبعدة عند وجود حساسية أو مكونات مرفوضة أو نظام غذائي محدد.');}
  else{selected=next;previous.push(next.id);feedback=txt('Ranked by your preferences. Exact ingredients and allergens may still be unverified.','النتائج محسوبة حسب تفضيلاتك. المكونات ومسببات الحساسية ممكن تفضل غير موثقة.');}
  profile=archetype(answer);
+ const override=(state().lab?.archetypes||[]).find(x=>x?.id===profile[0]);
+ if(override)profile=[profile[0],override.label_en||profile[1],override.label_ar||profile[2]];
 }
 async function savePassport(foodId,field){
  if(!state().user){feedback=txt('Sign in with your own account to save your Taste Passport.','سجّل بحسابك عشان تحفظ باسبور الطعم.');paint();return;}
@@ -375,6 +377,7 @@ function editorMarkup(){
  const s=state(),foods=s.foods||[],chosen=foods.find(x=>x.id===selectedFood)||null,features=s.features||[];
  let html='<div class="wte-x-editor"><div class="wte-x-over">PRIVATE CONTENT STUDIO / SUPABASE RLS</div><h2>'+txt('Seven experiences and Food Lab','السبع تجارب ومعمل الأكل')+'</h2><p>'+txt('All data is private by default. Draft, preview, published, archived and hidden states are editable. Global public switches remain separate.','كل البيانات خاصة. يمكن تعديل المسودة والمعاينة والمنشور والمؤرشف والمخفي. مفاتيح النشر العام منفصلة.')+'</p>';
  html+='<section class="wte-x-editorpanel"><h3>'+txt('Feature controls','التحكم في الأقسام')+'</h3><div class="wte-x-editrows">'+features.map(f=>'<form class="wte-x-editrow" data-x-form="feature" data-id="'+h(f.slug)+'"><strong>'+h(loc(f,'title'))+'</strong>'+
+ multi('title_en','Title EN',f.title_en)+multi('title_ar','Title AR',f.title_ar)+multi('intro_en','Intro EN',f.intro_en)+multi('intro_ar','Intro AR',f.intro_ar)+
  select('status',txt('State','الحالة'),[['draft','Draft'],['preview','Preview'],['published','Published'],['archived','Archived'],['hidden','Hidden']],f.status)+
  '<label><input type="checkbox" name="partner_reviewed" '+(f.partner_reviewed?'checked':'')+'> '+txt('Partner reviewed','مراجعة الشريك')+'</label><button type="submit" class="wte-x-secondary">'+txt('Save','حفظ')+'</button></form>').join('')+'</div></section>';
  html+='<section class="wte-x-editorpanel"><h3>'+txt('Manage food recommendations','إدارة ترشيحات الأكل')+'</h3><label class="wte-x-field"><span>'+txt('Select food to edit','اختار أكلة للتعديل')+'</span><select id="wte-x-food-select">'+options([['',txt('Create new food record','إضافة أكلة جديدة')],...foods.map(x=>[x.id,x.name_en])],selectedFood)+'</select></label>'+
@@ -394,6 +397,7 @@ function editorMarkup(){
  field('sweet','Sweetness 1–5',chosen?.sweet??3,'number')+
  field('spice','Spice 0–5',chosen?.spice??1,'number')+
  field('prep_minutes','Prep minutes (optional)',chosen?.prep_minutes??'','number')+
+ multi('testing_notes','Testing notes / internal source',chosen?.testing_notes||'')+
  select('price_band','Price',[['','Unknown'],['budget','Budget'],['mid','Mid-range'],['premium','Premium']],chosen?.price_band||'')+
  field('recipe_url','Verified recipe HTTPS URL',chosen?.recipe_url||'')+
  select('place_id','Verified place',[['','No place linked'],...(s.places||[]).map(p=>[p.id,p.name_en])],chosen?.place_id||'')+
@@ -435,7 +439,7 @@ async function saveEditorial(form){
  const fd=new FormData(form),data=Object.fromEntries(fd.entries()),table=form.dataset.xForm;
  const client=state().client;
  if(table==='feature'){
-  const body={status:data.status,partner_reviewed:fd.has('partner_reviewed'),updated_at:new Date().toISOString()};
+  const body={title_en:data.title_en,title_ar:data.title_ar,intro_en:data.intro_en,intro_ar:data.intro_ar,status:data.status,partner_reviewed:fd.has('partner_reviewed'),updated_at:new Date().toISOString()};
   const {error}=await client.from('be_wte_features').update(body).eq('slug',form.dataset.id);if(error)throw error;
  }else if(table==='food'){
   if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug||''))throw Error('Use a lowercase slug.');
@@ -447,7 +451,7 @@ async function saveEditorial(form){
   for(const x of ['tested','partner_reviewed','image_rights_confirmed','ingredients_verified'])data[x]=fd.has(x);
   if(data.recipe_url&&!verifyUrl(data.recipe_url))throw Error('Only HTTPS recipe URLs are allowed.');
   if(data.image_url&&!data.image_url.startsWith('storage:')&&!verifyUrl(data.image_url))throw Error('Only approved image paths or HTTPS URLs are allowed.');
-  if(data.tested&&!data.ingredients_verified)throw Error('Verify ingredients before marking a food tested.');
+  if(data.tested&&(!data.ingredients_verified||!String(data.testing_notes||'').trim()))throw Error('Verified ingredients and testing evidence required for tested foods.');
   if(data.status==='published'&&!data.partner_reviewed)throw Error('Partner review required.');
   const q=selectedFood?client.from('be_wte_foods').update(data).eq('id',selectedFood):client.from('be_wte_foods').insert(data);
   const {error}=await q;if(error)throw error;
