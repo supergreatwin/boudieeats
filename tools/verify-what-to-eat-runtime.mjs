@@ -1,7 +1,10 @@
 import {readFileSync} from 'node:fs';
 import {runInNewContext,createContext,runInContext} from 'node:vm';
 import assert from 'node:assert/strict';
-const source=readFileSync(new URL('./what-to-eat-client.mjs',import.meta.url),'utf8').replace(/\nmain\(\);\s*$/,'');
+const source=readFileSync(new URL('./what-to-eat-client.mjs',import.meta.url),'utf8')
+ .replace(/^import \{mountExperienceGuide,mountExperienceStudio\} from '\.\/be-what-to-eat-experiences\.js';\s*/,'')
+ .replace(/\nmain\(\);\s*$/,'')
+ + '\nconst mountExperienceGuide=()=>{},mountExperienceStudio=()=>{};';
 assert(!source.endsWith('main();'),'Must remove startup before isolated tests.');
 const els=new Map(),el=id=>{if(!els.has(id))els.set(id,{innerHTML:'',textContent:'',dataset:{}});return els.get(id);};
 const root=el('wte-root');root.addEventListener=()=>{};
