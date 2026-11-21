@@ -9,6 +9,7 @@ const root=document.getElementById('be-account-app');
 const status=document.getElementById('be-account-status');
 const base=config.basePath||'/';
 const here=location.origin+base+(ar?'ar/':'')+(document.body.dataset.mode==='desk'?'editorial-desk/':'account/');
+let lastResetAttemptAt=0;
 let client=null, user=null, profile=null, staffAuthorized=false, tab=document.body.dataset.mode==='desk'?'articles':'profile', authMode='login', recovery=false, refreshing=false;
 
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -674,9 +675,18 @@ root.addEventListener('submit',async event=>{
     say(tr('Check your email for a confirmation link before signing in.','راجع بريدك لتأكيد الحساب قبل تسجيل الدخول.'));return;
   }
   if(action==='forgot'){
-    const {error}=await client.auth.resetPasswordForEmail(value(form,'email'),{redirectTo:here+'?mode=reset'});
-    if(error)throw error;
-    say(tr('If the address is registered, a reset message will be sent.','لو البريد مسجّل، هتوصلك رسالة استعادة كلمة المرور.'));return;
+    const generic=tr('If the address is registered and eligible, a reset email will be sent.','لو البريد مسجّل والطلب مسموح، هتوصلك رسالة استعادة كلمة المرور.');
+    // Browser cooldown improves UX; the Supabase Edge Function independently
+    // enforces transactional 60-second/email and hourly email/IP quotas.
+    if(Date.now()-lastResetAttemptAt<60_000){say(generic);return;}
+    const response=await fetch(config.url.replace(/\/$/,'')+'/functions/v1/be-request-password-reset',{
+      method:'POST',headers:{'Content-Type':'application/json','apikey':config.publishableKey},
+      body:JSON.stringify({email:value(form,'email'),locale:ar?'ar':'en'}),
+      cache:'no-store'
+    });
+    if(!response.ok)throw Error(tr('Unable to request a reset right now. Please try later.','تعذّر إرسال طلب الاستعادة حاليًا، جرّب بعدين.'));
+    lastResetAttemptAt=Date.now();
+    say(generic);return;
   }
   if(action==='recovery'){
     const pass=value(form,'password');if(pass.length<12)throw Error(tr('Password is too short.','كلمة المرور قصيرة.'));
