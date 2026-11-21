@@ -17,7 +17,7 @@ function render({arabic,desk,base,config}){
    '<a href="'+localBase+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
    '<a href="'+localBase+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
    '<a href="'+localBase+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
-   '<a href="'+localBase+'account/">'+(arabic?'حسابي':'My account')+'</a>'+
+   '<a href="'+localBase+'account/">'+(arabic?'دخول / حساب جديد':'Sign in / Sign up')+'</a>'+
    '')+'</nav></div></header>'+
  '<main class="be-shell be-main"><p class="be-overline">'+(arabic?'المجتمع والتحرير':'COMMUNITY & EDITORIAL')+'</p><h1>'+title+'.</h1>'+
  '<p class="be-intro">'+description+'</p><div id="be-account-status" class="be-status" role="status" aria-live="polite"></div><div id="be-account-app"></div></main>'+
