@@ -14,6 +14,7 @@ import { addPublishedPages } from './published-pages.mjs';
 import { addCompliancePages } from './compliance-pages.mjs';
 import { finishResponsiveLayout } from './responsive-finish.mjs';
 import { addBoudieExperiences } from './boudie-experiences-pages.mjs';
+import { launchBoudieDiscovery } from './launch-discovery.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -116,13 +117,15 @@ addPublishedPages({
 finishLanguageLinks({ directory: dist, basePath: originalBase });
 // Apply responsive brand-safe corrections to both complete language editions.
 polishVisitorPages({ directory: dist, basePath: originalBase });
-// Seven Boudie Eats experiences: noindex and unlinked until the editor-approved
-// venue, food, photo, spotlight and passport launch gates pass.
+// Seven public Boudie Eats experiences. Unapproved data remains excluded by
+// Supabase RLS regardless of which routes are navigable.
 addBoudieExperiences({ directory: dist, basePath: originalBase,
   supabaseUrl: process.env.BE_SUPABASE_URL || bePublicConfig.url,
   supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey });
 // Security response headers and bilingual privacy, cookies and terms.
 addCompliancePages({ directory: dist });
+// Public seven-experience launch, after legal notices and before responsive CSS.
+launchBoudieDiscovery({ directory: dist });
 // Last-mile responsive polish: phones, tablets, desktops and reduced-motion users.
 finishResponsiveLayout({ directory: dist });
 // Cancelled collaboration routes and assets are deliberately not generated.
