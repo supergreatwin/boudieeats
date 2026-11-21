@@ -24,6 +24,6 @@ if(!desk.includes('be-account.js') || !desk.includes('data-mode="desk"'))errors.
 const account=readFileSync(join(dir,'account/index.html'),'utf8');
 if(!account.includes('be-account.js') || !account.includes('data-mode="account"'))errors.push('Independent account page missing');
 const signup=readFileSync(join(dir,'newsletter-signup/index.html'),'utf8');
-if(!signup.includes('not issuing active email subscriptions'))errors.push('Newsletter status transparency missing');
+if(!signup.includes('free Boudie Eats newsletter')||!signup.includes('explicit choice'))errors.push('Free newsletter consent wording missing');
 if(errors.length){console.error(errors.join('\n\n').slice(0,14500));process.exit(1);}
 console.log('PASS: '+files.length+' English-LTR pages; no Arabic text found; reader forms and editorial routes present.');
