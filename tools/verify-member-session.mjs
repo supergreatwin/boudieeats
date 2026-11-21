@@ -21,7 +21,10 @@ for(const [prefix,form] of [['','vXDORl'],['ar/','7XK9Dz']]){
  if(!homepage.includes('class="be-member-logout"')&&js.includes('be-member-logout')===false)issues.push('Logout not provided');
  const visitor=read(prefix+'recipes/index.html');
  if(!visitor.includes('be-member.js')||!visitor.includes('be-account-nav'))issues.push('Member header not added to '+prefix+'recipes');
- for(const privateRoute of ['account/','editorial-desk/','discover/']){
+ const discovery=read(prefix+'discover/index.html');
+ if(!discovery.includes('be-member.js')||!discovery.includes('class="be-account-nav"'))
+  issues.push('Member header missing on Discover '+prefix);
+ for(const privateRoute of ['account/','editorial-desk/']){
   const privatePage=read(prefix+privateRoute+'index.html');
   if(privatePage.includes('be-member.js'))issues.push('Extra member UI overrides protected route '+prefix+privateRoute);
  }
