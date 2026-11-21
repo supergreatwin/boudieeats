@@ -5,8 +5,8 @@ const deskCss='<style>'+"\nbody[data-mode=\"desk\"] .be-top{background:#fffcf6}\
 const esc=v=>String(v).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 function render({arabic,desk,base,config}){
  const language=arabic?'ar-EG':'en',direction=arabic?'rtl':'ltr';
- const title=desk?(arabic?'مكتب التحرير':'Editorial desk'):(arabic?'حسابي':'My account');
- const description=desk?(arabic?'مساحة خاصة للمقالات والمراجعات وطلبات المساهمة.':'A private workspace for contributors, review queues and assignments.'):(arabic?'حسابك المستقل في بودي إيتس. اسم مستخدم وملف شخصي ومساهمات خاصة.':'Your independent BoudieEats account, username, profile and private submissions.');
+ const title=desk?(arabic?'مكتب التحرير':'Editorial desk'):(arabic?'دخول / حساب جديد':'Sign in / Sign up');
+ const description=desk?(arabic?'مساحة خاصة للمحررين والمديرين المصرح لهم فقط.':'Restricted workspace for verified editors and administrators only.'):(arabic?'حسابك المستقل في بودي إيتس. اسم مستخدم وملف شخصي ومساهمات خاصة.':'Your independent BoudieEats account, username, profile and private submissions.');
  const localBase=base+(arabic?'ar/':'');
  const publicConfig=JSON.stringify({url:config.url||'',publishableKey:config.key||'',basePath:base}).replace(/</g,'\\u003c');
  return '<!doctype html><html lang="'+language+'" dir="'+direction+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#315b4b">'+
@@ -17,8 +17,8 @@ function render({arabic,desk,base,config}){
    '<a href="'+localBase+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
    '<a href="'+localBase+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
    '<a href="'+localBase+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
-   '<a href="'+localBase+'account/">'+(arabic?'حسابي':'My account')+'</a>'+
-   '<a href="'+localBase+'editorial-desk/">'+(arabic?'مكتب التحرير':'Editorial desk')+'</a>')+'</nav></div></header>'+
+   '<a href="'+localBase+'account/">'+(arabic?'دخول / حساب جديد':'Sign in / Sign up')+'</a>'+
+   '')+'</nav></div></header>'+
  '<main class="be-shell be-main"><p class="be-overline">'+(arabic?'المجتمع والتحرير':'COMMUNITY & EDITORIAL')+'</p><h1>'+title+'.</h1>'+
  '<p class="be-intro">'+description+'</p><div id="be-account-status" class="be-status" role="status" aria-live="polite"></div><div id="be-account-app"></div></main>'+
  '<footer class="be-footer"><div class="be-shell"><span>© BoudieEats</span><span>'+(arabic?'يومية أكل مصرية.':'An Egyptian food journal.')+'</span></div></footer>'+
@@ -42,10 +42,11 @@ export function addAccountPages({directory,basePath='/',supabaseUrl='',supabaseP
   if(!html.includes('</header>'))continue;
   const arabic=entry.startsWith('ar/');
   const link=base+(arabic?'ar/':'')+'account/';
-  const label=arabic?'حسابي':'My account';
+  const label=arabic?'دخول / حساب جديد':'Sign in / Sign up';
   const menuStyle='<style>.be-account-nav{display:inline-flex;margin:8px;padding:8px 14px;border:1px solid currentColor;border-radius:6px;text-decoration:none;font-weight:700}</style>';
   html=html.replace('</head>',menuStyle+'</head>');
   html=html.replace('</header>','<a class="be-account-nav" href="'+link+'">'+label+'</a></header>');
+  if(html.includes('</footer>'))html=html.replace('</footer>','<a class="be-account-nav" href="'+link+'">'+label+'</a></footer>');
   writeFileSync(file,html);
  }
 }

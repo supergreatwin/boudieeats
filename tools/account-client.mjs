@@ -9,7 +9,8 @@ const root=document.getElementById('be-account-app');
 const status=document.getElementById('be-account-status');
 const base=config.basePath||'/';
 const here=location.origin+base+(ar?'ar/':'')+(document.body.dataset.mode==='desk'?'editorial-desk/':'account/');
-let client=null, user=null, profile=null, tab=document.body.dataset.mode==='desk'?'articles':'profile', authMode='login', recovery=false, refreshing=false;
+let lastResetAttemptAt=0;
+let client=null, user=null, profile=null, staffAuthorized=false, tab=document.body.dataset.mode==='desk'?'articles':'profile', authMode='login', recovery=false, refreshing=false;
 
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const roleLabel=r=>({
@@ -21,8 +22,8 @@ const roleLabel=r=>({
 function say(message,error=false){status.textContent=message||'';status.dataset.error=error?'true':'false';}
 function button(label,action,klass=''){return '<button type="button" class="'+klass+'" data-action="'+action+'">'+label+'</button>';}
 const showProfile=()=>tab==='profile';
-const isStaff=()=>profile&&['editor','admin'].includes(profile.role);
-const canWrite=()=>profile&&['contributor','editor','admin'].includes(profile.role);
+const isStaff=()=>staffAuthorized===true&&profile&&['editor','admin'].includes(profile.role)&&!!user?.email_confirmed_at;
+const canWrite=()=>isStaff();
 const value=(form,name)=>String(new FormData(form).get(name)||'').trim();
 function formFrame(type,fields,buttonText){
  return '<form data-form="'+type+'" class="be-form">'+fields+'<button class="be-primary" type="submit">'+buttonText+'</button></form>';
@@ -53,11 +54,12 @@ function authPanel(){
   '<div class="be-actions">'+button(tr('Create account','إنشاء حساب'),'signup')+button(tr('Forgot password?','نسيت كلمة المرور؟'),'forgot')+'</div></section>';
 }
 function nav(){
- const items=[['profile',tr('My account','حسابي')],['desk',tr('Editorial desk','مكتب التحرير')],['pitches',tr('Ideas & pitches','الأفكار والاقتراحات')]];
- if(canWrite())items.push(['drafts',tr('My drafts','مسوداتي')]);
- if(isStaff())items.push(['review',tr('Review queue','المراجعة')]);
- if(profile?.role==='admin')items.push(['applications',tr('Applications','طلبات المساهمة')]);
- return '<nav class="be-tabs" aria-label="'+tr('Account sections','أقسام الحساب')+'">'+items.map(([k,l])=>button(l,'tab:'+k,tab===k?'be-active':'')).join('')+'</nav>';
+ const items=[['profile',tr('My account','حسابي')],['pitches',tr('My suggestions','اقتراحاتي')]];
+ if(profile?.role==='reader')items.push(['apply',tr('Apply to contribute','قدّم طلب مساهمة')]);
+ return '<nav class="be-tabs" aria-label="'+tr('Reader account sections','أقسام حساب القارئ')+'">'+
+  items.map(([key,label])=>button(label,'tab:'+key,tab===key?'be-active':'')).join('')+
+  (isStaff()?'<a class="be-primary" href="'+base+(ar?'ar/':'')+'editorial-desk/">'+tr('Open staff Editorial Desk','افتح مكتب التحرير للموظفين')+'</a>':'')+
+  '</nav>';
 }
 function profileView(){
  return '<section class="be-panel"><h2>'+tr('Profile & username','الملف الشخصي واسم المستخدم')+'</h2><p class="be-muted">'+
@@ -427,34 +429,37 @@ function render(){
   'لسه ما تمش ربط قاعدة بيانات الحسابات المستقلة. إنشاء الحسابات متوقف لحد ما نختبر تأكيد البريد وصلاحيات البيانات.')+
   '</p></section>';return;
  }
+ if(deskMode){
+  if(!user||!profile||!isStaff()){
+    root.innerHTML='<section class="be-panel" role="alert"><h2>'+tr('Restricted staff area','منطقة خاصة بفريق التحرير')+'</h2><p>'+tr('Only verified editors and administrators can use the Editorial Desk. Sign in through your reader account.','مكتب التحرير للمحررين والمديرين المصرح لهم فقط. سجّل دخولك من صفحة حسابك.')+'</p><a class="be-primary" href="'+base+(ar?'ar/':'')+'account/">'+tr('Go to sign in / sign up','تسجيل الدخول أو إنشاء حساب')+'</a></section>';
+    return;
+  }
+  if(recovery){window.location.replace(base+(ar?'ar/':'')+'account/?mode=reset');return;}
+  renderDesk();return;
+ }
  if(recovery){root.innerHTML=authPanel();return;}
  if(!user||!profile){root.innerHTML=authPanel();return;}
- if(deskMode){renderDesk();return;}
- if(!['profile','desk','pitches','drafts','review','applications','apply'].includes(tab))tab='profile';
- if(tab==='drafts'&&!canWrite())tab='desk';
- if(tab==='review'&&!isStaff())tab='desk';
- if(tab==='applications'&&profile.role!=='admin')tab='desk';
- if(tab==='apply'&&profile.role!=='reader')tab='desk';
+ if(!['profile','pitches','apply'].includes(tab))tab='profile';
+ if(tab==='apply'&&profile.role!=='reader')tab='profile';
  root.innerHTML='<div class="be-greeting"><div><p class="be-eyebrow">'+tr('YOUR SPACE','مساحتك الخاصة')+'</p><h2>'+
  tr('Welcome, ','أهلاً، ')+escapeHtml(profile.display_name||profile.username||tr('reader','يا قارئ'))+'</h2></div>'+
  button(tr('Sign out','تسجيل الخروج'),'logout')+'</div>'+
  nav()+'<div class="be-dashboard">'+(
- tab==='profile'?profileView():tab==='desk'?deskView():tab==='pitches'?pitchView():
- tab==='drafts'?draftView():tab==='review'?staffView():tab==='applications'?applicationView():applyView())+'</div>';
+ tab==='profile'?profileView():tab==='pitches'?pitchView():applyView())+'</div>';
  if(tab==='pitches')loadPitches();
- if(tab==='drafts')loadDrafts();
- if(tab==='review')loadReview();
- if(tab==='applications')loadApplications();
- if(tab==='apply')loadApplicationState();
+  if(tab==='apply')loadApplicationState();
 }
 async function loadProfile(){
  const {data:auth,error}=await client.auth.getUser();
  if(error&&!/session missing/i.test(error.message||''))say(error.message,true);
  user=auth?.user||null;
- if(!user){profile=null;return;}
+ if(!user){profile=null;staffAuthorized=false;return;}
  const {data,error:loadError}=await client.from('be_profiles').select('id,username,display_name,bio,role').eq('id',user.id).single();
  if(loadError){profile=null;say(tr('Your profile is unavailable. Please contact the editor.','ملفك الشخصي مش متاح دلوقتي. تواصل مع التحرير.')+' '+loadError.message,true);return;}
  profile=data;
+ // Role checks are performed on the server each time. UI state is never an authorization source.
+ const staffCheck=await client.rpc('be_staff');
+ staffAuthorized=!!user.email_confirmed_at && staffCheck.error===null && staffCheck.data===true && ['editor','admin'].includes(data.role);
  // Initial profile preferences are only display data. Never trust user metadata for roles.
  const initial={};
  if(!profile.username&&user.user_metadata?.requested_username){
@@ -578,7 +583,7 @@ root.addEventListener('click',async event=>{
  const action=button.dataset.action;
  if(action.startsWith('tab:')){tab=action.slice(4);say('');render();return;}
  if(['login','signup','forgot','recovery'].includes(action)){authMode=action;say('');render();return;}
- if(action==='logout'){await client.auth.signOut();user=profile=null;say(tr('Signed out.','تم تسجيل الخروج.'));render();return;}
+ if(action==='logout'){await client.auth.signOut();user=profile=null;staffAuthorized=false;say(tr('Signed out.','تم تسجيل الخروج.'));render();return;}
  if(action==='cancel-edit'){say('');render();return;}
 
  if(action==='toggle-preview'){
@@ -670,9 +675,18 @@ root.addEventListener('submit',async event=>{
     say(tr('Check your email for a confirmation link before signing in.','راجع بريدك لتأكيد الحساب قبل تسجيل الدخول.'));return;
   }
   if(action==='forgot'){
-    const {error}=await client.auth.resetPasswordForEmail(value(form,'email'),{redirectTo:here+'?mode=reset'});
-    if(error)throw error;
-    say(tr('If the address is registered, a reset message will be sent.','لو البريد مسجّل، هتوصلك رسالة استعادة كلمة المرور.'));return;
+    const generic=tr('If the address is registered and eligible, a reset email will be sent.','لو البريد مسجّل والطلب مسموح، هتوصلك رسالة استعادة كلمة المرور.');
+    // Browser cooldown improves UX; the Supabase Edge Function independently
+    // enforces transactional 60-second/email and hourly email/IP quotas.
+    if(Date.now()-lastResetAttemptAt<60_000){say(generic);return;}
+    const response=await fetch(config.url.replace(/\/$/,'')+'/functions/v1/be-request-password-reset',{
+      method:'POST',headers:{'Content-Type':'application/json','apikey':config.publishableKey},
+      body:JSON.stringify({email:value(form,'email'),locale:ar?'ar':'en'}),
+      cache:'no-store'
+    });
+    if(!response.ok)throw Error(tr('Unable to request a reset right now. Please try later.','تعذّر إرسال طلب الاستعادة حاليًا، جرّب بعدين.'));
+    lastResetAttemptAt=Date.now();
+    say(generic);return;
   }
   if(action==='recovery'){
     const pass=value(form,'password');if(pass.length<12)throw Error(tr('Password is too short.','كلمة المرور قصيرة.'));
@@ -680,6 +694,7 @@ root.addEventListener('submit',async event=>{
     recovery=false;authMode='login';await refresh();say(tr('Password updated.','تم تحديث كلمة المرور.'));return;
   }
   if(!user||!profile)throw Error(tr('Please sign in.','سجّل دخولك الأول.'));
+  if(deskMode&&!isStaff())throw Error(tr('Verified editor or administrator required.','الدخول للمحررين والمديرين الموثقين فقط.'));
   if(action==='profile'){
     const username=value(form,'username').toLowerCase();
     if(!/^[a-z][a-z0-9_]{2,23}$/.test(username))throw Error(tr('Use a valid username.','اسم المستخدم غير صالح.'));
@@ -718,7 +733,7 @@ async function init(){
    if(location.search.includes('mode=reset')){authMode='recovery';}
    client.auth.onAuthStateChange((event)=>{
     if(event==='PASSWORD_RECOVERY'){recovery=true;authMode='recovery';render();}
-    if(event==='SIGNED_OUT'){user=profile=null;render();}
+    if(event==='SIGNED_OUT'){user=profile=null;staffAuthorized=false;render();}
    });
    await refresh();
  }catch(error){client=null;say(tr('Could not connect to accounts.','تعذّر الاتصال بنظام الحسابات.'),true);render();}

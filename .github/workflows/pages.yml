@@ -32,6 +32,8 @@ jobs:
           node --check tools/account-pages.mjs
           node --check tools/published-pages.mjs
           node --check tools/verify-no-retired-brand.mjs
+          node --check tools/compliance-pages.mjs
+          node --check tools/verify-security-compliance.mjs
       - name: Build and verify the site
         run: node tools/build-pages.mjs
         env:
@@ -46,6 +48,7 @@ jobs:
           node tools/verify-accounts.mjs
           node tools/verify-publishing.mjs
           node tools/verify-no-retired-brand.mjs
+          node tools/verify-security-compliance.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist

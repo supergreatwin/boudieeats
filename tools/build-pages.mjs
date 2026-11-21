@@ -11,6 +11,7 @@ import { addAccountPages } from './account-pages.mjs';
 import { bePublicConfig } from './be-public-config.mjs';
 import { polishVisitorPages } from './site-polish.mjs';
 import { addPublishedPages } from './published-pages.mjs';
+import { addCompliancePages } from './compliance-pages.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -113,6 +114,8 @@ addPublishedPages({
 finishLanguageLinks({ directory: dist, basePath: originalBase });
 // Apply responsive brand-safe corrections to both complete language editions.
 polishVisitorPages({ directory: dist, basePath: originalBase });
+// Security response headers and bilingual privacy, cookies and terms.
+addCompliancePages({ directory: dist });
 // Cancelled collaboration routes and assets are deliberately not generated.
 // Ship the original supplied logo artwork as a shared English/Arabic asset.
 mkdirSync(join(dist, 'media'), { recursive: true });
