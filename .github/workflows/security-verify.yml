@@ -27,6 +27,10 @@ jobs:
           node --check tools/verify-security-compliance.mjs
           node --check tools/responsive-finish.mjs
           node --check tools/verify-responsive.mjs
+          node --check tools/boudie-experiences-client.mjs
+          node --check tools/boudie-editorial-manager.mjs
+          node --check tools/boudie-experiences-pages.mjs
+          node --check tools/verify-boudie-experiences.mjs
       - name: Build staged site without deployment
         env:
           SITE_URL: https://boudieeats.com/
@@ -40,6 +44,7 @@ jobs:
         run: |
           node tools/verify-security-compliance.mjs
           node tools/verify-responsive.mjs
+          node tools/verify-boudie-experiences.mjs
           node tools/verify-no-retired-brand.mjs
           node tools/verify-bilingual.mjs
           node tools/verify-accounts.mjs

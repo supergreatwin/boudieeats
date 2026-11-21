@@ -266,6 +266,7 @@ function deskNav(){
   ['profile',tr('Profile','الملف الشخصي')],
   ['pitches',tr('Pitches','الأفكار الواردة')],
   ...(isStaff()?[
+   ['experiences',tr('Seven experiences','التجارب السبعة')],
    ['review',tr('Review queue','المراجعة')],
    ['analytics',tr('Analytics','الإحصائيات')],
    ['activity',tr('Recent activity','النشاط الأخير')]
@@ -276,6 +277,21 @@ function deskNav(){
   items.map(([key,label])=>button(label,'tab:'+key,tab===key?'be-active':'')).join('')+'</nav>';
 }
 const deskHeading=(title,desc)=>'<header class="be-view-heading"><div><h2>'+title+'</h2><p>'+desc+'</p></div></header>';
+function deskExperiences(){
+ return deskHeading(tr('Seven Boudie Eats experiences','تجارب بودي إيتس السبعة'),
+ tr('Manage real places, dishes, original photos, spotlight stories, badges, and quiz settings. Create drafts now and publish whenever you are ready.','أضف المطاعم والأكلات والصور الأصلية وحكايات سبوتلايت والشارات وإعدادات الاختبار. احفظ مسودات وانشرها وقت ما تحب.'))+
+ '<section class="be-panel" id="be-discovery-studio"><p>'+tr('Loading secure content manager…','جارٍ فتح محرر المحتوى الخاص…')+'</p></section>';
+}
+async function loadExperienceEditor(){
+ const target=document.getElementById('be-discovery-studio');if(!target||!isStaff())return;
+ try{
+  const mod=await import(base+'be-editorial-manager.js');
+  if(!target.isConnected||!isStaff())return;
+  await mod.mountExperienceEditor({client,target,locale:ar?'ar':'en',role:profile.role});
+ }catch(error){
+  if(target.isConnected)target.textContent=tr('Content editor temporarily unavailable. ','تعذّر تحميل محرر المحتوى. ')+(error.message||'');
+ }
+}
 function deskArticles(){
  return deskHeading(tr('Articles & drafts','المقالات والمسودات'),
    tr('Prepare recipes, reviews and food stories. Review is required before approval.',
@@ -320,11 +336,11 @@ function deskAccounts(){
  '</h2><div id="be-team-accounts" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section></div>';
 }
 function renderDesk(){
- if(!['articles','apply','alerts','profile','pitches','review','analytics','activity','accounts'].includes(tab))
+ if(!['articles','apply','experiences','alerts','profile','pitches','review','analytics','activity','accounts'].includes(tab))
    tab=canWrite()?'articles':'apply';
  if(tab==='articles'&&!canWrite())tab='apply';
  if(tab==='review'&&!isStaff())tab=canWrite()?'articles':'apply';
- if(['analytics','activity'].includes(tab)&&!isStaff())tab='profile';
+ if(['analytics','activity','experiences'].includes(tab)&&!isStaff())tab='profile';
  if(tab==='accounts'&&profile.role!=='admin')tab='profile';
  if(tab==='apply'&&profile.role!=='reader')tab=canWrite()?'articles':'profile';
  const who=escapeHtml(profile.display_name||profile.username||tr('contributor','مساهم'));
@@ -335,11 +351,12 @@ function renderDesk(){
  '<h2>'+tr('Welcome to your editorial desk','أهلاً بيك في مكتب التحرير')+'</h2></div></div>'+
  button(tr('Sign out','تسجيل الخروج'),'logout')+'</div>'+
  deskNav()+'<div class="be-dashboard" id="be-editorial-view">'+(
- tab==='articles'?deskArticles():tab==='apply'?applyView():tab==='alerts'?deskAlerts():
+ tab==='articles'?deskArticles():tab==='experiences'?deskExperiences():tab==='apply'?applyView():tab==='alerts'?deskAlerts():
  tab==='profile'?profileView():tab==='pitches'?deskPitches():tab==='review'?staffView():
  tab==='analytics'?deskAnalytics():tab==='activity'?deskActivity():deskAccounts()
  )+'</div></div>';
  if(tab==='articles'){loadDrafts();if(isStaff())loadReview();}
+ if(tab==='experiences'&&isStaff())loadExperienceEditor();
  if(tab==='apply')loadApplicationState();
  if(tab==='pitches'){loadPitches();if(isStaff())loadIncomingPitches();}
  if(tab==='review')loadReview();
