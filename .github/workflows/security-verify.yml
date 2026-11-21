@@ -30,6 +30,7 @@ jobs:
           node --check tools/boudie-experiences-client.mjs
           node --check tools/boudie-editorial-manager.mjs
           node --check tools/boudie-experiences-pages.mjs
+          node --check tools/launch-discovery.mjs
           node --check tools/verify-boudie-experiences.mjs
       - name: Build staged site without deployment
         env:
