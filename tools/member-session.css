@@ -1,0 +1,52 @@
+/* Boudie Eats first-party member UI. Readable on phone, tablet and desktop. */
+html:not(.be-member-signed-in) .be-discover-nav,
+html:not(.be-member-signed-in) .be-discover-teaser,
+html:not(.be-member-signed-in) .be-discover-footer { display:none!important; }
+html.be-member-signed-in .be-discover-nav,
+html.be-member-signed-in .be-discover-footer { display:inline-flex!important; }
+html.be-member-signed-in .be-discover-teaser { display:flex!important; }
+a.be-account-nav { min-height:44px; min-width:0; display:inline-flex; align-items:center; justify-content:center; white-space:normal; max-width:min(45vw,240px); overflow-wrap:anywhere; text-decoration:none; }
+html.be-member-signed-in a.be-account-nav { color:inherit; border-color:currentColor; }
+.be-member-logout { margin-inline:3px 8px; padding:8px 10px; color:#72253f; background:transparent; border:1px solid #d4bfc7; border-radius:2px; font:600 12px/1.2 "DM Sans",sans-serif; cursor:pointer; min-height:44px; }
+.be-member-logout:hover { background:#f5e9eb; }
+.be-member-logout:disabled { opacity:.5; cursor:wait; }
+.be-member-dialog { background:#fffaf2; color:#33232b; border:1px solid #72253f; border-radius:0!important; width:min(510px,calc(100vw - 28px)); max-width:100%; max-height:min(760px,calc(100dvh - 24px)); padding:0!important; overflow:auto; box-shadow:0 25px 80px rgba(32,16,23,.24); overscroll-behavior:contain; }
+.be-member-dialog::backdrop { background:rgba(22,10,18,.7); backdrop-filter:blur(3px); }
+.be-member-surface { position:relative; padding:clamp(24px,5vw,44px); }
+.be-member-close { position:absolute; inset-block-start:12px; inset-inline-end:12px; display:grid; place-items:center; width:44px; height:44px; border:0; background:transparent; color:#72253f; font:400 28px/1 "DM Sans",sans-serif; cursor:pointer; }
+.be-member-brand { margin-bottom:clamp(22px,4vw,32px); font:700 11px/1.5 "DM Sans",sans-serif; letter-spacing:.16em; color:#72253f; }
+.be-member-dialog h2 { margin:0 30px 10px 0; font:600 clamp(31px,5vw,46px)/1.12 "Fraunces",Georgia,serif; letter-spacing:-.035em; color:#33232b; }
+.be-member-description { max-width:40ch; margin:0 0 24px; color:#695860; font:400 15px/1.65 "DM Sans",sans-serif; }
+.be-member-tabs { display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid #dccbd1; gap:0; margin:0 0 22px; }
+.be-member-tabs[hidden] { display:none!important; }
+.be-member-tabs button { min-height:44px; background:transparent; border:0; border-bottom:2px solid transparent; color:#6e5862; font:700 14px/1.3 "DM Sans",sans-serif; cursor:pointer; }
+.be-member-tabs button[aria-pressed="true"] { color:#72253f; border-color:#72253f; }
+.be-member-fields { display:grid; gap:14px; }
+.be-member-field { display:grid; gap:6px; color:#33232b; font:600 13px/1.4 "DM Sans",sans-serif; }
+.be-member-field input { display:block; width:100%; min-width:0; height:48px; box-sizing:border-box; padding:10px 12px; border:1px solid #cab5c0; border-radius:0; background:#fffdf8; color:#33232b; font:400 16px/1.3 "DM Sans",sans-serif; }
+.be-member-field input:focus-visible { outline:2px solid #72253f; outline-offset:2px; }
+.be-member-submit { width:100%; min-height:48px; padding:12px 18px; margin-top:22px; border:1px solid #72253f; background:#72253f; color:#fffaf2; font:700 15px/1.3 "DM Sans",sans-serif; cursor:pointer; }
+.be-member-submit:hover { background:#5c1a31; }
+.be-member-submit:disabled { opacity:.56; cursor:wait; }
+.be-member-options { display:flex; justify-content:center; margin:14px 0 0; }
+.be-member-options button { min-height:40px; padding:6px 12px; border:0; background:transparent; color:#72253f; text-decoration:underline; text-underline-offset:3px; font:600 13px/1.3 "DM Sans",sans-serif; cursor:pointer; }
+.be-member-status { min-height:0; margin:10px 0 0; font:400 13px/1.5 "DM Sans",sans-serif; }
+.be-member-status[data-error="true"] { color:#a02037; }
+.be-member-privacy { border-top:1px solid #e8dade; padding-top:15px; margin:19px 0 0; color:#695860; font:400 12px/1.6 "DM Sans",sans-serif; }
+.be-member-privacy a { color:#72253f; }
+.be-member-notice { position:fixed; z-index:100100; inset-block-end:18px; inset-inline-end:18px; width:min(430px,calc(100vw - 36px)); display:flex; gap:12px; justify-content:space-between; align-items:center; padding:16px 18px; background:#fffaf2; border:1px solid #72253f; color:#33232b; box-shadow:0 12px 35px rgba(25,12,18,.2); font:400 14px/1.6 "DM Sans",sans-serif; }
+.be-member-notice button { flex:none; min-width:36px; min-height:36px; font:400 24px/1 "DM Sans",sans-serif; cursor:pointer; color:#72253f; background:transparent; border:0; }
+.be-member-notice[data-error="true"] { border-color:#a02037; }
+html[lang^="ar"] :is(.be-member-dialog h2,.be-member-description,.be-member-tabs button,.be-member-field,.be-member-submit,.be-member-options button,.be-member-privacy,.be-member-notice,.be-member-logout) { font-family:"Lalezar",sans-serif!important; letter-spacing:0!important; }
+html[lang^="ar"] .be-member-dialog h2 { font-family:"Aref Ruqaa",serif!important; }
+html[lang^="ar"] .be-member-brand { letter-spacing:0; }
+@media(max-width:600px) {
+ .be-member-dialog { width:calc(100vw - 16px); max-height:calc(100dvh - 16px); }
+ .be-member-surface { padding:30px 19px 23px; }
+ .be-member-dialog h2 { margin-inline-end:25px; font-size:34px; }
+ .be-member-description { font-size:14px; }
+ .be-member-logout { padding:7px; margin-inline:2px; font-size:11px; }
+ a.be-account-nav { max-width:min(43vw,180px); font-size:12px!important; padding:8px!important; }
+ .be-member-notice { inset-block-end:9px; inset-inline-end:9px; width:calc(100vw - 18px); }
+}
+@media(prefers-reduced-motion:reduce){ .be-member-dialog::backdrop{backdrop-filter:none;} }

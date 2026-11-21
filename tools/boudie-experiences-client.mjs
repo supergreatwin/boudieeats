@@ -246,15 +246,14 @@ async function loadApprovedContent(){
  store.loaded=true;updateDishes();renderCity();renderMama();renderGallery();renderSpotlight();renderPassport();
 }
 function showDiscoverSignIn(){
- const redirect=encodeURIComponent(location.pathname);
- const account=base+(ar?'ar/':'')+'account/';
+ const home=base+(ar?'ar/':'');
  root.innerHTML='<section class="be-exp-section be-exp-auth-gate" role="region" aria-labelledby="be-discover-signin-title">'+
  '<p class="be-exp-small">'+lang('BOUDIE EATS · MEMBERS','بودي إيتس · للأعضاء')+'</p>'+
  '<h1 id="be-discover-signin-title">'+lang('Sign in to explore.','سجّل دخولك علشان تستكشف.')+'</h1>'+
  '<p>'+lang('The seven Boudie Eats experiences are available to readers with a confirmed account. Recipes, reviews and stories remain free to browse.','تجارب بودي إيتس السبعة متاحة للقراء أصحاب الحسابات المؤكدة. الوصفات والتجارب والحكايات العادية بتفضل مجانية ومفتوحة.')+'</p>'+
  '<div class="be-exp-auth-actions">'+
- link(lang('Sign in','تسجيل الدخول'),account+'?next='+redirect)+
- link(lang('Create a free account','إنشاء حساب مجاني'),account+'?mode=signup&next='+redirect,true)+
+ link(lang('Sign in','تسجيل الدخول'),home+'?auth=signin')+
+ link(lang('Create a free account','إنشاء حساب مجاني'),home+'?auth=signup',true)+
  '</div></section>';
 }
 async function bootDiscover(){
