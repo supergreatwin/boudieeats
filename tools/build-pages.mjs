@@ -12,6 +12,7 @@ import { bePublicConfig } from './be-public-config.mjs';
 import { polishVisitorPages } from './site-polish.mjs';
 import { addPublishedPages } from './published-pages.mjs';
 import { addCompliancePages } from './compliance-pages.mjs';
+import { finishResponsiveLayout } from './responsive-finish.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -116,6 +117,8 @@ finishLanguageLinks({ directory: dist, basePath: originalBase });
 polishVisitorPages({ directory: dist, basePath: originalBase });
 // Security response headers and bilingual privacy, cookies and terms.
 addCompliancePages({ directory: dist });
+// Last-mile responsive polish: phones, tablets, desktops and reduced-motion users.
+finishResponsiveLayout({ directory: dist });
 // Cancelled collaboration routes and assets are deliberately not generated.
 // Ship the original supplied logo artwork as a shared English/Arabic asset.
 mkdirSync(join(dist, 'media'), { recursive: true });
