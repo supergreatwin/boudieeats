@@ -78,7 +78,7 @@ root.innerHTML=(render[slug]||home)();
 // All published records are retrieved through Supabase RLS; unpublished
 // venue, food, contributor, or photo records cannot appear in this UI.
 const cfg=window.BE_DISCOVER_CONFIG||{};
-const store={foods:[],places:[],terms:[],photos:[],sections:[],badges:[],loaded:false,failed:false};
+const store={foods:[],places:[],terms:[],photos:[],sections:[],recognitions:[],badges:[],loaded:false,failed:false};
 let updateDishes=()=>{};
 const dishQuery=document.getElementById('be-dish-q');
 if(dishQuery){
@@ -160,7 +160,8 @@ function renderCity(){
 }
 function renderMama(){
  const out=document.getElementById('be-mama-results');if(!out)return;
- const picks=store.places.filter(p=>Array.isArray(p.tags)&&p.tags.includes('mama-approved'));
+ const awarded=new Set(store.recognitions.filter(x=>x.kind==='mama'&&x.status==='approved'&&x.editorial_approved).map(x=>x.place_id));
+ const picks=store.places.filter(p=>awarded.has(p.id));
  out.innerHTML=picks.length?picks.map(makePlaceCard).join(''):
   loadingEmpty(lang('Our first family picks are being reviewed','بنراجع اختيارات ماما الأولى'),
    lang('No place receives the badge before an actual editorial decision.','مفيش مكان بياخد العلامة قبل قرار تحريري واضح.'));
@@ -231,7 +232,8 @@ async function loadApprovedContent(){
  ['places',publicRecords('be_wte_places','id,slug,name_en,name_ar,city_id,cuisine_id,district_en,district_ar,summary_en,summary_ar,image_url,image_alt_en,image_alt_ar,image_rights_confirmed,price_band,tags','status=eq.published&editorial_approved=eq.true')],
  ['terms',publicRecords('be_wte_terms','id,kind,slug,label_en,label_ar','active=eq.true')],
  ['photos',publicRecords('be_wte_photos','image_url,image_rights_confirmed,image_alt_en,image_alt_ar,caption_en,caption_ar,image_credit','image_rights_confirmed=eq.true')],
- ['sections',publicRecords('be_wte_sections','slug,kind,title_en,title_ar,body_en,body_ar','status=eq.published&editorial_approved=eq.true&active=eq.true')]
+ ['sections',publicRecords('be_wte_sections','slug,kind,title_en,title_ar,body_en,body_ar','status=eq.published&editorial_approved=eq.true&active=eq.true')],
+ ['recognitions',publicRecords('be_wte_recognitions','place_id,kind,status,editorial_approved','status=eq.approved&editorial_approved=eq.true')]
  ];
  const outcomes=await Promise.allSettled(tasks.map(([,promise])=>promise));
  outcomes.forEach((result,index)=>{if(result.status==='fulfilled')store[tasks[index][0]]=result.value;else store.failed=true;});
