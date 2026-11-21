@@ -138,9 +138,9 @@ async function submit(event){
 function bind(){
  document.addEventListener('click',event=>{
   const account=event.target.closest('a.be-account-nav');
-  if(account&&!user){event.preventDefault();open('login');return}
+  if(account&&!user&&supabase){event.preventDefault();open('login');return}
   const explore=event.target.closest('.be-discover-nav,.be-discover-teaser a,.be-discover-footer');
-  if(explore&&!user){event.preventDefault();open('login');}
+  if(explore&&!user&&supabase){event.preventDefault();open('login');}
  });
  const openMode=new URLSearchParams(location.search).get('auth');
  if(openMode==='signin'||openMode==='signup')open(openMode==='signup'?'signup':'login');
