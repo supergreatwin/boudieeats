@@ -1,8 +1,8 @@
-// Boudie Eats independent seven-experience prototype.
+// Boudie Eats independent seven-experience application.
 // No external brand assets, copyrighted partner content, or invented venues.
-// This is a public-data-free interactive preview; persistence awaits launch wiring.
+// Public content is queried through RLS; personal saved dishes are bound to signed-in accounts.
 const root=document.getElementById('be-exp-app');
-const ar=document.documentElement.lang==='ar';
+const ar=document.documentElement.lang.toLowerCase().startsWith('ar');
 const lang=(en,arabic)=>ar?arabic:en;
 const base=document.body.dataset.base||'/';
 const slug=document.body.dataset.view||'home';
