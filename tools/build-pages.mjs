@@ -16,6 +16,7 @@ import { finishResponsiveLayout } from './responsive-finish.mjs';
 import { addBoudieExperiences } from './boudie-experiences-pages.mjs';
 import { launchBoudieDiscovery } from './launch-discovery.mjs';
 import { addMemberSession } from './member-session-pages.mjs';
+import { applyUnifiedBrand } from './unified-brand-pages.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -138,6 +139,9 @@ finishResponsiveLayout({ directory: dist });
 mkdirSync(join(dist, 'media'), { recursive: true });
 copyFileSync(join(root, 'assets', 'boudieeats-wordmark.svg'), join(dist, 'media', 'boudieeats-wordmark.svg'));
 copyFileSync(join(root, 'assets', 'boudieeats-wordmark-cream-gold-v2.svg'), join(dist, 'media', 'boudieeats-wordmark-cream-gold-v2.svg'));
+
+// One branded interface for every English/Arabic route, including auth and desk.
+applyUnifiedBrand({ directory: dist, basePath: originalBase });
 
 // Cloudflare Pages: keep XML discovery available but out of normal search
 // results, and keep the pages.dev mirror from competing with our own domain.
