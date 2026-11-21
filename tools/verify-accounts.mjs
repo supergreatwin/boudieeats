@@ -22,7 +22,7 @@ for(const [label,html] of [['English',authEnglish],['Arabic',authArabic]]){
  if(html.includes('fxnvjjguxdqvfspsghmi'))errors.push(label+': unexpected backend detected');
 }
 const source=readFileSync(join(dist,'be-account.js'),'utf8');
-for(const name of ['signInWithPassword','signUp','resetPasswordForEmail','updateUser','be_profiles','be_drafts','be_pitches','be_applications']){
+for(const name of ['signInWithPassword','signUp','be-request-password-reset','updateUser','be_profiles','be_drafts','be_pitches','be_applications']){
  if(!source.includes(name))errors.push('Account app missing '+name);
 }
 for(const name of ['renderDesk','deskNav','deskArticles','deskPitches','deskAlerts','deskAnalytics','deskActivity','deskAccounts','loadIncomingPitches','loadDeskMetrics','loadTeamAccounts','edit-draft','be_review_pitch']){
@@ -42,4 +42,4 @@ for(const marker of ['enable row level security','be_register_profile','be_my_ro
  if(!schema.includes(marker))errors.push('Private DB schema missing '+marker);
 }
 if(errors.length){console.error(errors.join('\n'));process.exit(1);}
-console.log('PASS independent accounts: bilingual registration, profile, editorial desk, private data schema and safe disabled state before backend setup.');
+console.log('PASS independent accounts: bilingual registration, server-authorized staff desk, dedicated reset endpoint, and private data schema.');
