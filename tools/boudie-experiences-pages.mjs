@@ -23,7 +23,7 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  const primaryNav='<a href="'+base+prefix+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
  '<a href="'+base+prefix+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
  '<a href="'+base+prefix+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
- '<a href="'+base+prefix+'account/">'+(arabic?'دخول / حساب جديد':'Sign in / Sign up')+'</a>'+
+ '<a class="be-account-nav" href="'+base+prefix+'account/">'+(arabic?'دخول / حساب جديد':'Sign in / Sign up')+'</a>'+
  ''; 
  const switcher='<nav class="be-language" aria-label="Language"><a hreflang="'+(arabic?'en':'ar-EG')+'" href="'+langHref+'">'+(arabic?'EN':'AR')+'</a></nav>';
  const logo=arabic?'<span class="be-exp-logo-text">بودي إيتس.</span>':'<img src="'+base+'media/boudieeats-wordmark-cream-gold-v2.svg" width="195" height="32" alt="boudieeats.">';
