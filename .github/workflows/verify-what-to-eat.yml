@@ -23,6 +23,7 @@ jobs:
       - name: Verify script syntax
         run: |
           node --check tools/what-to-eat-client.mjs
+          node --check tools/what-to-eat-experiences.mjs
           node --check tools/what-to-eat-pages.mjs
           node --check tools/what-to-eat-newsletter.mjs
           node --check tools/build-pages.mjs
@@ -38,6 +39,7 @@ jobs:
         run: |
           node tools/verify-what-to-eat.mjs
           node tools/verify-what-to-eat-runtime.mjs
+          node tools/verify-food-lab.mjs
           node tools/verify-what-to-eat-public-api.mjs
           node tools/verify-accounts.mjs
           node tools/verify-publishing.mjs
