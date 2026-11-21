@@ -126,6 +126,7 @@ function foodDetails(f){
  return '<section class="wte-x-detail"><button class="wte-x-back" data-x-back="1">← '+txt('Back','رجوع')+'</button><small>'+h(f.mode.toUpperCase())+' / '+h(loc(f,'cuisine')||'')+'</small><h3>'+h(label(f))+'</h3>'+
  '<div class="wte-x-columns"><div><p>'+h(loc(f,'description'))+'</p>'+
  '<p><b>'+txt('Weirdness','درجة الغرابة')+':</b> '+h(f.weirdness)+'/5</p>'+
+ (answer?'<p><b>'+txt('Why this fits','ليه مناسبة ليك')+':</b> '+txt('Weighted match based on your weirdness, adventure, comfort, sweetness and spice preferences.','توافق محسوب من درجة الغرابة والمغامرة والراحة والحلاوة والشطة.')+' '+txt('Score','النقاط')+': '+h(f._score??'—')+'</p>':'')+
  '<p><b>'+txt('Ingredients','المكونات')+':</b> '+h(ing||txt('Not verified','غير موثقة'))+'</p>'+
  '<p><b>'+txt('Allergens','مسببات الحساسية')+':</b> '+h(f.ingredients_verified?(al||txt('No listed allergens; cross-contact not verified','لا توجد مسببات حساسية مذكورة؛ التلامس غير موثق')):txt('UNKNOWN — verify before eating','غير معروفة — تحقق قبل الأكل'))+'</p>'+
  '<p><b>'+txt('Flavour / texture','النكهة / القوام')+':</b> '+h((f.flavours||[]).join(', ')||txt('Not documented','غير موثق'))+' / '+h((f.textures||[]).join(', ')||txt('Not documented','غير موثق'))+'</p>'+
@@ -216,7 +217,7 @@ function renderPassport(){
 function renderCommunity(){
  const ideas=(state().ideas||[]).filter(x=>x.status==='approved');
  let html='<section class="wte-x-community"><h3>'+txt('Would You Try It?','تجربها ولا لأ؟')+'</h3><p>'+txt('Original food ideas are moderated before publication.','أفكار الأكل بتتراجع قبل النشر.')+'</p>';
- html+=(ideas.length?ideas.map(i=>'<article class="wte-x-note"><h4>'+h(i.title)+'</h4><p>'+h(i.description)+'</p><small>'+h(i.tested?txt('Submitted as tried','مذكور إنها مجربة'):txt('Hypothetical','افتراضية'))+'</small><div class="wte-x-actions"><button data-x-vote="'+h(i.id)+':yes" class="wte-x-secondary">'+txt('Yes','آه')+'</button><button data-x-vote="'+h(i.id)+':no" class="wte-x-secondary">'+txt('No','لأ')+'</button><button data-x-vote="'+h(i.id)+':tried" class="wte-x-secondary">'+txt('Already tried','جربتها')+'</button></div></article>').join(''):'<p class="wte-x-empty">'+txt('No community experiments approved yet.','مفيش تجارب مجتمعية معتمدة لسه.')+'</p>');
+ html+=(ideas.length?ideas.map(i=>'<article class="wte-x-note"><h4>'+h(i.title)+'</h4><p>'+h(i.description)+'</p><small>'+h(i.tested?txt('Submitted as tried','مذكور إنها مجربة'):txt('Hypothetical','افتراضية'))+'</small><div class="wte-x-actions"><button data-x-vote="'+h(i.id)+':yes" class="wte-x-secondary">'+txt('Yes','آه')+'</button><button data-x-vote="'+h(i.id)+':no" class="wte-x-secondary">'+txt('No','لأ')+'</button><button data-x-vote="'+h(i.id)+':tried" class="wte-x-secondary">'+txt('Already tried','جربتها')+'</button></div><form class="wte-x-form" data-x-rating="'+h(i.id)+'"><label class="wte-x-field">'+txt('Taste rating if you actually tried it (1–5)','قيّم الطعم لو جربته فعلًا (١–٥)')+'<input type="number" name="taste_rating" min="1" max="5" step="1" required></label><label class="wte-x-field">'+txt('Your experience (optional)','تجربتك (اختياري)')+'<textarea name="review" maxlength="1200" rows="2"></textarea></label><button class="wte-x-secondary" type="submit">'+txt('Submit taste review','ابعت تقييمي')+'</button></form></article>').join(''):'<p class="wte-x-empty">'+txt('No community experiments approved yet.','مفيش تجارب مجتمعية معتمدة لسه.')+'</p>');
  html+='<h3>'+txt('Submit a food experiment','ابعت تجربة أكل')+'</h3><form class="wte-x-form" id="wte-x-idea"><label class="wte-x-field">'+txt('Combination title','عنوان الفكرة')+'<input name="title" maxlength="120" minlength="4" required></label><label class="wte-x-field">'+txt('Describe the idea','اشرح الفكرة')+'<textarea name="description" maxlength="2000" rows="3"></textarea></label>'+
  '<label class="wte-x-field">'+txt('Experiment type','نوع التجربة')+'<select name="mode">'+options(modes.filter(m=>['fusion','weird','chaos'].includes(m[0])).map(m=>[m[0],txt(m[1],m[2])]),'chaos')+'</select></label>'+
  '<label class="wte-x-field">'+txt('Main ingredients','المكونات')+'<input name="ingredients" maxlength="500"></label>'+
@@ -261,8 +262,8 @@ function suggest(another=false){
  ranking=rankFoods(allowedFoods(),answer,state().lab?.rules||{});
  const remaining=ranking.filter(f=>!previous.includes(f.id));
  const eligible=remaining.length?remaining:ranking.filter(f=>f.id!==selected?.id);
- const next=eligible[0]||ranking[0]||null;
- if(!next){selected=null;feedback=txt('No eligible recommendations. Food with unverified ingredients is excluded when you enter allergies, disliked ingredients or dietary restrictions.','مفيش ترشيحات مناسبة. الأكلات بمكونات غير موثقة مستبعدة عند وجود حساسية أو مكونات مرفوضة أو نظام غذائي محدد.');}
+ const next=(another&&ranking.length<2)?null:(eligible[0]||ranking[0]||null);
+ if(!next){if(!another)selected=null;feedback=another?txt('No alternative eligible dish is available.','مفيش طبق بديل مناسب.'):txt('No eligible recommendations. Food with unverified ingredients is excluded when you enter allergies, disliked ingredients or dietary restrictions.','مفيش ترشيحات مناسبة. الأكلات بمكونات غير موثقة مستبعدة عند وجود حساسية أو مكونات مرفوضة أو نظام غذائي محدد.');}
  else{selected=next;previous.push(next.id);feedback=txt('Ranked by your preferences. Exact ingredients and allergens may still be unverified.','النتائج محسوبة حسب تفضيلاتك. المكونات ومسببات الحساسية ممكن تفضل غير موثقة.');}
  profile=archetype(answer);
  const override=(state().lab?.archetypes||[]).find(x=>x?.id===profile[0]);
@@ -333,7 +334,7 @@ function controls(ev){
 function changes(e){
  if(e.target.id==='wte-x-meter'){meter=Number(e.target.value);const label=source.querySelector('.wte-x-meter b');if(label)label.textContent=meter+'/5';return;}
  if(e.target.id==='wte-x-city'){city=e.target.value;paint();return;}
- if(e.target.id==='wte-x-search'){query=e.target.value;return;}
+ if(e.target.id==='wte-x-search'){query=e.target.value;if(e.type==='change')paint();return;}
 }
 async function formSubmit(e){
  if(e.target.id==='wte-x-quiz'){
@@ -349,6 +350,18 @@ async function formSubmit(e){
   paint();return;
  }
  if(e.target.id==='wte-x-idea'){e.preventDefault();if(busy)return;busy=true;try{await submitIdea(e.target);}catch(err){setStatus(err.message||err);}finally{busy=false;}}
+ if(e.target.dataset.xRating){e.preventDefault();if(busy)return;busy=true;try{
+   if(!state().user)throw Error(txt('Sign in to rate a food experiment.','سجّل دخولك عشان تقيّم.'));
+   const id=e.target.dataset.xRating,idea=(state().ideas||[]).find(i=>i.id===id&&i.status==='approved');
+   if(!idea)throw Error(txt('Only approved experiments can be rated.','التجارب المعتمدة بس اللي ينفع تقييمها.'));
+   const fd=new FormData(e.target),score=Number(fd.get('taste_rating'));
+   if(!Number.isInteger(score)||score<1||score>5)throw Error('Rating must be 1–5.');
+   const review=String(fd.get('review')||'').trim();
+   if(review.length>1200)throw Error('Review too long.');
+   const {error}=await state().client.from('be_wte_votes').upsert({idea_id:id,owner_id:state().user.id,vote:'tried',taste_rating:score,review},{onConflict:'idea_id,owner_id'});
+   if(error)throw error;
+   feedback=txt('Your first-hand taste rating has been saved privately.','تقييمك للتجربة اتحفظ بشكل خاص.');paint();
+ }catch(err){setStatus(err.message||err);}finally{busy=false;}}
 }
 export function mountExperienceGuide(ctx){
  context=ctx;const root=ctx.root;
