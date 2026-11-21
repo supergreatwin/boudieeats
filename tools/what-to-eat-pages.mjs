@@ -26,7 +26,7 @@ function page({arabic,editor,base,url,key}){
     '<link rel="apple-touch-icon" href="'+base+'be-what-to-eat-app-192.png">'+
     '<meta name="apple-mobile-web-app-capable" content="yes">'+
     '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'+
-    '<link rel="stylesheet" href="'+base+'be-what-to-eat.css"></head>'+
+    '<link rel="stylesheet" href="'+base+'be-what-to-eat.css"><link rel="stylesheet" href="'+base+'be-what-to-eat-experiences.css"></head>'+
     '<body data-wte-mode="'+(editor?'editor':'guide')+'"><header class="wte-site-header"><a class="wte-wordmark" href="'+(editor?editorPath+'?preview=1':guidePath)+'" aria-label="what to eat?">'+brand+'</a>'+
     '<nav class="be-language" aria-label="'+(arabic?'روابط القسم':'Section navigation')+'">'+nav+
     '<a href="'+altPath+'" hreflang="'+(arabic?'en':'ar-EG')+'">'+(arabic?'EN':'عربي')+'</a></nav></header>'+
@@ -38,6 +38,8 @@ function page({arabic,editor,base,url,key}){
 export function addWhatToEatPages({directory,basePath='/',supabaseUrl='',supabasePublishableKey=''}){
   const base=basePath.endsWith('/')?basePath:basePath+'/';
   copyFileSync(new URL('./what-to-eat-client.mjs',import.meta.url),join(directory,'be-what-to-eat.js'));
+  copyFileSync(new URL('./what-to-eat-experiences.mjs',import.meta.url),join(directory,'be-what-to-eat-experiences.js'));
+  copyFileSync(new URL('./what-to-eat-experiences.css',import.meta.url),join(directory,'be-what-to-eat-experiences.css'));
   copyFileSync(new URL('./what-to-eat.css',import.meta.url),join(directory,'be-what-to-eat.css'));
   copyFileSync(new URL('./what-to-eat-newsletter.mjs',import.meta.url),join(directory,'be-what-to-eat-newsletter.js'));
   for(const size of [192,512])copyFileSync(new URL('../assets/what-to-eat-app-'+size+'.png',import.meta.url),join(directory,'be-what-to-eat-app-'+size+'.png'));
