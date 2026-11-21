@@ -194,3 +194,6 @@ for (const [path, expected] of [
     throw new Error(`Missing the reviewed content at /${path}/`);
   }
 }
+
+// Fail the production build if even one bilingual/public/private page diverges.
+execFileSync(process.execPath, [join(root, 'tools', 'verify-unified-brand.mjs')], { cwd: root, stdio: 'inherit' });
