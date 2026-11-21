@@ -26,6 +26,21 @@ else {
  if(/what[-\s]to[-\s]eat|whattocommunity/i.test(c))errors.push('Former brand in client code');
  if(/demo stamp|Koshary.*Ful medames/i.test(c))errors.push('Demo or fake result shipped as verified content');
 }
+const staff=join(dist,'be-editorial-manager.js');
+if(!existsSync(staff))errors.push('Missing editorial content manager');
+else {
+ const manager=readFileSync(staff,'utf8');
+ for(const key of ['be_wte_foods','be_wte_places','be_wte_photos','be_wte_sections','be_wte_badges','be_wte_features','be_wte_recognitions','be_wte_lab_settings','be_wte_settings','client.rpc(\'be_staff\')','email_confirmed_at']){
+  if(!manager.includes(key))errors.push('Manager missing required feature or role control '+key);
+ }
+}
+const account=join(dist,'be-account.js');
+if(!existsSync(account))errors.push('Account client not generated');
+else {
+ const accountScript=readFileSync(account,'utf8');
+ if(!accountScript.includes('loadExperienceEditor()')||!accountScript.includes("if(tab==='experiences'&&isStaff())"))errors.push('Experience editor is not behind staff-only desk tab');
+ if(!accountScript.includes("client.rpc('be_staff')"))errors.push('Supabase staff role check is missing');
+}
 const css=join(dist,'be-experiences.css');
 if(!existsSync(css))errors.push('Missing experience styling');
 else{
