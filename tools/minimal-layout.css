@@ -338,6 +338,28 @@ html[lang^="ar"] .be-welcome-actions a {font-size:1.2rem}
 }
 .be-home-newsletter button:hover {background:rgba(255,255,255,.1)}
 .be-minimal-home>.be-discover-teaser[hidden] {display:none!important}
+/* Recipes index: lead with actual search, filters and recipe cards,
+   not a breadcrumb, decorative header, or duplicated featured recipe. */
+html[data-be-layout="recipe-index"] .be-recipe-index-sr-only {
+  position:absolute!important;
+  width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;border:0!important;
+}
+html[data-be-layout="recipe-index"] .archive-body {
+  box-sizing:border-box!important;
+  width:min(1320px,calc(100% - 32px))!important;
+  max-width:1320px!important;
+  min-height:0!important;
+  margin:0 auto!important;
+  padding:clamp(18px,2.7vw,36px) 0 36px!important;
+}
+html[data-be-layout="recipe-index"] .catalog {
+  margin:0!important;padding-top:0!important;
+}
+html[data-be-layout="recipe-index"] .filter-form {
+  margin-top:0!important;
+}
 /* Five recipe cards per row on large screens, title and three facts only. */
 html[data-be-layout="recipe-index"] .entry-grid {
   display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
