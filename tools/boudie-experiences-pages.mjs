@@ -45,9 +45,13 @@ function sharedHeader({directory,arabic,view,base}) {
  const arTarget=base+'ar/discover/'+(view==='home'?'':view+'/');
  const switcher=/<nav\b[^>]*class="[^"]*\bbe-language\b[^"]*"[^>]*>[\s\S]*?<\/nav>/i;
  if(!switcher.test(header))throw new Error('Language switcher not found in shared masthead');
- header=header.replace(switcher, block=>block
-   .replace('href="'+base+'"','href="'+enTarget+'"')
-   .replace('href="'+base+'ar/"','href="'+arTarget+'"'));
+ header=header.replace(switcher, block=>{
+   let links=block.replace('href="'+base+'"','href="'+enTarget+'"')
+     .replace('href="'+base+'ar/"','href="'+arTarget+'"');
+   const active=arabic?arTarget:enTarget;
+   links=links.replace('href="'+active+'"','aria-current="page" href="'+active+'"');
+   return links;
+ });
  // The desktop header already has Discover; ensure mobile does too.
  header=header.replace(/(<details\b[^>]*class="[^"]*\bmobile-nav\b[^"]*"[^>]*>[\s\S]*?<nav\b[^>]*>)/i,
   '$1<a aria-current="page" class="be-discover-nav" href="'+
