@@ -13,16 +13,19 @@ function pageClass(html, value) {
 }
 function homepage(html, base, ar) {
   const path = base + (ar ? 'ar/' : '');
-  const photos = [
-    ['vermicelli-oven.webp','recipes/shaareya-bel-laban/', ar ? 'شعرية باللبن' : 'Vermicelli milk pudding'],
-    ['skillet-chocolate-cookie.webp','recipes/skillet-chocolate-cookie/', ar ? 'كوكيز بالشوكولاتة في الطاسة' : 'Skillet chocolate cookie'],
-    ['chocolate-brownies.webp','recipes/chocolate-brownies/', ar ? 'براونيز بالشوكولاتة' : 'Chocolate brownies'],
-    ['iced-coffee.webp','recipes/iced-milk-coffee/', ar ? 'قهوة ساقعة باللبن' : 'Iced milk coffee']
-  ];
-  const grid = photos.map(([img,slug,alt],i) =>
-    '<a class="be-photo-cell" href="' + path + slug + '" aria-label="' + escapeHtml(alt) + '">' +
-    '<img loading="' + (i < 2 ? 'eager' : 'lazy') + '" decoding="async" src="' +
-    path + 'media/' + img + '" alt="' + escapeHtml(alt) + '"></a>').join('');
+  const welcome = ar ? {
+    kicker: 'رسالة صغيرة من بودي',
+    heading: 'أهلًا بيك في بودي إيتس',
+    copy: 'وصفات نجربها، أماكن نكتشفها، وحكايات أكل تستاهل تتحكي.',
+    recipes: 'شوف الوصفات',
+    reviews: 'اقرأ التجارب'
+  } : {
+    kicker: 'A little note from Boudie',
+    heading: 'Welcome to Boudie Eats',
+    copy: 'Food worth making, places worth trying, and stories worth sharing.',
+    recipes: 'Browse recipes',
+    reviews: 'Read reviews'
+  };
   const featured = [
     ['vermicelli-oven.webp','recipes/shaareya-bel-laban/',
       ar ? 'شعرية باللبن' : 'Vermicelli milk pudding'],
@@ -33,9 +36,17 @@ function homepage(html, base, ar) {
       '<img loading="lazy" decoding="async" src="' + path + 'media/' + img + '" alt="">' +
       '<h3>' + escapeHtml(title) + '</h3></a>').join('');
   const intro = '<div class="be-minimal-home">' +
-    '<section class="be-photo-grid" aria-label="' +
-    (ar ? 'أربع صور من مطبخ بودي' : 'Four photographs from Boudie’s kitchen') + '">' +
-    grid + '</section>' +
+    '<section class="be-home-welcome" aria-labelledby="be-welcome-title">' +
+    '<div class="be-welcome-inner">' +
+    '<p class="be-welcome-kicker">' + escapeHtml(welcome.kicker) + '</p>' +
+    '<h1 id="be-welcome-title">' + escapeHtml(welcome.heading) +
+    '<span class="be-welcome-dot" aria-hidden="true">.</span></h1>' +
+    '<p class="be-welcome-copy">' + escapeHtml(welcome.copy) + '</p>' +
+    '<div class="be-welcome-actions">' +
+    '<a class="be-welcome-primary" href="' + path + 'recipes/">' +
+    escapeHtml(welcome.recipes) + '</a>' +
+    '<a class="be-welcome-secondary" href="' + path + 'reviews/">' +
+    escapeHtml(welcome.reviews) + '</a></div></div></section>' +
     '<section class="be-featured-recipes" aria-labelledby="be-featured-title">' +
     '<h2 id="be-featured-title">' + (ar ? 'وصفتين مختارتين' : 'Two featured recipes') +
     '</h2><div class="be-feature-grid">' + featured + '</div></section>' +
