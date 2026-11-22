@@ -56,19 +56,32 @@ function home(){
     '<span class="be-exp-member-eyebrow">'+lang('A LITTLE SOMETHING FOR EVERY APPETITE','لكل مزاج أكلة')+'</span>'+
     '<h2 id="be-member-choices-title">'+lang('Where shall we start?','هنبدأ منين؟')+'</h2>'+
 
-   '</div><p>'+lang('Seven ways to make food more fun.','سبع طرق نخلي بيها الأكل أحلى.')+'</p></div>'+
+   '</div></div>'+
    '<div class="be-exp-member-layout"><div class="be-exp-member-grid">'+cards+'</div><aside class="be-exp-contribution-aside" id="be-member-contributions" aria-label="'+lang('Share with Boudie Eats','شاركنا في بودي إيتس')+'"></aside></div>'+
-  '</section>'+
-  '<section class="be-exp-member-bottom" aria-label="'+lang('Your food journey','رحلتك مع الأكل')+'">'+
-   '<div><strong>'+lang('A little adventurous today?','نفسك تجرّب حاجة مختلفة؟')+'</strong>'+
-   '<p>'+lang('Take the food personality quiz and see where your taste takes you.','جرّب اختبار شخصية الأكل وشوف ذوقك هيوديك فين.')+'</p></div>'+
-   link(lang('Try the food lab','جرّب معمل الأكل'),path('food-lab'))+
   '</section>'+
  '</div>';
 }
 function standard(title,copy,num,body){
- return '<section class="be-exp-section be-exp-section--fresh"><div class="be-exp-section-intro"><div class="be-exp-section-intro-copy">'+eyebrow(num)+'<h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p><a class="be-exp-back" href="'+path('home')+'">'+lang('← Member home','← الرئيسية للأعضاء')+'</a><a class="be-exp-share-jump" href="#be-member-contributions">'+lang('Contribute here','شارك في القسم')+'</a></div><div class="be-exp-section-motif" aria-hidden="true">'+(Object.values(activityIcons)[Math.max(0,Math.min(6,Number(num)-1))])+'</div></div><div class="be-exp-section-content"><div class="be-exp-detail-layout"><div class="be-exp-detail-main">'+body+'</div><aside class="be-exp-contribution-aside" id="be-member-contributions" aria-label="'+lang('Share with Boudie Eats','شاركنا في بودي إيتس')+'"></aside></div></div></section>';
+ return '<section class="be-exp-section be-exp-section--fresh" aria-label="'+esc(title)+'">'+
+  '<div class="be-exp-detail-layout">'+
+   '<div class="be-exp-detail-main">'+
+    '<div class="be-exp-section-intro">'+
+     '<div class="be-exp-section-intro-copy">'+
+      eyebrow()+'<h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p>'+
+      '<a class="be-exp-back" href="'+path('home')+'">'+lang('← Back to Discover','← الرجوع لاكتشف')+'</a>'+
+     '</div>'+
+     '<div class="be-exp-section-motif" aria-hidden="true">'+
+      (Object.values(activityIcons)[Math.max(0,Math.min(6,Number(num)-1))])+
+     '</div>'+
+    '</div>'+
+    '<div class="be-exp-section-content">'+body+'</div>'+
+   '</div>'+
+   '<aside class="be-exp-contribution-aside" id="be-member-contributions" aria-label="'+
+     lang('Share with Boudie Eats','شاركنا في بودي إيتس')+'"></aside>'+
+  '</div>'+
+ '</section>';
 }
+
 const empty=(title,copy)=>'<div class="be-exp-empty"><strong>'+esc(title)+'</strong><p>'+esc(copy)+'</p></div>';
 function mama(){
  return standard(lang('Boudie’s Mama Picks','اختيارات ماما عند بودي'),
