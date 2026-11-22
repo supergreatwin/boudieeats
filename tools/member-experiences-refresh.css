@@ -7,12 +7,6 @@
 }
 .be-exp-page{max-width:1440px;padding:20px clamp(15px,3vw,46px) 45px}
 .be-exp-top-in{max-width:1440px}
-.be-exp-subnav{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;
-  padding:8px 0 18px;margin-bottom:12px;border-color:rgba(114,37,63,.15)}
-.be-exp-subnav a{flex:none;border:0;border-radius:999px;
-  background:rgba(114,37,63,.055);color:var(--burgundy);font-weight:700;padding:10px 15px}
-.be-exp-subnav a:hover{background:var(--be-apricot);text-decoration:none}
-.be-exp-subnav a[aria-current=page]{background:var(--be-orange);color:#39201d;border:0}
 .be-exp-member-home{padding:8px 0 0}
 .be-exp-member-welcome{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(0,.84fr);
   min-height:370px;overflow:hidden;border-radius:18px;background:var(--be-peach)}
@@ -43,7 +37,7 @@
 .be-exp-member-layout,.be-exp-detail-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,338px);
   gap:clamp(16px,2vw,30px);align-items:start;min-width:0}
 .be-exp-member-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.3vw,17px)}
-.be-exp-member-card{display:flex;flex-direction:column;min-width:0;min-height:245px;
+.be-exp-member-card{display:flex;flex-direction:column;min-width:0;min-height:188px;
   border:1px solid rgba(114,37,63,.09);border-radius:15px;background:var(--be-card);
   padding:clamp(17px,1.7vw,27px);text-decoration:none;
   box-shadow:0 6px 25px rgba(51,35,43,.04);transition:transform .16s ease,box-shadow .16s ease}
@@ -53,11 +47,8 @@
 .be-exp-member-card:nth-child(7){background:var(--burgundy);color:var(--paper)}
 .be-exp-member-card:hover{transform:translateY(-3px);box-shadow:0 14px 35px rgba(51,35,43,.12)}
 .be-exp-member-icon{font-size:clamp(28px,3vw,40px);line-height:1}
-.be-exp-member-number{display:block;margin-top:15px;font:800 .7rem/1.5 'DM Sans',sans-serif;opacity:.68}
 .be-exp-member-card h2{font:600 clamp(1.18rem,1.5vw,1.65rem)/1.24 'Fraunces',Georgia,serif;
-  color:inherit;margin:8px 0}
-.be-exp-member-card p{font-size:clamp(.85rem,.92vw,.96rem);line-height:1.65;color:inherit;
-  margin:0 0 20px;opacity:.82}
+  color:inherit;margin:clamp(16px,2.1vw,25px) 0 12px}
 .be-exp-member-go{align-self:flex-end;margin-top:auto;font-size:23px;color:var(--be-orange-ink)}
 .be-exp-member-card:nth-child(7) .be-exp-member-go{color:var(--gold)}
 .be-exp-member-bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;
@@ -140,7 +131,6 @@ html[lang^=ar] .be-share-field textarea,html[lang^=ar] .be-share-field select,
 html[lang^=ar] .be-share-submit,html[lang^=ar] .be-share-status,
 html[lang^=ar] .be-share-consent,html[lang^=ar] .be-share-heading p,
 html[lang^=ar] .be-share-queue-list{font-family:'Lalezar',sans-serif;font-size:1rem}
-html[lang^=ar] .be-exp-member-card p{font-size:1.05rem}
 html[lang^=ar] .be-exp-member-eyebrow,html[lang^=ar] .be-share-kicker{letter-spacing:0}
 @media(max-width:1120px){
  .be-exp-member-layout,.be-exp-detail-layout{grid-template-columns:minmax(0,1fr) minmax(240px,300px)}
@@ -159,7 +149,7 @@ html[lang^=ar] .be-exp-member-eyebrow,html[lang^=ar] .be-share-kicker{letter-spa
  .be-exp-member-welcome-visual{min-height:190px}
  .be-exp-member-welcome h1{font-size:clamp(2.4rem,10vw,3.6rem)}
  .be-exp-member-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
- .be-exp-member-card{min-height:200px;padding:16px}
+ .be-exp-member-card{min-height:168px;padding:16px}
  .be-exp-member-card:nth-child(1){grid-column:span 2}
  .be-exp-member-card h2{font-size:1.22rem}
  .be-exp-member-icon{font-size:28px}
@@ -171,7 +161,6 @@ html[lang^=ar] .be-exp-member-eyebrow,html[lang^=ar] .be-share-kicker{letter-spa
 }
 @media(max-width:420px){
  .be-exp-member-card h2{font-size:1.08rem}
- .be-exp-member-card p{font-size:.84rem}
  .be-exp-ideas,.be-exp-gallery{grid-template-columns:minmax(0,1fr)}
 }
 @media(prefers-reduced-motion:reduce){.be-exp-member-card{transition:none}}
@@ -247,7 +236,6 @@ html[lang^=ar] .be-share-toggle{font-family:"Lalezar",sans-serif}
   .be-exp-member-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .be-share-toggle{width:100%}
   .be-exp-share-jump{margin-inline-start:0;margin-block-start:8px}
-  .be-exp-subnav a{padding:10px 12px}
 }
 @media(max-width:355px){
   .be-exp-member-grid{grid-template-columns:minmax(0,1fr)}
