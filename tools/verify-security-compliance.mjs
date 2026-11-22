@@ -16,13 +16,24 @@ for(const prefix of ['','ar/']){
  requireCheck(desk.includes('noindex,nofollow'),'Staff desk page indexable: '+prefix);
  requireCheck(!!account&&!!desk,'Missing account or desk: '+prefix);
  requireCheck(!account.includes('href="/'+prefix+'editorial-desk/"'),'Reader account advertises staff desk: '+prefix);
+ requireCheck(desk.includes('data-editorial-authorized="true"'),'Staff UI is not hidden by default: '+prefix);
+ requireCheck(desk.includes('noindex,nofollow,noarchive'),'Staff route permits indexing/archiving: '+prefix);
+ requireCheck(!desk.includes('data-staff-role="reader"'),'Reader role may appear in privileged markup: '+prefix);
 }
 const script=read('be-account.js');
 requireCheck(script.includes("client.rpc('be_staff')"),'No server-authoritative staff check');
 requireCheck(script.includes("if(deskMode&&!isStaff())"),'No staff-only action guard'); // source branch has exact string
+requireCheck(script.includes('window.location.replace(deskLogin())'),'Unauthorized direct desk access does not redirect');
+requireCheck(script.includes("if(deskMode&&!isStaff()){denyDesk();return;}"),'Staff desk does not fail closed during session verification');
+requireCheck(script.includes("document.body.dataset.editorialAuthorized='true'"),'Verified staff interface has no gated reveal');
+requireCheck(script.includes("client.rpc('be_staff')"),'Staff role is not verified server-side');
 requireCheck(script.includes('be-request-password-reset'),'Reset handler not using protected edge endpoint');
 requireCheck(!script.includes('client.auth.resetPasswordForEmail('),'Direct auth reset bypass remains in browser code');
 const headers=read('_headers');
+for(const prefix of ['/editorial-desk/*','/ar/editorial-desk/*']){
+ requireCheck(headers.includes(prefix+'\n  Cache-Control: no-store'),'Staff route is not no-store: '+prefix);
+ requireCheck(headers.includes('X-Robots-Tag: noindex, nofollow, noarchive'),'Staff route lacks archive protection: '+prefix);
+}
 for(const required of ['X-Content-Type-Options: nosniff','Referrer-Policy: strict-origin-when-cross-origin','Content-Security-Policy:','Strict-Transport-Security:','X-Frame-Options: DENY']){
  requireCheck(headers.includes(required),'Missing Cloudflare header: '+required);
 }
