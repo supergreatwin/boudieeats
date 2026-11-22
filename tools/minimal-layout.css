@@ -40,28 +40,64 @@ html[lang^="ar"] .be-feature-card h3,
 html[lang^="ar"] .entry-grid>.entry-card h3 {
   font-family:"Aref Ruqaa",serif!important;letter-spacing:0!important;
 }
-/* Full-bleed four-photo homepage, two featured recipes, one newsletter invitation. */
+/* Quiet, type-led bilingual homepage. No cover/photo grid. */
 html[data-be-layout="minimal-home"] main {
   width:100%!important;max-width:none!important;
   padding:0!important;margin:0!important;overflow:visible!important;
 }
 .be-minimal-home {width:100%;max-width:none;margin:0;background:var(--be-brand-cream);}
-.be-photo-grid {
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(0,1fr));gap:0!important;
-  width:100%;height:min(82vw,calc(100svh - 78px));
-  min-height:520px;max-height:1080px;overflow:hidden;
+.be-home-welcome {
+  background:var(--be-brand-cream);
+  display:flex;justify-content:center;align-items:center;text-align:center;
+  padding:clamp(70px,9vw,128px) 24px clamp(66px,8vw,116px)!important;
 }
-.be-photo-cell {
-  position:relative;display:block;min-width:0;min-height:0;overflow:hidden;
-  border:0!important;margin:0!important;padding:0!important;background:var(--be-brand-ink);
+.be-welcome-inner {width:100%;max-width:1100px;margin:0 auto;}
+.be-welcome-kicker {
+  margin:0 0 clamp(22px,2.7vw,34px)!important;
+  color:var(--be-brand-burgundy);text-transform:uppercase;
+  letter-spacing:.2em;font:700 .79rem/1.5 "DM Sans",sans-serif;
 }
-.be-photo-cell img {
-  display:block;width:100%!important;height:100%!important;
-  object-fit:cover!important;object-position:center!important;
-  max-width:none!important;max-height:none!important;transition:transform .6s ease;
+.be-home-welcome h1 {
+  color:var(--be-brand-burgundy-dark);
+  font:600 clamp(2.8rem,6.7vw,6.6rem)/1.08 "Fraunces",Georgia,serif;
+  letter-spacing:-.045em;margin:0 auto!important;max-width:1050px;
+  text-wrap:balance;
 }
-.be-photo-cell:hover img {transform:scale(1.025)}
+.be-welcome-dot {color:var(--be-brand-gold);}
+.be-welcome-copy {
+  color:var(--be-brand-ink);
+  font:400 clamp(1.08rem,1.65vw,1.35rem)/1.65 "DM Sans",sans-serif;
+  margin:clamp(20px,2.5vw,30px) auto 0!important;
+  max-width:720px;text-wrap:pretty;
+}
+.be-welcome-actions {
+  display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-top:clamp(28px,3.5vw,42px);
+}
+.be-welcome-actions a {
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:174px;min-height:48px;padding:12px 22px;
+  text-decoration:none!important;font:700 .95rem/1.2 "DM Sans",sans-serif;
+  border-radius:2px;transition:background-color .18s ease,color .18s ease;
+}
+.be-welcome-primary {color:var(--be-brand-cream)!important;background:var(--be-brand-burgundy)!important;border:1px solid var(--be-brand-burgundy);}
+.be-welcome-primary:hover {background:var(--be-brand-burgundy-dark)!important;}
+.be-welcome-secondary {color:var(--be-brand-burgundy)!important;border:1px solid var(--be-brand-burgundy)!important;background:transparent!important;}
+.be-welcome-secondary:hover {background:#f4e8e6!important;}
+.be-welcome-actions a:focus-visible {outline:2px solid var(--be-brand-burgundy-dark);outline-offset:4px}
+html[lang^="ar"] .be-home-welcome h1 {
+  font-family:"Aref Ruqaa",serif!important;letter-spacing:0!important;line-height:1.4;
+}
+html[lang^="ar"] .be-welcome-kicker {
+  font-family:"Lalezar",sans-serif!important;letter-spacing:0!important;
+  text-transform:none;font-size:1.1rem;
+}
+html[lang^="ar"] .be-welcome-copy,
+html[lang^="ar"] .be-welcome-actions a {
+  font-family:"Lalezar",sans-serif!important;
+}
+html[lang^="ar"] .be-welcome-copy {font-size:clamp(1.15rem,1.9vw,1.5rem)}
+html[lang^="ar"] .be-welcome-actions a {font-size:1.2rem}
 .be-featured-recipes {
   width:min(1240px,calc(100% - 48px));margin:0 auto!important;
   padding:clamp(32px,5vw,68px) 0!important;
@@ -184,7 +220,8 @@ html[data-be-layout="about-page"] .about-body {padding-top:8px!important}
   html[data-be-layout="recipe-index"] .entry-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
 @media(max-width:700px) {
-  .be-photo-grid {min-height:0;height:auto;max-height:none;aspect-ratio:1/1}
+  .be-home-welcome {padding:64px 18px 68px!important}
+  .be-home-welcome h1 {font-size:clamp(2.5rem,10vw,4.4rem)}
   .be-featured-recipes {width:calc(100% - 32px)}
   .be-home-newsletter {padding:24px 16px!important;flex-wrap:wrap}
   .be-review-side-layout {grid-template-columns:minmax(0,1fr)!important}
@@ -192,7 +229,9 @@ html[data-be-layout="about-page"] .about-body {padding-top:8px!important}
   html[data-be-layout="recipe-index"] .entry-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 @media(max-width:430px) {
-  .be-photo-grid {aspect-ratio:3/4}
+  .be-home-welcome {padding:56px 16px 60px!important}
+  .be-welcome-actions {flex-direction:column;gap:11px}
+  .be-welcome-actions a {width:100%;max-width:330px}
   .be-feature-grid {grid-template-columns:minmax(0,1fr)}
   html[data-be-layout="recipe-index"] .entry-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
   html[data-be-layout="recipe-index"] .entry-card .entry-copy {padding:10px 7px!important}
@@ -200,5 +239,5 @@ html[data-be-layout="about-page"] .about-body {padding-top:8px!important}
   html[lang^="ar"] .be-recipe-facts {font-size:.94rem}
 }
 @media(prefers-reduced-motion:reduce) {
-  .be-photo-cell img {transition:none}
+  .be-welcome-actions a {transition:none}
 }
