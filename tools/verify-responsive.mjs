@@ -8,7 +8,7 @@ const experience=readFileSync(new URL('./member-experiences-refresh.css',import.
 for(const marker of ['@media(max-width:760px)','@media(max-width:480px)','@media(prefers-reduced-motion:reduce)','--be-burgundy:#72253f']){
   if(!legacy.includes(marker))issues.push('Responsive layer missing '+marker);
 }
-for(const marker of ['.be-photo-grid','.be-feature-grid','.be-home-newsletter','.be-review-side-layout',
+for(const marker of ['.be-home-welcome','.be-welcome-inner','.be-feature-grid','.be-home-newsletter','.be-review-side-layout',
   '@media(max-width:1100px)','@media(max-width:700px)','@media(max-width:430px)',
   '@media(prefers-reduced-motion:reduce)']){
   if(!current.includes(marker))issues.push('New shared layout missing '+marker);
@@ -20,12 +20,12 @@ for(const locale of ['','ar/']){
   const home=join(dist,locale,'index.html');
   if(!existsSync(home)){issues.push('Homepage missing '+locale);continue;}
   const html=readFileSync(home,'utf8');
-  for(const marker of ['id="be-responsive-release"','data-be-layout="minimal-home"','class="be-photo-grid"',
+  for(const marker of ['id="be-responsive-release"','data-be-layout="minimal-home"','class="be-home-welcome"',
     'class="be-featured-recipes"','class="be-home-newsletter"','be-discover-teaser',
     'be-letter-dialog','be-minimal.css']){
     if(!html.includes(marker))issues.push(locale+' homepage missing '+marker);
   }
-  if((html.match(/class="be-photo-cell"/g)||[]).length!==4)issues.push(locale+' should have exactly four homepage photographs');
+  if(html.includes('be-photo-grid') || html.includes('be-photo-cell'))issues.push(locale+' still contains retired homepage cover');
   if((html.match(/class="be-feature-card"/g)||[]).length!==2)issues.push(locale+' should have exactly two featured recipes');
   if(/(?:what[- ]to[- ]eat|whattocommunity)/i.test(html))issues.push(locale+' includes withdrawn brand');
   const discover=join(dist,locale,'discover','index.html');
@@ -49,4 +49,4 @@ for(const route of ['recipes/','reviews/','stories/','account/','editorial-desk/
  }
 }
 if(issues.length){console.error(issues.join('\n'));process.exit(1);}
-console.log('PASS: bilingual four-photo homepage, two featured recipes, compact public layout, and 7 responsive member pages per language.');
+console.log('PASS: bilingual welcome homepage, two featured recipes, compact public layout, and 7 responsive member pages per language.');
