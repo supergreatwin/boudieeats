@@ -193,6 +193,24 @@ html[lang^=ar] body[data-view] .be-unified-header :is(.desktop-nav a,.be-account
   }
 }
 
+@media(max-width:420px) {
+  body[data-view] .be-unified-header .header-inner {
+    flex-wrap:wrap!important;min-height:0!important;
+    justify-content:center!important;gap:2px 10px!important;
+  }
+  body[data-view] .be-unified-header .wordmark {
+    width:100%!important;justify-content:center!important;
+    min-height:40px!important;
+  }
+  body[data-view] .be-unified-header .utilities {
+    flex:1 1 100%!important;justify-content:space-between!important;
+    width:100%!important;gap:4px!important;
+  }
+  body[data-view] .be-unified-header .utilities > a.be-account-nav {
+    max-width:125px!important;
+  }
+}
+
 /* Keep existing wordmarks; remove inconsistent active underlines and account borders. */
 .masthead .desktop-nav a::before,
 .masthead .desktop-nav a::after,
