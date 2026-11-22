@@ -1,5 +1,6 @@
 import {mkdirSync,readFileSync,writeFileSync,copyFileSync,readdirSync,rmSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
+import {createHash} from 'node:crypto';
 import {bePublicConfig} from './be-public-config.mjs';
 
 // Generate a clean independent Boudie Eats experience hub. The withdrawn
@@ -54,7 +55,7 @@ function sharedHeader({directory,arabic,view,base}) {
     (arabic?'اكتشف تجارب بودي إيتس':'Discover Boudie Eats')+'</a>');
  return header;
 }
-function page({arabic,base,view,header,supabaseUrl,supabasePublishableKey}){
+function page({arabic,base,view,header,assetVersion,supabaseUrl,supabasePublishableKey}){
  const prefix=arabic?'ar/':'',path=base+prefix+'discover/',title=view==='home'?(arabic?'اكتشف بودي إيتس':'Discover Boudie Eats'):names[view][arabic?1:0];
  const lang=arabic?'ar-EG':'en',langHref=base+(arabic?'':'ar/')+'discover/'+(view==='home'?'':view+'/');
  const enHref='https://boudieeats.com/discover/'+(view==='home'?'':view+'/');
@@ -65,12 +66,12 @@ function page({arabic,base,view,header,supabaseUrl,supabasePublishableKey}){
  '<meta name="description" content="'+e(arabic?'سبع تجارب أصلية للأكل من بودي إيتس':'Seven independent food discovery experiences by Boudie Eats')+'">'+
  '<meta name="theme-color" content="#72253f"><link rel="canonical" href="https://boudieeats.com/'+prefix+'discover/'+(view==='home'?'':view+'/')+'">'+
  '<link rel="alternate" hreflang="en" href="'+enHref+'"><link rel="alternate" hreflang="ar-EG" href="'+arHref+'">'+
- '<link rel="stylesheet" href="'+base+'be-experiences.css"><link rel="stylesheet" href="'+base+'be-experiences-refresh.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
+ '<link rel="stylesheet" href="'+base+'be-experiences.css?v='+assetVersion+'"><link rel="stylesheet" href="'+base+'be-experiences-refresh.css?v='+assetVersion+'"></head><body data-view="'+view+'" data-base="'+base+'">'+
  header+
  '<div class="be-exp-page"><main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
  '<footer class="be-exp-footer"><div><span>© Boudie Eats</span><span>'+(arabic?'الأكل حكايات.':'Food is a story.')+'</span></div></footer>'+
  '<script>window.BE_DISCOVER_CONFIG='+JSON.stringify({url:supabaseUrl,publishableKey:supabasePublishableKey}).replace(/</g,'\\u003c')+';</script>'+ 
- '<script type="module" src="'+base+'be-experiences.js"></script></body></html>';
+ '<script type="module" src="'+base+'be-experiences.js?v='+assetVersion+'"></script></body></html>';
 }
 export function addBoudieExperiences({directory,basePath='/',supabaseUrl=bePublicConfig.url,supabasePublishableKey=bePublicConfig.publishableKey}){
  const base=basePath.endsWith('/')?basePath:basePath+'/';
@@ -96,12 +97,18 @@ export function addBoudieExperiences({directory,basePath='/',supabaseUrl=bePubli
  copyFileSync(new URL('./boudie-experiences.css',import.meta.url),join(directory,'be-experiences.css'));
  copyFileSync(new URL('./member-submissions-client.mjs',import.meta.url),join(directory,'be-member-submissions.js'));
  copyFileSync(new URL('./member-experiences-refresh.css',import.meta.url),join(directory,'be-experiences-refresh.css'));
+ // Every visual or client update gets a new URL to avoid stale Safari/edge caches.
+ const assetVersion=createHash('sha256').update([
+  readFileSync(new URL('./boudie-experiences-client.mjs',import.meta.url),'utf8'),
+  readFileSync(new URL('./boudie-experiences.css',import.meta.url),'utf8'),
+  readFileSync(new URL('./member-experiences-refresh.css',import.meta.url),'utf8')
+ ].join('\n')).digest('hex').slice(0,12);
  for(const arabic of [false,true]){
   const prefix=arabic?'ar/':'';
   for(const view of ['home',...routes]){
    const folder=join(directory,prefix,'discover',...(view==='home'?[]:[view]));
    mkdirSync(folder,{recursive:true});
-   writeFileSync(join(folder,'index.html'),page({arabic,base,view,header:sharedHeader({directory,arabic,view,base}),supabaseUrl,supabasePublishableKey}));
+   writeFileSync(join(folder,'index.html'),page({arabic,base,view,header:sharedHeader({directory,arabic,view,base}),assetVersion,supabaseUrl,supabasePublishableKey}));
   }
  }
  // The new experience remains noindexed and unlinked from public menus.
