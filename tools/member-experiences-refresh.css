@@ -175,3 +175,82 @@ html[lang^=ar] .be-exp-member-eyebrow,html[lang^=ar] .be-share-kicker{letter-spa
  .be-exp-ideas,.be-exp-gallery{grid-template-columns:minmax(0,1fr)}
 }
 @media(prefers-reduced-motion:reduce){.be-exp-member-card{transition:none}}
+
+
+/* Consistent contribution UI and alignment in BOTH language editions. */
+#be-member-contributions{min-width:0;max-width:100%;width:100%;scroll-margin-top:24px}
+.be-exp-member-layout,.be-exp-detail-layout,.be-exp-member-grid,.be-exp-detail-main{
+  min-width:0;max-width:100%;
+}
+.be-exp-member-card,.be-exp-section-content,.be-exp-box,.be-exp-idea,
+.be-share-shell,.be-share-queue-item{overflow-wrap:anywhere}
+.be-exp-member-welcome-visual img{max-width:none}
+.be-share-expander{margin:0;min-width:0}
+.be-share-toggle{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border:1px solid var(--be-orange);border-radius:9px;
+  background:var(--be-orange);color:#41241b;font-weight:800;
+  padding:12px 14px;cursor:pointer;list-style:none;
+  min-height:46px;
+}
+.be-share-toggle::-webkit-details-marker{display:none}
+.be-share-toggle span{font-size:1.15em;transition:transform .15s ease}
+.be-share-expander[open] .be-share-toggle span{transform:rotate(45deg)}
+.be-share-expander[open] .be-share-form{padding:16px 0 0}
+.be-share-form,.be-share-field{min-width:0;max-width:100%}
+.be-share-queue-item>div{min-width:0;flex:1}
+.be-share-status-pill{max-width:45%;white-space:normal;text-align:center;line-height:1.35}
+.be-exp-share-jump{
+  margin-inline-start:15px;display:inline-flex;align-items:center;
+  color:var(--be-orange-ink);text-decoration:none;font-weight:800;
+  border-bottom:2px solid var(--be-orange);
+  min-height:39px;
+}
+.be-exp-share-jump:hover{color:var(--burgundy)}
+.be-exp-member-choices-head .be-exp-share-jump{margin-inline-start:0}
+.be-share-field input[type=file]{
+  padding:10px;background:var(--be-peach);max-width:100%;font-size:.85rem;
+}
+.be-share-field input[type=file]::file-selector-button{
+  background:var(--burgundy);color:#fffaf2;border:0;border-radius:6px;
+  padding:9px 11px;margin-inline-end:8px;cursor:pointer;
+}
+.be-exp-footer{padding:15px 24px!important;color:var(--ink)}
+.be-exp-top a.be-account-nav{border:0;border-radius:0;background:transparent}
+html[dir=rtl] .be-exp-member-card,
+html[dir=rtl] .be-share-shell{text-align:right}
+html[dir=ltr] .be-exp-member-card,
+html[dir=ltr] .be-share-shell{text-align:left}
+html[lang^=ar] .be-exp-share-jump,
+html[lang^=ar] .be-share-toggle{font-family:"Lalezar",sans-serif}
+@media(min-width:851px) {
+  .be-exp-member-layout,.be-exp-detail-layout {
+    grid-template-columns:minmax(0,1fr) minmax(250px,320px);
+    align-items:start;
+  }
+}
+@media(max-width:850px){
+  .be-exp-member-layout,.be-exp-detail-layout{
+    grid-template-columns:minmax(0,1fr)!important;gap:17px;
+  }
+  .be-exp-contribution-aside{position:relative;top:auto;max-width:100%;min-width:0}
+  .be-exp-member-layout>.be-exp-contribution-aside{grid-row:1}
+  .be-exp-detail-layout>.be-exp-contribution-aside{grid-row:1}
+  .be-share-shell{max-height:none!important;overflow:visible}
+}
+@media(max-width:580px) {
+  .be-exp-member-welcome-copy{align-items:stretch}
+  .be-exp-member-welcome-actions{flex-direction:column;align-items:stretch}
+  .be-exp-member-welcome-actions .be-exp-action{width:100%}
+  .be-exp-member-card:nth-child(n){grid-column:auto}
+  .be-exp-member-card:nth-child(1){grid-column:span 2}
+  .be-exp-member-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .be-share-toggle{width:100%}
+  .be-exp-share-jump{margin-inline-start:0;margin-block-start:8px}
+  .be-exp-subnav a{padding:10px 12px}
+}
+@media(max-width:355px){
+  .be-exp-member-grid{grid-template-columns:minmax(0,1fr)}
+  .be-exp-member-card:nth-child(1){grid-column:auto}
+  .be-exp-section-intro{padding:18px}
+}
