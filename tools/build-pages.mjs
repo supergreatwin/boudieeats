@@ -147,6 +147,12 @@ copyFileSync(join(root, 'assets', 'boudieeats-wordmark-cream-gold-v2.svg'), join
 // Host-specific rules do not apply to https://boudieeats.com/.
 const headersPath = join(dist, '_headers');
 let headerRules = existsSync(headersPath) ? readFileSync(headersPath, 'utf8').trimEnd() + '\n\n' : '';
+// Defense in depth for all staff-only routes on the Cloudflare deployment:
+for(const staffPath of ['/editorial-desk/*','/ar/editorial-desk/*']){
+  if(!headerRules.includes(staffPath+'\n')){
+    headerRules += staffPath+'\n  Cache-Control: no-store\\n  X-Robots-Tag: noindex, nofollow, noarchive\n\n';
+  }
+}
 if (!headerRules.includes('/sitemap.xml\n')) {
   headerRules += '/sitemap.xml\n  X-Robots-Tag: noindex\n\n';
 }
