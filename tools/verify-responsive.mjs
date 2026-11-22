@@ -9,6 +9,7 @@ for(const marker of ['@media(max-width:760px)','@media(max-width:480px)','@media
   if(!legacy.includes(marker))issues.push('Responsive layer missing '+marker);
 }
 for(const marker of ['.be-home-welcome','.be-welcome-inner','.be-feature-grid','.be-home-newsletter','.be-review-side-layout',
+  'footer.be-compact-footer','text-align:justify',
   '@media(max-width:1100px)','@media(max-width:700px)','@media(max-width:430px)',
   '@media(prefers-reduced-motion:reduce)']){
   if(!current.includes(marker))issues.push('New shared layout missing '+marker);
@@ -27,6 +28,16 @@ for(const locale of ['','ar/']){
   }
   if(html.includes('be-photo-grid') || html.includes('be-photo-cell'))issues.push(locale+' still contains retired homepage cover');
   if((html.match(/class="be-feature-card"/g)||[]).length!==2)issues.push(locale+' should have exactly two featured recipes');
+  if(html.includes('Recipes, food notes and stories, delivered as a letter.'))issues.push(locale+' still contains removed newsletter sentence');
+  const footer=html.match(/<footer class="be-compact-footer">([\s\S]*?)<\/footer>/);
+  if(!footer)issues.push(locale+' missing compact footer');
+  else {
+    if(/Sign in|Sign up|دخول \/ حساب|be-reader-links|be-discover-footer/i.test(footer[1]))issues.push(locale+' footer has redundant account or participation links');
+    for(const route of ['contact/','privacy/','terms/','cookies/']){
+      if(!footer[1].includes(locale+route))issues.push(locale+' footer missing '+route);
+    }
+  }
+
   if(/(?:what[- ]to[- ]eat|whattocommunity)/i.test(html))issues.push(locale+' includes withdrawn brand');
   const discover=join(dist,locale,'discover','index.html');
   const d=existsSync(discover)?readFileSync(discover,'utf8'):'';
