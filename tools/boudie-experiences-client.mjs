@@ -1,3 +1,4 @@
+import { mountMemberSubmissions } from './be-member-submissions.js';
 // Boudie Eats independent seven-experience application.
 // No external brand assets, copyrighted partner content, or invented venues.
 // Public content is queried through RLS; personal saved dishes are bound to signed-in accounts.
@@ -55,7 +56,7 @@ function home(){
     '<span class="be-exp-member-eyebrow">'+lang('A LITTLE SOMETHING FOR EVERY APPETITE','لكل مزاج أكلة')+'</span>'+
     '<h2 id="be-member-choices-title">'+lang('Where shall we start?','هنبدأ منين؟')+'</h2>'+
    '</div><p>'+lang('Seven ways to make food more fun.','سبع طرق نخلي بيها الأكل أحلى.')+'</p></div>'+
-   '<div class="be-exp-member-grid">'+cards+'</div>'+
+   '<div class="be-exp-member-layout"><div class="be-exp-member-grid">'+cards+'</div><aside class="be-exp-contribution-aside" id="be-member-contributions" aria-label="'+lang('Share with Boudie Eats','شاركنا في بودي إيتس')+'"></aside></div>'+
   '</section>'+
   '<section class="be-exp-member-bottom" aria-label="'+lang('Your food journey','رحلتك مع الأكل')+'">'+
    '<div><strong>'+lang('A little adventurous today?','نفسك تجرّب حاجة مختلفة؟')+'</strong>'+
@@ -65,7 +66,7 @@ function home(){
  '</div>';
 }
 function standard(title,copy,num,body){
- return '<section class="be-exp-section be-exp-section--fresh"><div class="be-exp-section-intro"><div class="be-exp-section-intro-copy">'+eyebrow(num)+'<h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p><a class="be-exp-back" href="'+path('home')+'">'+lang('← Member home','← الرئيسية للأعضاء')+'</a></div><div class="be-exp-section-motif" aria-hidden="true">'+(Object.values(activityIcons)[Math.max(0,Math.min(6,Number(num)-1))])+'</div></div><div class="be-exp-section-content">'+body+'</div></section>';
+ return '<section class="be-exp-section be-exp-section--fresh"><div class="be-exp-section-intro"><div class="be-exp-section-intro-copy">'+eyebrow(num)+'<h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p><a class="be-exp-back" href="'+path('home')+'">'+lang('← Member home','← الرئيسية للأعضاء')+'</a></div><div class="be-exp-section-motif" aria-hidden="true">'+(Object.values(activityIcons)[Math.max(0,Math.min(6,Number(num)-1))])+'</div></div><div class="be-exp-section-content"><div class="be-exp-detail-layout"><div class="be-exp-detail-main">'+body+'</div><aside class="be-exp-contribution-aside" id="be-member-contributions" aria-label="'+lang('Share with Boudie Eats','شاركنا في بودي إيتس')+'"></aside></div></div></section>';
 }
 const empty=(title,copy)=>'<div class="be-exp-empty"><strong>'+esc(title)+'</strong><p>'+esc(copy)+'</p></div>';
 function mama(){
@@ -318,6 +319,7 @@ async function bootDiscover(){
    }catch{memberName='';}
   }
   root.innerHTML=(render[slug]||home)();
+  mountMemberSubmissions({client:discoverAuthClient,user:data.user,ar,view:slug});
   bindDiscoverControls();
   await loadApprovedContent();
  }catch{showDiscoverSignIn();}
