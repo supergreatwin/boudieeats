@@ -116,23 +116,9 @@ function getSection(html, term) {
   found.sort((a,b)=>(a.end-a.start)-(b.end-b.start));
   return found[0] || null;
 }
+// Review sidebar is moved after DOM parsing (no brittle source-HTML matching).
 function reviews(html, ar) {
-  const criteria=getSection(html, ar ? 'ببص على إيه في التجربة' : 'What do I look for in a review');
-  const places=getSection(html, ar ? 'المطاعم والكافيهات</h2>' : 'Restaurants and cafés</h2>');
-  if (!criteria || !places || criteria.start <= places.end) {
-    throw new Error('Review sidebar source sections not found or unexpectedly ordered');
-  }
-  const originalSidebar=html.slice(criteria.start,criteria.end);
-  html=html.slice(0,criteria.start)+html.slice(criteria.end);
-  const restaurants=getSection(html, ar ? 'المطاعم والكافيهات</h2>' : 'Restaurants and cafés</h2>');
-  if (!restaurants) throw new Error('Restaurants section not found after extracting sidebar');
-  const content=html.slice(restaurants.start,restaurants.end);
-  const combined='<div class="be-review-side-layout"><div class="be-review-main">' + content +
-    '</div><aside class="be-review-sidebar" aria-label="' +
-    (ar ? 'معايير تقييم التجارب' : 'Review criteria') + '">' + originalSidebar +
-    '</aside></div>';
-  html=html.slice(0,restaurants.start)+combined+html.slice(restaurants.end);
-  return pageClass(html,'reviews-index');
+ return pageClass(html, 'reviews-index');
 }
 function about(html) {
   return pageClass(html, 'about-page');
@@ -141,6 +127,8 @@ function about(html) {
 export function applyBoudieMinimalLayout({directory,basePath='/'}) {
   const base=basePath.endsWith('/')?basePath:basePath+'/';
   copyFileSync(new URL('./minimal-layout.css',import.meta.url),join(directory,'be-minimal.css'));
+  copyFileSync(new URL('./minimal-interactions.js',import.meta.url),join(directory,'be-minimal-interactions.js'));
+
   let touched=0;
   for (const entry of readdirSync(directory,{recursive:true})) {
     if (!entry.endsWith('.html') || /^google[a-z0-9]+\.html$/i.test(entry)) continue;
@@ -153,7 +141,8 @@ export function applyBoudieMinimalLayout({directory,basePath='/'}) {
     if (route==='recipes/index.html') html=recipes(html,ar);
     if (route==='reviews/index.html') html=reviews(html,ar);
     if (route==='about/index.html') html=about(html);
-    html=html.replace('</head>','<link rel="stylesheet" href="' + base + 'be-minimal.css"></head>');
+    html=html.replace('</head>','<link rel="stylesheet" href="' + base + 'be-minimal.css">'+
+      '<script defer src="' + base + 'be-minimal-interactions.js"></script></head>');
     writeFileSync(path,html);
     touched++;
   }
