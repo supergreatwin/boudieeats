@@ -16,6 +16,7 @@ import { finishResponsiveLayout } from './responsive-finish.mjs';
 import { addBoudieExperiences } from './boudie-experiences-pages.mjs';
 import { launchBoudieDiscovery } from './launch-discovery.mjs';
 import { addMemberSession } from './member-session-pages.mjs';
+import { applyBoudieMinimalLayout } from './minimal-layout.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -133,6 +134,8 @@ addMemberSession({ directory: dist, basePath: originalBase,
   supabasePublishableKey: process.env.BE_SUPABASE_PUBLISHABLE_KEY || bePublicConfig.publishableKey });
 // Last-mile responsive polish: phones, tablets, desktops and reduced-motion users.
 finishResponsiveLayout({ directory: dist });
+// Keep the shared Boudie Eats palette and compact editorial page layouts consistent.
+applyBoudieMinimalLayout({ directory: dist, basePath: originalBase });
 // Cancelled collaboration routes and assets are deliberately not generated.
 // Ship the original supplied logo artwork as a shared English/Arabic asset.
 mkdirSync(join(dist, 'media'), { recursive: true });
