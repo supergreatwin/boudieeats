@@ -39,6 +39,16 @@ for(const locale of ['','ar/']){
   }
 
   if(/(?:what[- ]to[- ]eat|whattocommunity)/i.test(html))issues.push(locale+' includes withdrawn brand');
+  const recipeIndex=join(dist,locale,'recipes','index.html');
+  if(existsSync(recipeIndex)){
+    const recipeHtml=readFileSync(recipeIndex,'utf8');
+    for(const retired of ['class="page-intro','class="archive-feature','class="archive-heading']){
+      if(recipeHtml.includes(retired))issues.push(locale+' recipes still shows retired intro/banner: '+retired);
+    }
+    for(const required of ['be-recipe-index-sr-only','data-catalog="recipes"','class="filter-form"','class="entry-grid"']){
+      if(!recipeHtml.includes(required))issues.push(locale+' recipes missing essential catalog element: '+required);
+    }
+  } else issues.push(locale+' recipes index not built');
   const discover=join(dist,locale,'discover','index.html');
   const d=existsSync(discover)?readFileSync(discover,'utf8'):'';
   if(!d.includes('be-experiences-refresh.css')||!d.includes('be-experiences.js'))
