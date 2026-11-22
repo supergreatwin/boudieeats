@@ -24,8 +24,21 @@ function sharedHeader({directory,arabic,view,base}) {
  if(!found)throw new Error('Canonical Boudie Eats masthead missing in '+prefix+'homepage');
  let header=found[0].replace('class="masthead"','class="masthead be-unified-header"')
   .replace(/\saria-current="page"/g,'');
+ // At this build stage the native homepage has not yet received the
+ // public Discover link. Add it here only if it is absent.
+ if(!header.includes('class="be-discover-nav"')){
+   const discoverLink='<a class="be-discover-nav" href="'+base+prefix+
+     'account/?next='+encodeURIComponent('/'+prefix+'discover/')+'">'+
+     (arabic?'اكتشف تجارب بودي إيتس':'Discover Boudie Eats')+'</a>';
+   header=header.replace(/(<nav\\b[^>]*class="[^"]*\\bdesktop-nav\\b[^"]*"[^>]*>)/i,'$1'+discoverLink);
+ }
+ if(!header.includes('class="be-account-nav"')){
+   const accountLabel=arabic?'دخول / حساب جديد':'Sign in / Sign up';
+   header=header.replace(/(<div\\b[^>]*class="[^"]*\\butilities\\b[^"]*"[^>]*>)/i,
+     '$1<a class="be-account-nav" href="'+base+prefix+'account/">'+accountLabel+'</a>');
+ }
  if(!header.includes('class="be-discover-nav"')||!header.includes('class="be-account-nav"'))
-  throw new Error('Shared masthead is missing Discover or account navigation');
+   throw new Error('Cannot assemble shared Discover and account navigation');
  header=header.replace('class="be-discover-nav"', 'aria-current="page" class="be-discover-nav"');
  const enTarget=base+'discover/'+(view==='home'?'':view+'/');
  const arTarget=base+'ar/discover/'+(view==='home'?'':view+'/');
