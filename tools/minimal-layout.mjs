@@ -134,6 +134,22 @@ function recipes(html, ar) {
       return block.replace(/<\/h3>/i, '</h3>' + facts);
     });
   if (count < 5) throw new Error('Found only ' + count + ' recipe cards; required five-column recipe index');
+
+  // The recipes catalog is the page. Remove the empty-value breadcrumb,
+  // oversized green introduction and duplicate featured #001 ribbon.
+  // Keep one accessible H1, existing filters, recipe cards and publication feed.
+  const pageIntro=/<div\b[^>]*class="[^"]*\bpage-intro\b[^"]*"[^>]*>[\s\S]*?(?=<div\b[^>]*class="[^"]*\barchive-body\b)/i;
+  const feature=/<a\b[^>]*class="[^"]*\barchive-feature\b[^"]*"[^>]*>[\s\S]*?<\/a>/i;
+  if(!pageIntro.test(html) || !feature.test(html))
+    throw new Error('Recipes index introduction structure changed; refusing incomplete removal');
+  html=html.replace(pageIntro,
+    '<h1 class="be-recipe-index-sr-only">' + (ar ? 'الوصفات' : 'Recipes') + '</h1>');
+  html=html.replace(feature,'');
+  html=html.replace(/<h2\b[^>]*class="[^"]*\barchive-heading\b[^"]*"[^>]*>[\s\S]*?<\/h2>/i,'');
+  if (/<div\b[^>]*class="[^"]*\bpage-intro\b/.test(html) ||
+      /<a\b[^>]*class="[^"]*\barchive-feature\b/.test(html))
+    throw new Error('Recipes index still has duplicate introductory sections');
+
   return pageClass(html, 'recipe-index');
 }
 
