@@ -15,18 +15,37 @@ const names={
  'food-lab':['Boudie Food Personality Lab','معمل شخصية الأكل من بودي']
 };
 const e=(s)=>String(s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
+// The visitor homepage owns the header. Every Discover route reuses its markup
+// rather than maintaining a second, divergent navigation implementation.
+function sharedHeader({directory,arabic,view,base}) {
+ const prefix=arabic?'ar/':'';
+ const homepage=readFileSync(join(directory,prefix,'index.html'),'utf8');
+ const found=homepage.match(/<header\b[^>]*class="[^"]*\bmasthead\b[^"]*"[^>]*>[\s\S]*?<\/header>/i);
+ if(!found)throw new Error('Canonical Boudie Eats masthead missing in '+prefix+'homepage');
+ let header=found[0].replace('class="masthead"','class="masthead be-unified-header"')
+  .replace(/\saria-current="page"/g,'');
+ if(!header.includes('class="be-discover-nav"')||!header.includes('class="be-account-nav"'))
+  throw new Error('Shared masthead is missing Discover or account navigation');
+ header=header.replace('class="be-discover-nav"', 'aria-current="page" class="be-discover-nav"');
+ const enTarget=base+'discover/'+(view==='home'?'':view+'/');
+ const arTarget=base+'ar/discover/'+(view==='home'?'':view+'/');
+ const switcher=/<nav\b[^>]*class="[^"]*\bbe-language\b[^"]*"[^>]*>[\s\S]*?<\/nav>/i;
+ if(!switcher.test(header))throw new Error('Language switcher not found in shared masthead');
+ header=header.replace(switcher, block=>block
+   .replace('href="'+base+'"','href="'+enTarget+'"')
+   .replace('href="'+base+'ar/"','href="'+arTarget+'"'));
+ // The desktop header already has Discover; ensure mobile does too.
+ header=header.replace(/(<details\b[^>]*class="[^"]*\bmobile-nav\b[^"]*"[^>]*>[\s\S]*?<nav\b[^>]*>)/i,
+  '$1<a aria-current="page" class="be-discover-nav" href="'+
+    base+prefix+'account/?next='+encodeURIComponent('/'+prefix+'discover/')+'">'+
+    (arabic?'اكتشف تجارب بودي إيتس':'Discover Boudie Eats')+'</a>');
+ return header;
+}
+function page({arabic,base,view,header,supabaseUrl,supabasePublishableKey}){
  const prefix=arabic?'ar/':'',path=base+prefix+'discover/',title=view==='home'?(arabic?'اكتشف بودي إيتس':'Discover Boudie Eats'):names[view][arabic?1:0];
  const lang=arabic?'ar-EG':'en',langHref=base+(arabic?'':'ar/')+'discover/'+(view==='home'?'':view+'/');
  const enHref='https://boudieeats.com/discover/'+(view==='home'?'':view+'/');
  const arHref='https://boudieeats.com/ar/discover/'+(view==='home'?'':view+'/');
- const primaryNav='<a href="'+base+prefix+'">'+(arabic?'الرئيسية':'Home')+'</a>'+
- '<a href="'+base+prefix+'recipes/">'+(arabic?'الوصفات':'Recipes')+'</a>'+
- '<a href="'+base+prefix+'reviews/">'+(arabic?'التجارب':'Reviews')+'</a>'+
- '<a class="be-account-nav" href="'+base+prefix+'account/">'+(arabic?'دخول / حساب جديد':'Sign in / Sign up')+'</a>'+
- ''; 
- const switcher='<nav class="be-language" aria-label="Language"><a hreflang="'+(arabic?'en':'ar-EG')+'" href="'+langHref+'">'+(arabic?'EN':'AR')+'</a></nav>';
- const logo=arabic?'<span class="be-exp-logo-text">بودي إيتس.</span>':'<img src="'+base+'media/boudieeats-wordmark-cream-gold-v2.svg" width="195" height="32" alt="boudieeats.">';
  return '<!doctype html><html lang="'+lang+'" dir="'+(arabic?'rtl':'ltr')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
  '<title>'+e(title)+' | Boudie Eats</title>'+
  '<meta name="robots" content="noindex,nofollow,noarchive">'+
@@ -34,7 +53,7 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  '<meta name="theme-color" content="#72253f"><link rel="canonical" href="https://boudieeats.com/'+prefix+'discover/'+(view==='home'?'':view+'/')+'">'+
  '<link rel="alternate" hreflang="en" href="'+enHref+'"><link rel="alternate" hreflang="ar-EG" href="'+arHref+'">'+
  '<link rel="stylesheet" href="'+base+'be-experiences.css"><link rel="stylesheet" href="'+base+'be-experiences-refresh.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
- '<header class="be-exp-top"><div class="be-exp-top-in"><a href="'+base+prefix+'" class="be-exp-logo">'+logo+'</a><nav>'+primaryNav+'</nav>'+switcher+'</div></header>'+
+ header+
  '<div class="be-exp-page"><main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
  '<footer class="be-exp-footer"><div><span>© Boudie Eats</span><span>'+(arabic?'الأكل حكايات.':'Food is a story.')+'</span></div></footer>'+
  '<script>window.BE_DISCOVER_CONFIG='+JSON.stringify({url:supabaseUrl,publishableKey:supabasePublishableKey}).replace(/</g,'\\u003c')+';</script>'+ 
@@ -69,7 +88,7 @@ export function addBoudieExperiences({directory,basePath='/',supabaseUrl=bePubli
   for(const view of ['home',...routes]){
    const folder=join(directory,prefix,'discover',...(view==='home'?[]:[view]));
    mkdirSync(folder,{recursive:true});
-   writeFileSync(join(folder,'index.html'),page({arabic,base,view,supabaseUrl,supabasePublishableKey}));
+   writeFileSync(join(folder,'index.html'),page({arabic,base,view,header:sharedHeader({directory,arabic,view,base}),supabaseUrl,supabasePublishableKey}));
   }
  }
  // The new experience remains noindexed and unlinked from public menus.
