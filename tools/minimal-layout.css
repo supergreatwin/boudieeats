@@ -6,6 +6,193 @@
   --be-brand-gold:#ebc57b;
   --be-brand-ink:#33232b;
 }
+/* Discover uses the actual visitor masthead markup, with one stable responsive
+   presentation instead of a separate sub-site header. These rules are scoped
+   to Discover; they do not change public or Editorial Desk navigation. */
+body[data-view] .masthead.be-unified-header {
+  box-sizing:border-box!important;
+  position:relative;z-index:50;
+  width:100%;margin:0;
+  background:#51283e!important;color:#fffaf2!important;
+  border:0!important;box-shadow:none!important;
+}
+body[data-view] .be-unified-header .header-inner {
+  box-sizing:border-box!important;
+  max-width:1320px!important;
+  width:100%!important;
+  min-height:80px!important;
+  margin-inline:auto!important;
+  padding:12px clamp(16px,3vw,36px)!important;
+  display:flex!important;align-items:center!important;
+  justify-content:space-between!important;
+  gap:clamp(12px,1.5vw,22px)!important;
+}
+body[data-view] .be-unified-header .wordmark {
+  display:inline-flex!important;align-items:center!important;
+  flex:none!important;min-width:0!important;
+  color:#fffaf2!important;text-decoration:none!important;
+  border:0!important;box-shadow:none!important;background:transparent!important;
+}
+body[data-view] .be-unified-header .wordmark img {
+  display:block!important;
+  width:clamp(163px,15vw,207px)!important;height:auto!important;
+  max-width:100%!important;max-height:57px!important;
+  object-fit:contain!important;
+}
+body[data-view] .be-unified-header .be-arabic-wordmark {
+  font:700 clamp(1.7rem,2.5vw,2.3rem)/1.4 "Aref Ruqaa",serif!important;
+  letter-spacing:0!important;white-space:nowrap!important;
+}
+body[data-view] .be-unified-header .be-arabic-wordmark span {
+  color:#ebc57b!important;
+}
+body[data-view] .be-unified-header .desktop-nav {
+  display:flex!important;
+  flex:1!important;min-width:0!important;
+  align-items:center!important;justify-content:center!important;
+  gap:clamp(10px,1.4vw,22px)!important;
+  margin:0!important;padding:0!important;
+  flex-wrap:nowrap!important;
+  background:transparent!important;
+}
+body[data-view] .be-unified-header .desktop-nav a {
+  display:inline-flex!important;align-items:center!important;
+  min-height:40px!important;
+  margin:0!important;padding:2px 0!important;
+  font:600 clamp(.78rem,.92vw,.9rem)/1.3 "DM Sans",sans-serif!important;
+  white-space:nowrap!important;color:#fffaf2!important;
+  text-decoration:none!important;border:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+body[data-view] .be-unified-header .desktop-nav a[aria-current=page] {
+  color:#ebc57b!important;text-decoration:none!important;
+}
+body[data-view] .be-unified-header .desktop-nav a::before,
+body[data-view] .be-unified-header .desktop-nav a::after {
+  display:none!important;content:none!important;
+}
+body[data-view] .be-unified-header .utilities {
+  display:flex!important;flex:none!important;
+  align-items:center!important;justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+  gap:clamp(8px,1.1vw,14px)!important;
+  margin:0!important;min-width:0!important;
+  background:transparent!important;color:#fffaf2!important;
+}
+body[data-view] .be-unified-header .utilities > .icon-button {
+  min-width:38px!important;min-height:44px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  border:0!important;background:transparent!important;color:inherit!important;
+  padding:5px!important;
+}
+body[data-view] .be-unified-header .utilities > a.be-account-nav {
+  display:inline-flex!important;align-items:center!important;
+  min-height:44px!important;
+  max-width:175px!important;
+  margin:0!important;padding:4px 0!important;
+  color:#fffaf2!important;background:transparent!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  text-decoration:none!important;white-space:nowrap!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;
+  font:700 .82rem/1.3 "DM Sans",sans-serif!important;
+}
+body[data-view] .be-unified-header .be-member-logout {
+  color:#fffaf2!important;background:transparent!important;
+  min-height:44px!important;padding:4px 6px!important;
+  white-space:nowrap!important;font-size:.82rem!important;
+  border:0!important;
+}
+body[data-view] .be-unified-header .be-language {
+  display:inline-flex!important;align-items:center!important;
+  gap:10px!important;flex-wrap:nowrap!important;
+  margin:0!important;padding:0!important;
+  font:700 .8rem/1.3 "DM Sans",sans-serif!important;
+  color:#fffaf2!important;
+}
+body[data-view] .be-unified-header .be-language a {
+  color:inherit!important;min-height:38px!important;
+  display:inline-flex!important;align-items:center!important;
+  border:0!important;box-shadow:none!important;background:none!important;
+  text-decoration:none!important;padding:0 2px!important;
+  white-space:nowrap!important;
+}
+body[data-view] .be-unified-header .be-language a[aria-current=page] {
+  color:#ebc57b!important;
+}
+body[data-view] .be-unified-header .mobile-nav {display:none!important;}
+body[data-view] .be-unified-header a:focus-visible,
+body[data-view] .be-unified-header summary:focus-visible {
+  outline:2px solid #ebc57b!important;outline-offset:3px!important;
+}
+html[lang^=ar] body[data-view] .be-unified-header :is(.desktop-nav a,.be-account-nav,.be-member-logout) {
+  font-family:"Lalezar",sans-serif!important;font-size:1.01rem!important;
+}
+@media(max-width:1150px) {
+  body[data-view] .be-unified-header .header-inner {min-height:76px!important;}
+  body[data-view] .be-unified-header .desktop-nav {display:none!important;}
+  body[data-view] .be-unified-header .mobile-nav {
+    display:block!important;position:relative!important;flex:none!important;
+    min-width:44px!important;
+  }
+  body[data-view] .be-unified-header .mobile-nav summary {
+    list-style:none!important;cursor:pointer!important;
+    width:44px!important;height:44px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    padding:5px!important;color:#fffaf2!important;
+    background:transparent!important;border:0!important;
+  }
+  body[data-view] .be-unified-header .mobile-nav summary::-webkit-details-marker {display:none!important;}
+  body[data-view] .be-unified-header .mobile-nav nav {
+    display:flex!important;flex-direction:column!important;
+    align-items:stretch!important;gap:0!important;
+    box-sizing:border-box!important;
+    position:absolute!important;z-index:60!important;
+    top:calc(100% + 12px)!important;inset-inline-end:0!important;
+    width:min(320px,calc(100vw - 32px))!important;
+    max-width:calc(100vw - 32px)!important;
+    padding:9px!important;
+    border-radius:10px!important;border:1px solid #ddcbd0!important;
+    background:#fffaf2!important;color:#51283e!important;
+    box-shadow:0 12px 36px rgba(20,10,16,.18)!important;
+  }
+  body[data-view] .be-unified-header .mobile-nav:not([open]) nav {
+    display:none!important;
+  }
+  body[data-view] .be-unified-header .mobile-nav nav a {
+    display:block!important;
+    width:100%!important;min-height:42px!important;
+    padding:10px 12px!important;margin:0!important;
+    font:700 .94rem/1.4 "DM Sans",sans-serif!important;
+    text-decoration:none!important;color:#51283e!important;
+    border:0!important;border-radius:6px!important;
+    background:transparent!important;white-space:normal!important;
+  }
+  body[data-view] .be-unified-header .mobile-nav nav a[aria-current=page] {
+    background:#f7e8df!important;color:#72253f!important;
+  }
+}
+@media(max-width:550px) {
+  body[data-view] .be-unified-header .header-inner {
+    min-height:68px!important;padding:10px 15px!important;gap:8px!important;
+  }
+  body[data-view] .be-unified-header .wordmark img {
+    width:clamp(124px,29vw,162px)!important;
+  }
+  body[data-view] .be-unified-header .be-arabic-wordmark {
+    font-size:clamp(1.45rem,6.2vw,1.8rem)!important;
+  }
+  body[data-view] .be-unified-header .utilities {gap:6px!important;}
+  body[data-view] .be-unified-header .utilities > .icon-button {display:none!important;}
+  body[data-view] .be-unified-header .utilities > a.be-account-nav {
+    max-width:94px!important;font-size:.72rem!important;
+  }
+  body[data-view] .be-unified-header .be-language {gap:5px!important;font-size:.72rem!important;}
+  body[data-view] .be-unified-header .mobile-nav {min-width:38px!important;}
+  body[data-view] .be-unified-header .mobile-nav summary {
+    width:38px!important;height:42px!important;
+  }
+}
+
 /* Keep existing wordmarks; remove inconsistent active underlines and account borders. */
 .masthead .desktop-nav a::before,
 .masthead .desktop-nav a::after,
