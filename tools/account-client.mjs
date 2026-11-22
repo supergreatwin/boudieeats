@@ -770,6 +770,13 @@ async function init(){
     if(event==='PASSWORD_RECOVERY'){recovery=true;authMode='recovery';render();}
     if(event==='SIGNED_OUT'){user=profile=null;staffAuthorized=false;render();}
    });
+   if(deskMode){
+     // Revocation is checked again when the staff tab becomes active.
+     // Supabase RLS denies privileged operations even before revalidation.
+     window.addEventListener('focus',()=>{void refresh();});
+     document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh();});
+     window.addEventListener('pageshow',event=>{if(event.persisted)void refresh();});
+   }
    await refresh();
  }catch(error){client=null;say(tr('Could not connect to accounts.','تعذّر الاتصال بنظام الحسابات.'),true);render();}
 }
