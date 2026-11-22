@@ -30,11 +30,11 @@ function sharedHeader({directory,arabic,view,base}) {
    const discoverLink='<a class="be-discover-nav" href="'+base+prefix+
      'account/?next='+encodeURIComponent('/'+prefix+'discover/')+'">'+
      (arabic?'اكتشف تجارب بودي إيتس':'Discover Boudie Eats')+'</a>';
-   header=header.replace(/(<nav\\b[^>]*class="[^"]*\\bdesktop-nav\\b[^"]*"[^>]*>)/i,'$1'+discoverLink);
+   header=header.replace(/(<nav\b[^>]*class="[^"]*\bdesktop-nav\b[^"]*"[^>]*>)/i,'$1'+discoverLink);
  }
  if(!header.includes('class="be-account-nav"')){
    const accountLabel=arabic?'دخول / حساب جديد':'Sign in / Sign up';
-   header=header.replace(/(<div\\b[^>]*class="[^"]*\\butilities\\b[^"]*"[^>]*>)/i,
+   header=header.replace(/(<div\b[^>]*class="[^"]*\butilities\b[^"]*"[^>]*>)/i,
      '$1<a class="be-account-nav" href="'+base+prefix+'account/">'+accountLabel+'</a>');
  }
  if(!header.includes('class="be-discover-nav"')||!header.includes('class="be-account-nav"'))
