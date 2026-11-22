@@ -25,6 +25,14 @@ function say(message,error=false){status.textContent=message||'';status.dataset.
 function button(label,action,klass=''){return '<button type="button" class="'+klass+'" data-action="'+action+'">'+label+'</button>';}
 const showProfile=()=>tab==='profile';
 const isStaff=()=>staffAuthorized===true&&profile&&['editor','admin'].includes(profile.role)&&!!user?.email_confirmed_at;
+const deskLogin=()=>base+(ar?'ar/':'')+'account/?access=staff-only';
+// Never render an Editorial Desk preview to an anonymous or reader account.
+function denyDesk(){
+ if(document.body.dataset.mode!=='desk')return;
+ document.body.removeAttribute('data-editorial-authorized');
+ window.location.replace(deskLogin());
+}
+
 const canWrite=()=>isStaff();
 const value=(form,name)=>String(new FormData(form).get(name)||'').trim();
 function formFrame(type,fields,buttonText){
@@ -339,6 +347,7 @@ function deskAccounts(){
  '</h2><div id="be-team-accounts" aria-live="polite">'+tr('Loading…','جارٍ التحميل…')+'</div></section></div>';
 }
 function renderDesk(){
+ if(!isStaff()){denyDesk();return;}
  if(!['articles','apply','experiences','alerts','profile','pitches','review','analytics','activity','accounts'].includes(tab))
    tab=canWrite()?'articles':'apply';
  if(tab==='articles'&&!canWrite())tab='apply';
@@ -443,6 +452,8 @@ async function loadTeamAccounts(){
 
 function render(){
  if(!root)return;
+ if(deskMode&&!isStaff()){denyDesk();return;}
+ if(deskMode)document.body.dataset.editorialAuthorized='true';
  if(!client){
   root.innerHTML='<section class="be-panel be-disabled"><h2>'+tr('Accounts are being configured','بنجهّز نظام الحسابات')+'</h2><p>'+
   tr('The independent BoudieEats account backend is not connected yet. Registration is disabled until email verification and database permissions have been tested.',
@@ -450,10 +461,7 @@ function render(){
   '</p></section>';return;
  }
  if(deskMode){
-  if(!user||!profile||!isStaff()){
-    root.innerHTML='<section class="be-panel" role="alert"><h2>'+tr('Restricted staff area','منطقة خاصة بفريق التحرير')+'</h2><p>'+tr('Only verified editors and administrators can use the Editorial Desk. Sign in through your reader account.','مكتب التحرير للمحررين والمديرين المصرح لهم فقط. سجّل دخولك من صفحة حسابك.')+'</p><a class="be-primary" href="'+base+(ar?'ar/':'')+'account/">'+tr('Go to sign in / sign up','تسجيل الدخول أو إنشاء حساب')+'</a></section>';
-    return;
-  }
+  if(!isStaff()){denyDesk();return;}
   if(recovery){window.location.replace(base+(ar?'ar/':'')+'account/?mode=reset');return;}
   renderDesk();return;
  }
@@ -508,7 +516,13 @@ async function loadProfile(){
 }
 async function refresh(){
  if(refreshing)return;refreshing=true;
- try{await loadProfile();const next=safeDiscoverNext();if(next&&user?.email_confirmed_at&&profile){location.replace(next);return;}render();}
+ try{
+   await loadProfile();
+   if(deskMode&&!isStaff()){denyDesk();return;}
+   const next=deskMode?null:safeDiscoverNext();
+   if(next&&user?.email_confirmed_at&&profile){location.replace(next);return;}
+   render();
+  }
  catch(error){say(error.message||tr('Unable to load the account.','تعذّر تحميل الحساب.'),true);}
  finally{refreshing=false;}
 }
