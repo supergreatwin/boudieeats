@@ -516,6 +516,11 @@ async function loadProfile(){
 }
 async function refresh(){
  if(refreshing)return;refreshing=true;
+ if(deskMode){
+   // Never retain visible editorial controls while authorization is rechecked.
+   staffAuthorized=false;
+   document.body.removeAttribute('data-editorial-authorized');
+ }
  try{
    await loadProfile();
    if(deskMode&&!isStaff()){denyDesk();return;}
@@ -523,7 +528,10 @@ async function refresh(){
    if(next&&user?.email_confirmed_at&&profile){location.replace(next);return;}
    render();
   }
- catch(error){say(error.message||tr('Unable to load the account.','تعذّر تحميل الحساب.'),true);}
+ catch(error){
+    if(deskMode){denyDesk();return;}
+    say(error.message||tr('Unable to load the account.','تعذّر تحميل الحساب.'),true);
+  }
  finally{refreshing=false;}
 }
 function row(title,description,actions=''){
