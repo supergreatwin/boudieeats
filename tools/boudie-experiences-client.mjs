@@ -19,7 +19,7 @@ const features=[
 ];
 const esc=(v)=>String(v??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=(label,url,secondary=false)=>'<a class="be-exp-action'+(secondary?' be-exp-outline':'')+'" href="'+esc(url)+'">'+esc(label)+'</a>';
-const eyebrow=(num)=>'<p class="be-exp-small">'+esc(lang('BOUDIE EATS · EXPERIENCE '+num,'بودي إيتس · تجربة '+num))+'</p>';
+const eyebrow=()=>'<p class="be-exp-small">'+esc(lang('BOUDIE EATS · DISCOVER','بودي إيتس · اكتشف'))+'</p>';
 let memberName='';
 const activityIcons={
  'mama-picks':'🍲','dish-finder':'🍝','city-guide':'📍',
@@ -27,12 +27,12 @@ const activityIcons={
 };
 function home(){
  const greeting=memberName?lang('Welcome back, ','منوّرنا يا ')+esc(memberName):lang('Welcome to your table.','نورت سفرتنا!');
- const cards=features.map((x,i)=>
+ const cards=features.map(x=>
   '<a class="be-exp-member-card be-exp-member-card--'+esc(x.key)+'" href="'+path(x.key)+'">'+
    '<span class="be-exp-member-icon" aria-hidden="true">'+activityIcons[x.key]+'</span>'+
-   '<span class="be-exp-member-number">'+x.number+' / 07</span>'+
+
    '<h2>'+esc(lang(x.en,x.ar))+'</h2>'+
-   '<p>'+esc(lang(x.de,x.da))+'</p>'+
+
    '<span class="be-exp-member-go" aria-hidden="true">↗</span>'+
   '</a>').join('');
  return '<div class="be-exp-member-home">'+
@@ -55,7 +55,7 @@ function home(){
    '<div class="be-exp-member-choices-head"><div>'+
     '<span class="be-exp-member-eyebrow">'+lang('A LITTLE SOMETHING FOR EVERY APPETITE','لكل مزاج أكلة')+'</span>'+
     '<h2 id="be-member-choices-title">'+lang('Where shall we start?','هنبدأ منين؟')+'</h2>'+
-    '<a class="be-exp-share-jump" href="#be-member-contributions">'+lang('Share your idea','شارك بفكرتك')+'</a>'+
+
    '</div><p>'+lang('Seven ways to make food more fun.','سبع طرق نخلي بيها الأكل أحلى.')+'</p></div>'+
    '<div class="be-exp-member-layout"><div class="be-exp-member-grid">'+cards+'</div><aside class="be-exp-contribution-aside" id="be-member-contributions" aria-label="'+lang('Share with Boudie Eats','شاركنا في بودي إيتس')+'"></aside></div>'+
   '</section>'+
