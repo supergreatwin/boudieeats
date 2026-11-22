@@ -27,9 +27,6 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  ''; 
  const switcher='<nav class="be-language" aria-label="Language"><a hreflang="'+(arabic?'en':'ar-EG')+'" href="'+langHref+'">'+(arabic?'EN':'AR')+'</a></nav>';
  const logo=arabic?'<span class="be-exp-logo-text">بودي إيتس.</span>':'<img src="'+base+'media/boudieeats-wordmark-cream-gold-v2.svg" width="195" height="32" alt="boudieeats.">';
- const nav='<nav class="be-exp-subnav" aria-label="'+(arabic?'أقسام التجربة':'Experience sections')+'">'+
- '<a href="'+path+'" '+(view==='home'?'aria-current="page"':'')+'>'+(arabic?'الكل':'All seven')+'</a>'+
- routes.map(key=>'<a href="'+path+key+'/" '+(view===key?'aria-current="page"':'')+'>'+e(names[key][arabic?1:0])+'</a>').join('')+'</nav>';
  return '<!doctype html><html lang="'+lang+'" dir="'+(arabic?'rtl':'ltr')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
  '<title>'+e(title)+' | Boudie Eats</title>'+
  '<meta name="robots" content="noindex,nofollow,noarchive">'+
@@ -38,7 +35,7 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  '<link rel="alternate" hreflang="en" href="'+enHref+'"><link rel="alternate" hreflang="ar-EG" href="'+arHref+'">'+
  '<link rel="stylesheet" href="'+base+'be-experiences.css"><link rel="stylesheet" href="'+base+'be-experiences-refresh.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
  '<header class="be-exp-top"><div class="be-exp-top-in"><a href="'+base+prefix+'" class="be-exp-logo">'+logo+'</a><nav>'+primaryNav+'</nav>'+switcher+'</div></header>'+
- '<div class="be-exp-page">'+nav+'<main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
+ '<div class="be-exp-page"><main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
  '<footer class="be-exp-footer"><div><span>© Boudie Eats</span><span>'+(arabic?'الأكل حكايات.':'Food is a story.')+'</span></div></footer>'+
  '<script>window.BE_DISCOVER_CONFIG='+JSON.stringify({url:supabaseUrl,publishableKey:supabasePublishableKey}).replace(/</g,'\\u003c')+';</script>'+ 
  '<script type="module" src="'+base+'be-experiences.js"></script></body></html>';
