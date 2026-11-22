@@ -150,7 +150,7 @@ let headerRules = existsSync(headersPath) ? readFileSync(headersPath, 'utf8').tr
 // Defense in depth for all staff-only routes on the Cloudflare deployment:
 for(const staffPath of ['/editorial-desk/*','/ar/editorial-desk/*']){
   if(!headerRules.includes(staffPath+'\n')){
-    headerRules += staffPath+'\n  Cache-Control: no-store\\n  X-Robots-Tag: noindex, nofollow, noarchive\n\n';
+    headerRules += staffPath+'\n  Cache-Control: no-store\n  X-Robots-Tag: noindex, nofollow, noarchive\n\n';
   }
 }
 if (!headerRules.includes('/sitemap.xml\n')) {
