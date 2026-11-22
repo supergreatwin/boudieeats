@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, copyFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 // Final HTML pass for the owner's minimalist bilingual layout. Deliberately
 // leaves the newsletter dialog, member auth, protected routes and content DB intact.
@@ -166,6 +167,9 @@ export function applyBoudieMinimalLayout({directory,basePath='/'}) {
   const base=basePath.endsWith('/')?basePath:basePath+'/';
   copyFileSync(new URL('./minimal-layout.css',import.meta.url),join(directory,'be-minimal.css'));
   copyFileSync(new URL('./minimal-interactions.js',import.meta.url),join(directory,'be-minimal-interactions.js'));
+  const minimalVersion=createHash('sha256')
+    .update(readFileSync(new URL('./minimal-layout.css',import.meta.url),'utf8'))
+    .digest('hex').slice(0,12);
 
   let touched=0;
   for (const entry of readdirSync(directory,{recursive:true})) {
@@ -180,7 +184,7 @@ export function applyBoudieMinimalLayout({directory,basePath='/'}) {
     if (route==='reviews/index.html') html=reviews(html,ar);
     if (route==='about/index.html') html=about(html);
     html=compactFooter(html,base,ar);
-    html=html.replace('</head>','<link rel="stylesheet" href="' + base + 'be-minimal.css">'+
+    html=html.replace('</head>','<link rel="stylesheet" href="' + base + 'be-minimal.css?v=' + minimalVersion + '">'+
       '<script defer src="' + base + 'be-minimal-interactions.js"></script></head>');
     writeFileSync(path,html);
     touched++;
