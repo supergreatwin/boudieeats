@@ -36,7 +36,7 @@ function page({arabic,base,view,supabaseUrl,supabasePublishableKey}){
  '<meta name="description" content="'+e(arabic?'سبع تجارب أصلية للأكل من بودي إيتس':'Seven independent food discovery experiences by Boudie Eats')+'">'+
  '<meta name="theme-color" content="#72253f"><link rel="canonical" href="https://boudieeats.com/'+prefix+'discover/'+(view==='home'?'':view+'/')+'">'+
  '<link rel="alternate" hreflang="en" href="'+enHref+'"><link rel="alternate" hreflang="ar-EG" href="'+arHref+'">'+
- '<link rel="stylesheet" href="'+base+'be-experiences.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
+ '<link rel="stylesheet" href="'+base+'be-experiences.css"><link rel="stylesheet" href="'+base+'be-experiences-refresh.css"></head><body data-view="'+view+'" data-base="'+base+'">'+
  '<header class="be-exp-top"><div class="be-exp-top-in"><a href="'+base+prefix+'" class="be-exp-logo">'+logo+'</a><nav>'+primaryNav+'</nav>'+switcher+'</div></header>'+
  '<div class="be-exp-page">'+nav+'<main id="be-exp-app" aria-live="polite"><p>'+(arabic?'جارٍ تحميل التجربة…':'Loading experience…')+'</p></main></div>'+
  '<footer class="be-exp-footer"><div><span>© Boudie Eats</span><span>'+(arabic?'الأكل حكايات.':'Food is a story.')+'</span></div></footer>'+
@@ -65,6 +65,8 @@ export function addBoudieExperiences({directory,basePath='/',supabaseUrl=bePubli
  }
  copyFileSync(new URL('./boudie-experiences-client.mjs',import.meta.url),join(directory,'be-experiences.js'));
  copyFileSync(new URL('./boudie-experiences.css',import.meta.url),join(directory,'be-experiences.css'));
+ copyFileSync(new URL('./member-submissions-client.mjs',import.meta.url),join(directory,'be-member-submissions.js'));
+ copyFileSync(new URL('./member-experiences-refresh.css',import.meta.url),join(directory,'be-experiences-refresh.css'));
  for(const arabic of [false,true]){
   const prefix=arabic?'ar/':'';
   for(const view of ['home',...routes]){
