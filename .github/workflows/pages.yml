@@ -49,6 +49,7 @@ jobs:
           node tools/verify-publishing.mjs
           node tools/verify-no-retired-brand.mjs
           node tools/verify-security-compliance.mjs
+          node tools/verify-discover-layout.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: boudieeats/dist
