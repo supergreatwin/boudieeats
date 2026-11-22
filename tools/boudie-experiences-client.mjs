@@ -19,11 +19,53 @@ const features=[
 const esc=(v)=>String(v??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=(label,url,secondary=false)=>'<a class="be-exp-action'+(secondary?' be-exp-outline':'')+'" href="'+esc(url)+'">'+esc(label)+'</a>';
 const eyebrow=(num)=>'<p class="be-exp-small">'+esc(lang('BOUDIE EATS · EXPERIENCE '+num,'بودي إيتس · تجربة '+num))+'</p>';
+let memberName='';
+const activityIcons={
+ 'mama-picks':'🍲','dish-finder':'🍝','city-guide':'📍',
+ 'gallery':'📸','spotlight':'👩‍🍳','passport':'🎟️','food-lab':'🧪'
+};
 function home(){
- return '<section class="be-exp-hero"><div><p class="be-exp-small">'+lang('FOOD, THE BOUDIE WAY','الأكل على طريقة بودي')+'</p><h1>'+lang('Good food deserves a good story.','كل أكلة وراها حكاية.')+'</h1><p>'+lang('Seven new ways to discover dishes, places, people and your own appetite. Built independently for Boudie Eats.','سبع طرق جديدة تكتشف بيها أكلات وأماكن وناس وذوقك أنت في الأكل. كلها من بودي إيتس.')+'</p>'+link(lang('Start exploring','ابدأ الاستكشاف'),path('dish-finder'))+'</div><aside class="be-exp-hero-side"><strong>07</strong><p>'+lang('Experiences designed to connect original reviews, recipes and community contributions.','تجارب تجمع المراجعات والوصفات والمساهمات الأصلية.')+'</p></aside></section><section><p class="be-exp-small">'+lang('EXPLORE ALL SEVEN','استكشف السبع تجارب')+'</p><div class="be-exp-grid">'+features.map(x=>'<a class="be-exp-card" href="'+path(x.key)+'"><span class="number">'+x.number+'</span><h2>'+esc(lang(x.en,x.ar))+'</h2><p>'+esc(lang(x.de,x.da))+'</p><span class="arrow" aria-hidden="true">↗</span></a>').join('')+'</div></section><section class="be-exp-box be-exp-box--burgundy"><h2>'+lang('Our editorial promise','وعدنا التحريري')+'</h2><p>'+lang('Every published photograph, recommendation and creator story will need an original or properly licensed source and an editorial review. The city guide displays only approved venue records; listings remain limited while editorial review continues.','كل صورة وترشيح وحكاية هتتنشر لازم يكون مصدرها أصلي أو مرخص ويتراجع تحريرياً. دليل المدن بيعرض الأماكن المتراجعة بس، وممكن الأماكن تفضل محدودة لحد ما المراجعة تكتمل.')+'</p></section>';
+ const greeting=memberName?lang('Welcome back, ','منوّرنا يا ')+esc(memberName):lang('Welcome to your table.','نورت سفرتنا!');
+ const cards=features.map((x,i)=>
+  '<a class="be-exp-member-card be-exp-member-card--'+esc(x.key)+'" href="'+path(x.key)+'">'+
+   '<span class="be-exp-member-icon" aria-hidden="true">'+activityIcons[x.key]+'</span>'+
+   '<span class="be-exp-member-number">'+x.number+' / 07</span>'+
+   '<h2>'+esc(lang(x.en,x.ar))+'</h2>'+
+   '<p>'+esc(lang(x.de,x.da))+'</p>'+
+   '<span class="be-exp-member-go" aria-hidden="true">↗</span>'+
+  '</a>').join('');
+ return '<div class="be-exp-member-home">'+
+  '<section class="be-exp-member-welcome" aria-labelledby="be-member-welcome-title">'+
+   '<div class="be-exp-member-welcome-copy">'+
+    '<span class="be-exp-member-eyebrow">'+lang('YOUR SPACE AT BOUDIE EATS','مكانك في بودي إيتس')+'</span>'+
+    '<h1 id="be-member-welcome-title">'+greeting+'</h1>'+
+    '<p>'+lang('Pull up a chair. Follow a craving, find a new food story, or discover what kind of eater you are. There’s always something good on the table.','اقعد معانا على السفرة. دور على أكلة نفسك فيها، اكتشف حكاية جديدة، أو شوف ذوقك في الأكل عامل إزاي. هنا دايمًا في حاجة حلوة تتجرب.')+'</p>'+
+    '<div class="be-exp-member-welcome-actions">'+
+     link(lang('What should I eat?','آكل إيه النهارده؟'),path('dish-finder'))+
+     link(lang('My account','حسابي'),base+(ar?'ar/':'')+'account/',true)+
+    '</div>'+
+   '</div>'+
+   '<div class="be-exp-member-welcome-visual" aria-hidden="true">'+
+    '<img src="'+base+(ar?'ar/':'')+'media/vermicelli-oven.webp" alt="" loading="eager" decoding="async">'+
+    '<span class="be-exp-member-sticker">'+lang('MADE WITH APPETITE','معمول بنفس حلو')+'</span>'+
+   '</div>'+
+  '</section>'+
+  '<section class="be-exp-member-choices" aria-labelledby="be-member-choices-title">'+
+   '<div class="be-exp-member-choices-head"><div>'+
+    '<span class="be-exp-member-eyebrow">'+lang('A LITTLE SOMETHING FOR EVERY APPETITE','لكل مزاج أكلة')+'</span>'+
+    '<h2 id="be-member-choices-title">'+lang('Where shall we start?','هنبدأ منين؟')+'</h2>'+
+   '</div><p>'+lang('Seven ways to make food more fun.','سبع طرق نخلي بيها الأكل أحلى.')+'</p></div>'+
+   '<div class="be-exp-member-grid">'+cards+'</div>'+
+  '</section>'+
+  '<section class="be-exp-member-bottom" aria-label="'+lang('Your food journey','رحلتك مع الأكل')+'">'+
+   '<div><strong>'+lang('A little adventurous today?','نفسك تجرّب حاجة مختلفة؟')+'</strong>'+
+   '<p>'+lang('Take the food personality quiz and see where your taste takes you.','جرّب اختبار شخصية الأكل وشوف ذوقك هيوديك فين.')+'</p></div>'+
+   link(lang('Try the food lab','جرّب معمل الأكل'),path('food-lab'))+
+  '</section>'+
+ '</div>';
 }
 function standard(title,copy,num,body){
- return '<section class="be-exp-section">'+eyebrow(num)+'<h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p>'+body+'</section>';
+ return '<section class="be-exp-section be-exp-section--fresh"><div class="be-exp-section-intro"><div class="be-exp-section-intro-copy">'+eyebrow(num)+'<h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p><a class="be-exp-back" href="'+path('home')+'">'+lang('← Member home','← الرئيسية للأعضاء')+'</a></div><div class="be-exp-section-motif" aria-hidden="true">'+(Object.values(activityIcons)[Math.max(0,Math.min(6,Number(num)-1))])+'</div></div><div class="be-exp-section-content">'+body+'</div></section>';
 }
 const empty=(title,copy)=>'<div class="be-exp-empty"><strong>'+esc(title)+'</strong><p>'+esc(copy)+'</p></div>';
 function mama(){
@@ -269,6 +311,12 @@ async function bootDiscover(){
   const {data:sessionData}=await discoverAuthClient.auth.getSession();
   if(!sessionData?.session?.access_token){showDiscoverSignIn();return;}
   discoverAuthClient.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){discoverAuthClient=null;showDiscoverSignIn();}});
+  if(slug==='home'){
+   try{
+    const {data:profile,error:profileError}=await discoverAuthClient.from('be_profiles').select('display_name,username').eq('id',data.user.id).maybeSingle();
+    if(!profileError)memberName=String(profile?.display_name||profile?.username||'').trim().slice(0,40);
+   }catch{memberName='';}
+  }
   root.innerHTML=(render[slug]||home)();
   bindDiscoverControls();
   await loadApprovedContent();
