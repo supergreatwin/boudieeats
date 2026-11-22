@@ -52,8 +52,7 @@ function homepage(html, base, ar) {
     '</h2><div class="be-feature-grid">' + featured + '</div></section>' +
     '<section class="be-home-newsletter" aria-labelledby="be-news-title">' +
     '<div><h2 id="be-news-title">' + (ar ? 'جواب من بودي' : 'The Boudie Letter') +
-    '</h2><p>' + (ar ? 'وصفات وتجارب أكل وحكايات، في جواب يوصلّك.' :
-    'Recipes, food notes and stories, delivered as a letter.') + '</p></div>' +
+    '</h2></div>' +
     '<button type="button" data-be-letter-open>' +
     (ar ? 'اشترك في الجواب' : 'Join the letter') + '</button></section>' +
     // Retain the authenticated Discover deep link required by account routing
@@ -72,6 +71,34 @@ function homepage(html, base, ar) {
     throw new Error('Newsletter popup was lost during homepage reduction');
   }
   return pageClass(html, 'minimal-home');
+}
+
+// One small, useful footer on every public page; no repeated account or signup links.
+function compactFooter(html, base, ar) {
+  const route = base + (ar ? 'ar/' : '');
+  const labels = ar ? {
+    contact: 'كلّم بودي', privacy: 'الخصوصية',
+    terms: 'شروط الاستخدام', cookies: 'الكوكيز', links: 'روابط مهمة'
+  } : {
+    contact: 'Contact Boudie', privacy: 'Privacy',
+    terms: 'Terms', cookies: 'Cookies', links: 'Useful links'
+  };
+  const wordmark = ar
+    ? '<span class="be-footer-arabic-logo" lang="ar">بودي إيتس<span class="be-footer-gold-dot">.</span></span>'
+    : '<img src="' + base + 'media/boudieeats-wordmark-cream-gold-v2.svg" alt="boudieeats." width="204" height="40" loading="lazy">';
+  const markup = '<footer class="be-compact-footer">' +
+    '<div class="be-footer-row">' +
+    '<a class="be-footer-logo" href="' + route + '" aria-label="' +
+      (ar ? 'بودي إيتس — الرئيسية' : 'Boudie Eats — home') + '">' + wordmark + '</a>' +
+    '<nav class="be-footer-links" aria-label="' + labels.links + '">' +
+      '<a href="' + route + 'contact/">' + labels.contact + '</a>' +
+      '<a href="' + route + 'privacy/">' + labels.privacy + '</a>' +
+      '<a href="' + route + 'terms/">' + labels.terms + '</a>' +
+      '<a href="' + route + 'cookies/">' + labels.cookies + '</a>' +
+    '</nav></div>' +
+    '<div class="be-footer-copyright" dir="ltr">© boudieeats.</div>' +
+  '</footer>';
+  return html.replace(/<footer\b[^>]*class="[^"]*\b(?:footer|site-footer|be-exp-footer)\b[^"]*"[^>]*>[\s\S]*?<\/footer>/gi, markup);
 }
 
 function recipes(html, ar) {
@@ -152,6 +179,7 @@ export function applyBoudieMinimalLayout({directory,basePath='/'}) {
     if (route==='recipes/index.html') html=recipes(html,ar);
     if (route==='reviews/index.html') html=reviews(html,ar);
     if (route==='about/index.html') html=about(html);
+    html=compactFooter(html,base,ar);
     html=html.replace('</head>','<link rel="stylesheet" href="' + base + 'be-minimal.css">'+
       '<script defer src="' + base + 'be-minimal-interactions.js"></script></head>');
     writeFileSync(path,html);
