@@ -207,15 +207,105 @@ html[data-be-layout="about-page"] .page-intro .page-headline h1 {
 html[data-be-layout="about-page"] .page-intro .page-headline .eyebrow,
 html[data-be-layout="about-page"] .page-intro .page-headline .page-dek {display:none!important}
 html[data-be-layout="about-page"] .about-body {padding-top:8px!important}
-/* Compact footer, without hiding legal, contact or accessibility links. */
-.site-footer,body>footer {height:auto!important;min-height:0!important;
-  padding-block:clamp(18px,2.5vw,32px)!important}
-.site-footer .shell,.site-footer .footer-inner,body>footer>.shell,
-.site-footer .footer-main,.site-footer .footer-bottom {
-  min-height:0!important;padding-block:8px!important;margin-block:0!important;gap:clamp(9px,1.4vw,16px)!important;
+/* Justified reading copy across English and Arabic, not interface labels.
+   Last lines remain natural: we do not stretch single-line notices or links. */
+main :is(p,li,blockquote,dd),
+.be-exp-main :is(p,li,blockquote,dd),
+.be-exp-content :is(p,li,blockquote,dd) {
+  text-align:justify!important;
+  text-align-last:start!important;
+  text-justify:inter-word;
+  overflow-wrap:break-word;
+  hyphens:auto;
 }
-.site-footer :is(p,ul,nav),body>footer :is(p,ul,nav) {margin-block:6px!important}
-.site-footer h2,.site-footer h3,body>footer h2,body>footer h3 {margin-block:4px 10px!important}
+html[lang^="ar"] main :is(p,li,blockquote,dd),
+html[lang^="ar"] .be-exp-main :is(p,li,blockquote,dd) {hyphens:none;}
+/* Hero and short editorial labels remain centered rather than stretched. */
+.be-home-welcome :is(.be-welcome-kicker,.be-welcome-copy) {
+  text-align:center!important;text-align-last:center!important;
+}
+/* A modest newsletter invitation, not a second tall footer. */
+.be-home-newsletter {
+  min-height:0!important;height:auto!important;max-height:none!important;
+  margin:0!important;
+  padding:18px max(24px,calc((100% - 1240px)/2))!important;
+  gap:16px!important;
+}
+.be-home-newsletter h2 {
+  margin:0!important;
+  color:var(--be-brand-cream)!important;
+  font-size:clamp(1.22rem,2vw,1.75rem)!important;
+}
+.be-home-newsletter button {min-height:42px;padding:9px 18px;}
+/* Compact, purposeful, two-row footer. No account or duplicated menus. */
+html body footer.be-compact-footer {
+  box-sizing:border-box!important;
+  width:100%!important;
+  display:block!important;
+  height:auto!important;min-height:0!important;max-height:none!important;
+  margin:0!important;
+  padding:20px max(24px,calc((100% - 1240px)/2)) 12px!important;
+  background:var(--be-brand-burgundy-dark)!important;
+  color:var(--be-brand-cream)!important;
+  text-align:start!important;
+  border-top:1px solid rgba(255,250,242,.2);
+}
+.be-compact-footer *,
+.be-compact-footer *::before,
+.be-compact-footer *::after {box-sizing:border-box;}
+.be-compact-footer .be-footer-row {
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  flex-wrap:wrap!important;gap:14px 26px!important;
+  padding:0!important;margin:0!important;min-height:0!important;
+}
+.be-compact-footer .be-footer-logo {
+  display:inline-flex!important;align-items:center!important;
+  width:auto!important;height:auto!important;
+  border:0!important;text-decoration:none!important;
+  color:var(--be-brand-cream)!important;
+  padding:0!important;margin:0!important;
+}
+.be-compact-footer .be-footer-logo img {
+  display:block!important;width:clamp(150px,15vw,190px)!important;
+  height:auto!important;max-height:40px!important;object-fit:contain!important;
+}
+.be-compact-footer .be-footer-arabic-logo {
+  color:var(--be-brand-cream)!important;
+  font:700 1.95rem/1.2 "Aref Ruqaa",serif!important;
+  letter-spacing:0!important;
+}
+.be-compact-footer .be-footer-gold-dot {color:var(--be-brand-gold)!important;}
+.be-compact-footer .be-footer-links {
+  display:flex!important;align-items:center!important;
+  flex-wrap:wrap!important;justify-content:flex-end!important;
+  gap:8px clamp(13px,1.7vw,24px)!important;
+  padding:0!important;margin:0!important;
+  min-height:0!important;max-width:100%!important;
+  background:transparent!important;
+}
+.be-compact-footer .be-footer-links a {
+  color:var(--be-brand-cream)!important;
+  font:500 .86rem/1.35 "DM Sans",sans-serif!important;
+  white-space:nowrap!important;text-decoration:none!important;
+  background:none!important;border:0!important;
+  margin:0!important;padding:4px 0!important;
+}
+.be-compact-footer .be-footer-links a:hover {text-decoration:underline!important;text-underline-offset:4px!important;}
+.be-compact-footer a:focus-visible {outline:2px solid var(--be-brand-gold)!important;outline-offset:4px!important;}
+.be-compact-footer .be-footer-copyright {
+  margin:12px 0 0!important;padding:10px 0 0!important;
+  border-top:1px solid rgba(255,250,242,.22)!important;
+  min-height:0!important;line-height:1.3!important;
+  color:rgba(255,250,242,.8)!important;
+  font:400 .74rem/1.3 "DM Sans",sans-serif!important;
+  text-align:start!important;
+}
+html[lang^="ar"] .be-compact-footer .be-footer-links a {
+  font-family:"Lalezar",sans-serif!important;font-size:1.02rem!important;
+}
+html[lang^="ar"] .be-home-newsletter h2 {
+  font-family:"Aref Ruqaa",serif!important;
+}
 @media(max-width:1100px) {
   html[data-be-layout="recipe-index"] .entry-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
@@ -223,7 +313,9 @@ html[data-be-layout="about-page"] .about-body {padding-top:8px!important}
   .be-home-welcome {padding:64px 18px 68px!important}
   .be-home-welcome h1 {font-size:clamp(2.5rem,10vw,4.4rem)}
   .be-featured-recipes {width:calc(100% - 32px)}
-  .be-home-newsletter {padding:24px 16px!important;flex-wrap:wrap}
+  .be-home-newsletter {padding:16px!important;flex-wrap:wrap}
+  html body footer.be-compact-footer {padding:18px 16px 12px!important}
+  .be-compact-footer .be-footer-links {justify-content:flex-start!important}
   .be-review-side-layout {grid-template-columns:minmax(0,1fr)!important}
   .be-review-sidebar {position:static}
   html[data-be-layout="recipe-index"] .entry-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important}
