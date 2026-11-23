@@ -17,6 +17,7 @@ import { addBoudieExperiences } from './boudie-experiences-pages.mjs';
 import { launchBoudieDiscovery } from './launch-discovery.mjs';
 import { addMemberSession } from './member-session-pages.mjs';
 import { applyBoudieMinimalLayout } from './minimal-layout.mjs';
+import { repairRecipeStructuredData } from './repair-recipe-schema.mjs';
 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -136,6 +137,8 @@ addMemberSession({ directory: dist, basePath: originalBase,
 finishResponsiveLayout({ directory: dist });
 // Keep the shared Boudie Eats palette and compact editorial page layouts consistent.
 applyBoudieMinimalLayout({ directory: dist, basePath: originalBase });
+// Preserve authentic content while repairing bilingual Recipe JSON-LD and step links.
+repairRecipeStructuredData({ directory: dist });
 // Cancelled collaboration routes and assets are deliberately not generated.
 // Ship the original supplied logo artwork as a shared English/Arabic asset.
 mkdirSync(join(dist, 'media'), { recursive: true });
