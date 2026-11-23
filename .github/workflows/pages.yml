@@ -41,8 +41,8 @@ jobs:
           SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           BE_SUPABASE_URL: ${{ vars.BE_SUPABASE_URL }}
           BE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.BE_SUPABASE_PUBLISHABLE_KEY }}
-      - name: Inspect recipe structured data
-        run: node tools/inspect-recipe-data.mjs
+      - name: Verify recipe SEO structured data
+        run: node tools/verify-recipe-schema.mjs
       - name: Verify bilingual accounts
         run: |
           node tools/verify-english.mjs
